@@ -74,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Center(child: Text('Area 2')),
                           ),
                         ),
+                        SizedBox(height: 10.0,),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
@@ -85,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                   ),
+                  SizedBox(width: 10.0,),
                   Expanded(
                     child: Column(
                       children: [
@@ -96,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Center(child: Text('Area 4')),
                           ),
                         ),
+                        SizedBox(height: 10.0,),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
