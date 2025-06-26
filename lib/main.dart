@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'petchose.dart';
+import 'itemlist.dart';
 
 void main() {
   runApp(const MyApp());
@@ -61,6 +62,10 @@ class SubArea extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle button press
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ItemlistPage()),
+                      );
                     },
                     child: Center(child: Text('Area 3')),
                   ),
@@ -135,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Colors.lightGreen[100],
-              child: Subarea(),
+              child: SubArea(),
               // SubArea()로 변경
               ),
             ),

@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 
-class Mainarea1 extends StatelessWidget {
-  const Mainarea1({super.key});
+class Mainarea2 extends StatelessWidget {
+  const Mainarea2({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.lightBlue[100],
-      child: Center(child: Text('펫을 선택해주세요')),
+      child: Center(child: Text('Main Area')),
     );
   }
 }
 
-class Subarea1 extends StatelessWidget {
-  const Subarea1({super.key});
+class Subarea2 extends StatelessWidget {
+  const Subarea2({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(8.0),
+              color: Colors.lightBlue[50],
+              child: Center(child: Text('타이틀바')  
+              )
+            ),
+          ),
+          SizedBox(height: 10.0,),
           Expanded(
             child: ElevatedButton(
               onPressed: () {
@@ -37,13 +46,31 @@ class Subarea1 extends StatelessWidget {
               child: Center(child: Text('펫 2')),
             ),
           ),
+          SizedBox(height: 10.0,),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                // Handle button press
+              },
+              child: Center(child: Text('펫 3')),
+            ),
+          ),
+          SizedBox(height: 10.0,),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                // Handle button press
+              },
+              child: Center(child: Text('펫 4')),
+            ),
+          ),
         ],
       );
   }
 }
 
-class TutorialPage extends StatelessWidget {
-  const TutorialPage({super.key});
+class ItemlistPage extends StatelessWidget {
+  const ItemlistPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,18 +79,18 @@ class TutorialPage extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Container(
               color: Colors.lightBlue[100],
-              child: Mainarea1(),
+              child: Mainarea2(),
             ),
           ),
           Expanded(
-            flex: 4,
+            flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Colors.lightGreen[100],
-              child: Subarea1(),
+              child: Subarea2(),
               ),
             ),
         ],
