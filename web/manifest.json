@@ -1,6 +1,6 @@
 {
-    "name": "sampleapp",
-    "short_name": "sampleapp",
+    "name": "taskmate",
+    "short_name": "taskmate",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

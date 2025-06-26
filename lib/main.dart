@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'petchose.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +18,82 @@ class MyApp extends StatelessWidget {
       ),
       home: const MyHomePage(title: 'Virtual Pet'),
     );
+  }
+}
+
+class Mainarea extends StatelessWidget {
+  const Mainarea({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.lightBlue[100],
+      child: Center(child: Text('Main Area')),
+    );
+  }
+}
+
+class SubArea extends StatelessWidget {
+  const SubArea({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle button press
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TutorialPage()),
+                      );
+                    },
+                    child: Center(child: Text('Area 2')),
+                  ),
+                ),
+                SizedBox(height: 10.0,),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle button press
+                    },
+                    child: Center(child: Text('Area 3')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 10.0,),
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle button press
+                    },
+                    child: Center(child: Text('Area 4')),
+                  ),
+                ),
+                SizedBox(height: 10.0,),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle button press
+                    },
+                    child: Center(child: Text('Area 5')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
   }
 }
 
@@ -42,16 +119,15 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter layout example'),
-      ),
+      appBar: AppBar(),
       body: Column(
         children: [
           Expanded(
             flex: 4,
             child: Container(
               color: Colors.lightBlue[100],
-              child: Center(child: Text('Area 1')),
+              child: Mainarea(),
+              // MainArea()로 변경
             ),
           ),
           Expanded(
@@ -59,58 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Colors.lightGreen[100],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Handle button press
-                            },
-                            child: Center(child: Text('Area 2')),
-                          ),
-                        ),
-                        SizedBox(height: 10.0,),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Handle button press
-                            },
-                            child: Center(child: Text('Area 3')),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 10.0,),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Handle button press
-                            },
-                            child: Center(child: Text('Area 4')),
-                          ),
-                        ),
-                        SizedBox(height: 10.0,),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Handle button press
-                            },
-                            child: Center(child: Text('Area 5')),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                ),
+              child: Subarea(),
+              // SubArea()로 변경
               ),
             ),
         ],
