@@ -6,8 +6,13 @@ class Mainarea1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.lightBlue[100],
-      child: Center(child: Text('펫을 선택해주세요')),
+      color: Colors.purple[100],
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.all(8.0),
+          child: Text(
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            '함께할 펫을 선택해주세요!',))),
     );
   }
 }
@@ -25,7 +30,11 @@ class Subarea1 extends StatelessWidget {
               onPressed: () {
                 // Handle button press
               },
-              child: Center(child: Text('펫 1')),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[100],
+              ),
+              child: Center(
+                child: Image.asset("assets/images/dragon.png", fit: BoxFit.cover, height: 100.0, width: 100.0)),
             ),
           ),
           SizedBox(height: 10.0,),
@@ -34,7 +43,22 @@ class Subarea1 extends StatelessWidget {
               onPressed: () {
                 // Handle button press
               },
-              child: Center(child: Text('펫 2')),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[100],
+              ),
+              child: Center(child: Image.asset("assets/images/unicon.png", fit: BoxFit.cover, height: 100.0, width: 100.0)),
+            ),
+          ),
+          SizedBox(height: 10.0,),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                // Handle button press
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue[100],
+              ),
+              child: Center(child: Image.asset("assets/images/unicon.png", fit: BoxFit.cover, height: 100.0, width: 100.0)),
             ),
           ),
         ],
@@ -42,8 +66,8 @@ class Subarea1 extends StatelessWidget {
   }
 }
 
-class TutorialPage extends StatelessWidget {
-  const TutorialPage({super.key});
+class PetChoose extends StatelessWidget {
+  const PetChoose({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +78,8 @@ class TutorialPage extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Container(
-              color: Colors.lightBlue[100],
+              padding: EdgeInsets.all(20.0),
+              color: Colors.white,
               child: Mainarea1(),
             ),
           ),
@@ -62,7 +87,7 @@ class TutorialPage extends StatelessWidget {
             flex: 4,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.lightGreen[100],
+              color: Colors.grey[100],
               child: Subarea1(),
               ),
             ),
