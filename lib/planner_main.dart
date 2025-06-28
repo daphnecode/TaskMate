@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:planner/task.dart';
+import 'task.dart';
 import 'planner_edit.dart';
-import 'package:planner/statistics.dart';
+import 'statistics.dart';
 
 
 void main() {
