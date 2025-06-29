@@ -62,11 +62,6 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
 
             const SizedBox(height: 16),
 
-            // 📆 선택된 날짜 출력
-            Text(
-              "${_selectedDate.year} / ${_selectedDate.month.toString().padLeft(2, '0')} / ${_selectedDate.day.toString().padLeft(2, '0')}",
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
 
             const SizedBox(height: 16),
 
@@ -76,6 +71,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
               child: TodayEditBox(
                 taskList: taskList,
                 onTaskListUpdated: _updateTaskList,
+                selectedDate: _selectedDate,
               ),
             ),
           ],

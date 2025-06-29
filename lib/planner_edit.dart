@@ -362,16 +362,18 @@ class ChecklistItemEdit extends StatelessWidget {
   }
 }
 
-//일일 리스트 편집
+
 // 일일 리스트 편집
 class TodayEditBox extends StatefulWidget {
   final List<Task> taskList;
   final void Function(List<Task>) onTaskListUpdated;
+  final DateTime? selectedDate;
 
   const TodayEditBox({
     Key? key,
     required this.taskList,
     required this.onTaskListUpdated,
+    this.selectedDate,
   }) : super(key: key);
 
   @override
@@ -410,6 +412,10 @@ class _TodayEditBoxState extends State<TodayEditBox> {
 
   @override
   Widget build(BuildContext context) {
+    String formattedDate = widget.selectedDate !=null
+        ? "${widget.selectedDate!.year} / ${widget.selectedDate!.month.toString().padLeft(2, '0')} / ${widget.selectedDate!.day.toString().padLeft(2, '0')}"
+        : "2025/00/00";
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       margin: const EdgeInsets.only(bottom: 8),
@@ -423,7 +429,7 @@ class _TodayEditBoxState extends State<TodayEditBox> {
               TextButton(
                 onPressed: () {},
                 child: Text(
-                  '2025/00/00',
+                  formattedDate,
                   style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
                 ),
               ),
