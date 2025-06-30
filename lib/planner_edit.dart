@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
-import 'task.dart';
-import 'daily_edit.dart';
+import 'package:planner/task.dart';
+import 'package:planner/daily_edit.dart';
 
 
 class PlannerEditPage extends StatefulWidget {
@@ -12,6 +12,10 @@ class PlannerEditPage extends StatefulWidget {
 }
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
+
+  bool showFullRepeat =false;
+  bool showFullToday = false;
+
   List<Task> repeatTaskList = [
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
@@ -52,7 +56,27 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
           },
         )
       ]),
-      body: SingleChildScrollView(
+      body: showFullRepeat
+          ? ReapeatEditFullScreen(
+        tasklist: repeatTaskList,
+        onTaskAListUpdated: updateRepeatTasks,
+        onCollapse: () {
+          setState(() {
+            showFullRepeat = false;
+          });
+        },
+      )
+          : showFullToday
+          ? TodayEditFullScreen(
+        taskList: todayTaskList,
+        onTaskListUpdated: updateTodayTasks,
+        onCollapse: () {
+          setState(() {
+            showFullToday = false;
+          });
+        },
+      )
+          : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -60,15 +84,26 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
               RepeatEditBox(
                 taskList: repeatTaskList,
                 onTaskListUpdated: updateRepeatTasks,
+                onExpand: () {
+                  setState(() {
+                    showFullRepeat = true;
+                  });
+                },
               ),
               TodayEditBox(
-                  taskList: todayTaskList,
-                  onTaskListUpdated: updateTodayTasks,
+                taskList: todayTaskList,
+                onTaskListUpdated: updateTodayTasks,
+                onExpand: () {
+                  setState(() {
+                    showFullToday = true;
+                  });
+                },
               ),
             ],
           ),
         ),
       ),
+
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
         child: Padding(
@@ -109,11 +144,13 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
 class RepeatEditBox extends StatefulWidget {
   final List<Task> taskList;
   final void Function(List<Task>) onTaskListUpdated;
+  final VoidCallback onExpand;
 
   const RepeatEditBox({
     Key? key,
     required this.taskList,
     required this.onTaskListUpdated,
+    required this.onExpand,
   }) : super(key: key);
 
   @override
@@ -163,10 +200,13 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () {},
-                child: Text(
-                  '반복해야 할 일',
-                  style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+                onPressed: widget.onExpand,
+                child: Row(
+                  children: const [
+                    Text('반복해야 할 일',
+                      style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                  ],
                 ),
               ),
             ],
@@ -363,16 +403,19 @@ class ChecklistItemEdit extends StatelessWidget {
 }
 
 
+
 // 일일 리스트 편집
 class TodayEditBox extends StatefulWidget {
   final List<Task> taskList;
   final void Function(List<Task>) onTaskListUpdated;
   final DateTime? selectedDate;
+  final VoidCallback onExpand;
 
   const TodayEditBox({
     Key? key,
     required this.taskList,
     required this.onTaskListUpdated,
+    required this.onExpand,
     this.selectedDate,
   }) : super(key: key);
 
@@ -412,7 +455,7 @@ class _TodayEditBoxState extends State<TodayEditBox> {
 
   @override
   Widget build(BuildContext context) {
-    String formattedDate = widget.selectedDate !=null
+    String formattedDate = widget.selectedDate != null
         ? "${widget.selectedDate!.year} / ${widget.selectedDate!.month.toString().padLeft(2, '0')} / ${widget.selectedDate!.day.toString().padLeft(2, '0')}"
         : "2025/00/00";
 
@@ -427,19 +470,19 @@ class _TodayEditBoxState extends State<TodayEditBox> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () {},
+                onPressed: widget.onExpand,
                 child: Text(
                   formattedDate,
-                  style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Checklist items', style: TextStyle(fontSize: 16)),
+              const Text('Checklist items', style: TextStyle(fontSize: 16)),
               OutlinedButton(
                 onPressed: _addTask,
                 style: OutlinedButton.styleFrom(
@@ -451,7 +494,7 @@ class _TodayEditBoxState extends State<TodayEditBox> {
               )
             ],
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           SizedBox(
             height: 140,
             child: ListView.builder(
@@ -480,6 +523,236 @@ class _TodayEditBoxState extends State<TodayEditBox> {
           ),
         ],
       ),
+    );
+  }
+}
+
+
+//반복 리스트 편집 확장
+class ReapeatEditFullScreen extends StatefulWidget {
+  final List<Task> tasklist;
+  final void Function(List<Task>) onTaskAListUpdated;
+  final VoidCallback onCollapse;
+
+  const ReapeatEditFullScreen({
+    required this.tasklist,
+    required this.onTaskAListUpdated,
+    required this.onCollapse,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ReapeatEditFullScreen> createState() => _ReapeatEditFullScreenState();
+}
+
+class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
+  late List<Task> _localTaskList;
+  @override
+  void initState() {
+    super.initState();
+    _localTaskList = List.from(widget.tasklist);
+  }
+
+  void _addTask() {
+    setState(() {
+      _localTaskList.add(Task(text: '할 일을 추가해보세요', isChecked: false, point: 0));
+      widget.onTaskAListUpdated(_localTaskList);
+    });
+  }
+
+  void _removeTask(int index) {
+    setState(() {
+      _localTaskList.removeAt(index);
+      widget.onTaskAListUpdated(_localTaskList);
+    });
+  }
+
+  void _updateTaskText(int index, String newText) {
+    setState(() {
+      _localTaskList[index] = _localTaskList[index].copyWith(text: newText);
+      widget.onTaskAListUpdated(_localTaskList);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // 제목과 접기 버튼
+        TextButton(
+          onPressed: widget.onCollapse,
+          child: Row(
+            children: const [
+              Text('반복해야 할 일', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              Icon(Icons.expand_less),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Checklist items', style: TextStyle(fontSize: 16)),
+              OutlinedButton(
+                onPressed: _addTask,
+                style: OutlinedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  side: const BorderSide(color: Colors.blue, width: 2),
+                  padding: const EdgeInsets.all(8),
+                ),
+                child: const Icon(Icons.add, color: Colors.blue),
+              )
+            ],
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: ListView.builder(
+              itemCount: _localTaskList.length,
+              itemBuilder: (context, index) {
+                final task = _localTaskList[index];
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(text: task.text),
+                        onChanged: (newText) => _updateTaskText(index, newText),
+                        decoration: const InputDecoration(border: InputBorder.none),
+                        autofocus: index == _localTaskList.length - 1,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => _removeTask(index),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// 일일 리스트 편집 확장
+class TodayEditFullScreen extends StatefulWidget {
+  final List<Task> taskList;
+  final void Function(List<Task>) onTaskListUpdated;
+  final VoidCallback onCollapse;
+  final DateTime? selectedDate;
+
+  const TodayEditFullScreen({
+    Key? key,
+    required this.taskList,
+    required this.onTaskListUpdated,
+    required this.onCollapse,
+    this.selectedDate,
+  }) : super(key: key);
+
+  @override
+  State<TodayEditFullScreen> createState() => _TodayEditFullScreenState();
+}
+
+class _TodayEditFullScreenState extends State<TodayEditFullScreen> {
+  late List<Task> _localTaskList;
+
+  @override
+  void initState() {
+    super.initState();
+    _localTaskList = List.from(widget.taskList);
+  }
+
+  void _addTask() {
+    setState(() {
+      _localTaskList.add(Task(text: '할 일을 추가해보세요', isChecked: false, point: 0));
+      widget.onTaskListUpdated(_localTaskList);
+    });
+  }
+
+  void _removeTask(int index) {
+    setState(() {
+      _localTaskList.removeAt(index);
+      widget.onTaskListUpdated(_localTaskList);
+    });
+  }
+
+  void _updateTaskText(int index, String newText) {
+    setState(() {
+      _localTaskList[index] = _localTaskList[index].copyWith(text: newText);
+      widget.onTaskListUpdated(_localTaskList);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String formattedDate = widget.selectedDate != null
+        ? "${widget.selectedDate!.year} / ${widget.selectedDate!.month.toString().padLeft(2, '0')} / ${widget.selectedDate!.day.toString().padLeft(2, '0')}"
+        : "2025/00/00";
+
+    return Column(
+      children: [
+        TextButton(
+          onPressed: widget.onCollapse,
+          child: Row(
+            children: [
+              Text(
+                formattedDate,
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const Icon(Icons.expand_less),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Checklist items', style: TextStyle(fontSize: 16)),
+              OutlinedButton(
+                onPressed: _addTask,
+                style: OutlinedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  side: const BorderSide(color: Colors.blue, width: 2),
+                  padding: const EdgeInsets.all(8),
+                ),
+                child: const Icon(Icons.add, color: Colors.blue),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: ListView.builder(
+              itemCount: _localTaskList.length,
+              itemBuilder: (context, index) {
+                final task = _localTaskList[index];
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(text: task.text),
+                        onChanged: (newText) => _updateTaskText(index, newText),
+                        decoration: const InputDecoration(border: InputBorder.none),
+                        autofocus: index == _localTaskList.length - 1,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => _removeTask(index),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

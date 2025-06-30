@@ -65,15 +65,18 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
 
             const SizedBox(height: 16),
 
-            // ✅ 일일 리스트 편집 박스
+
+            // 일일 리스트 편집 박스
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TodayEditBox(
                 taskList: taskList,
                 onTaskListUpdated: _updateTaskList,
                 selectedDate: _selectedDate,
+                onExpand: () {}, // ✅ 이거 추가! 확장 기능 필요 없으면 빈 함수로
               ),
             ),
+
           ],
         ),
       ),
