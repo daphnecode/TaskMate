@@ -1,146 +1,23 @@
 import 'package:flutter/material.dart';
-import 'petchoose.dart';
+import 'petmain.dart';
 
-class Mainarea2 extends StatelessWidget {
-  const Mainarea2({super.key});
+class Item {
+  final Image icon;
+  final String name;
+  final int count;
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          color: Colors.white10,
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold), 
-                      "LV 13",),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
-                      ],
-                    )
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(Icons.question_mark,),
-                        onPressed: () {
-                          // Handle back button press
-                        },
-                        )
-                      ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
-                      ],
-                    )
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: GestureDetector(
-            onLongPress: () {
-              // Handle long press
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PetChoose()),
-              );
-            },
-            child: Container(
-              color: Colors.white,
-              child: Center(child: Text('Main Area')),
-          ),),
-        ),
-      ],
-    );
-  }
-}
-
-class Subarea2 extends StatelessWidget {
-  const Subarea2({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Colors.lightBlue[100],
-              child: Center(child: Text('타이틀바')  
-              )
-            ),
-          ),
-          SizedBox(height: 10.0,),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-              },
-              child: Center(child: Text('펫 1')),
-            ),
-          ),
-          SizedBox(height: 10.0,),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-              },
-              child: Center(child: Text('펫 2')),
-            ),
-          ),
-          SizedBox(height: 10.0,),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-              },
-              child: Center(child: Text('펫 3')),
-            ),
-          ),
-          SizedBox(height: 10.0,),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-              },
-              child: Center(child: Text('펫 4')),
-            ),
-          ),
-        ],
-      );
-  }
+  Item({required this.icon, required this.name, required this.count});
 }
 
 class ItemlistPage extends StatelessWidget {
-  const ItemlistPage({super.key});
+  final void Function(int) onNext;
+  ItemlistPage({required this.onNext, super.key});
+  
+  final List<Item> items = [
+    Item(icon: Image.asset("assets/icons/icon-soup.png"), name: '버섯 수프', count: 5),
+    Item(icon: Image.asset("assets/icons/icon-strawberry.png"), name: '딸기', count: 3),
+    Item(icon: Image.asset("assets/icons/icon-cupcake.png"), name: '푸딩', count: 2),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +29,7 @@ class ItemlistPage extends StatelessWidget {
             flex: 4,
             child: Container(
               color: Colors.white,
-              child: Mainarea2(),
+              child: Mainarea(),
             ),
           ),
           Expanded(
@@ -160,12 +37,33 @@ class ItemlistPage extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Colors.grey[100],
-              child: Subarea2(),
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return ListTile(
+                    leading: item.icon,
+                    title: Text(item.name, style: TextStyle(fontSize: 18)),
+                    trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
+                  );
+                },
               ),
             ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          // Handle bottom navigation bar tap
+          if (index == 0) {
+            // Navigate to planner
+          } else if (index == 1) {
+            // Navigate to home
+            onNext(0); // Call onNext to switch to ItemlistPage
+          } else if (index == 2) {
+            // Navigate to settings
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month),

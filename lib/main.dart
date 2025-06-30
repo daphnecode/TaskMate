@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'itemlist.dart';
 import 'petmain.dart';
 
 void main() {
@@ -31,58 +32,34 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
+  int _currentIndex = 0;
+  
+  void goNext(int index) {
     setState(() {
-      _selectedIndex = index;
+      _currentIndex = index;
     });
   }
 
-  // 화면 내용은 여기에 따라 달라질 수 있음
   @override
   Widget build(BuildContext context) {
+    Widget currentWidget;
+    
+    switch (_currentIndex) {
+        case 0:
+          currentWidget = Petmain(onNext: goNext);
+          break;
+        case 1:
+          currentWidget = ItemlistPage(onNext: goNext);
+          break;
+        case 2:
+          currentWidget = Icon(Icons.star);
+          break;
+        default:
+          currentWidget = Text('기본');
+    }
+    
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 4,
-            child: Container(
-              color: Colors.white,
-              child: Mainarea(),
-              // MainArea()로 변경
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: SubArea(),
-              // SubArea()로 변경
-              ),
-            ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
-    );
+      body:currentWidget
+    );  
   }
 }

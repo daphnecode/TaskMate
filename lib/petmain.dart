@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'petchoose.dart';
 import 'itemlist.dart';
 
-class Mainarea extends StatelessWidget {
+class Mainarea extends StatefulWidget {
   const Mainarea({super.key});
 
+  @override
+  State<Mainarea> createState() => _MainareaState();
+}
+
+class _MainareaState extends State<Mainarea> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -75,7 +80,23 @@ class Mainarea extends StatelessWidget {
             },
             child: Container(
               color: Colors.white,
-              child: Center(child: Text('Main Area')),
+              child: Stack(
+                children: [
+                  Image.asset(
+                    "assets/images/beach.png", 
+                    fit: BoxFit.cover, 
+                    height: double.infinity, width: double.infinity
+                    ),
+                  Positioned(
+                    left: 150.0, top: 150.0,
+                    child: Image.asset(
+                      "assets/images/dragon.png", 
+                      fit: BoxFit.cover, 
+                      height: 180.0, width: 180.0
+                    ),
+                  ),
+                ],
+              ),
           ),),
         ),
       ],
@@ -83,12 +104,32 @@ class Mainarea extends StatelessWidget {
   }
 }
 
-class SubArea extends StatelessWidget {
-  const SubArea({super.key});
+class Petmain extends StatelessWidget {
+  final void Function(int) onNext;
+  const Petmain({required this.onNext, super.key});
+
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    
+    return Scaffold(
+      appBar: AppBar(),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Container(
+              color: Colors.white,
+              child: Mainarea(),
+              // MainArea()로 변경
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
@@ -97,11 +138,7 @@ class SubArea extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle button press
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ItemlistPage()),
-                      );
+                     onNext(1); // Navigate to ItemlistPage
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[100],
@@ -132,10 +169,7 @@ class SubArea extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle button press
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ItemlistPage()),
-                      );
+                      onNext(1); // Navigate to ItemlistPage
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[100],
@@ -159,6 +193,39 @@ class SubArea extends StatelessWidget {
             ),
           ),
         ],
-      );
+      ),
+              // SubArea()로 변경
+              ),
+            ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          // Handle bottom navigation bar tap
+          if (index == 0) {
+            // Navigate to planner
+          } else if (index == 1) {
+            // Navigate to home
+            onNext(0); // Call onNext to switch to ItemlistPage
+          } else if (index == 2) {
+            // Navigate to settings
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: 'planner',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'setting',
+          ),
+        ],
+      ),
+    );
   }
 }
