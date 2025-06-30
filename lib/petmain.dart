@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'petchoose.dart';
-import 'itemlist.dart';
 
-class Mainarea extends StatefulWidget {
-  const Mainarea({super.key});
+class Mainarea extends StatelessWidget {
+  final void Function(int) onNext;
+  const Mainarea({required this.onNext, super.key});
 
-  @override
-  State<Mainarea> createState() => _MainareaState();
-}
-
-class _MainareaState extends State<Mainarea> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -29,11 +23,11 @@ class _MainareaState extends State<Mainarea> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
-                      Icon(Icons.heart_broken,),
+                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
                       ],
                     )
                   ),
@@ -56,11 +50,11 @@ class _MainareaState extends State<Mainarea> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
-                      Icon(Icons.apple,),
+                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
                       ],
                     )
                   ),
@@ -73,10 +67,7 @@ class _MainareaState extends State<Mainarea> {
           child: GestureDetector(
             onLongPress: () {
               // Handle long press
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PetChoose()),
-              );
+              onNext(2); // Navigate to PetChoose
             },
             child: Container(
               color: Colors.white,
@@ -120,7 +111,7 @@ class Petmain extends StatelessWidget {
             flex: 4,
             child: Container(
               color: Colors.white,
-              child: Mainarea(),
+              child: Mainarea(onNext: onNext,),
               // MainArea()로 변경
             ),
           ),

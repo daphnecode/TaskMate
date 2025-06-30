@@ -67,7 +67,8 @@ class Subarea1 extends StatelessWidget {
 }
 
 class PetChoose extends StatelessWidget {
-  const PetChoose({super.key});
+  final void Function(int) onNext;
+  const PetChoose({required this.onNext, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +95,17 @@ class PetChoose extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          // Handle bottom navigation bar tap
+          if (index == 0) {
+            // Navigate to planner
+          } else if (index == 1) {
+            // Navigate to home
+            onNext(0); // Call onNext to switch to ItemlistPage
+          } else if (index == 2) {
+            // Navigate to settings
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month),

@@ -29,7 +29,7 @@ class ItemlistPage extends StatelessWidget {
             flex: 4,
             child: Container(
               color: Colors.white,
-              child: Mainarea(),
+              child: Mainarea(onNext: onNext,),
             ),
           ),
           Expanded(

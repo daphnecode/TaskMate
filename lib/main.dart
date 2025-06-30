@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'itemlist.dart';
 import 'petmain.dart';
+import 'petchoose.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
           currentWidget = ItemlistPage(onNext: goNext);
           break;
         case 2:
-          currentWidget = Icon(Icons.star);
+          currentWidget = PetChoose(onNext: goNext);
           break;
         default:
           currentWidget = Text('기본');
