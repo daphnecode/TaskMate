@@ -440,8 +440,12 @@ class ItemCategory extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Handle button press
-                                onNext(4); // Navigate to ItemlistPage
+                                Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ItemlistPage2(onNext: onNext,),
+                                ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -463,8 +467,12 @@ class ItemCategory extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Handle button press
-                                onNext(5); // Navigate to ItemlistPage
+                                Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ItemlistPage3(onNext: onNext,),
+                                ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -481,8 +489,12 @@ class ItemCategory extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Handle button press
-                                onNext(6);
+                                Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ItemlistPage4(onNext: onNext,),
+                                ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],

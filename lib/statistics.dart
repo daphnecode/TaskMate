@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
 import 'package:pie_chart/pie_chart.dart';
 
 class StatisticsPage extends StatelessWidget {

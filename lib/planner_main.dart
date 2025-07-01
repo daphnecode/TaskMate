@@ -235,7 +235,7 @@ class _PlannerMainState extends State<PlannerMain> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const PlannerEditPage(),
+                          builder: (context) => PlannerEditPage(onNext: onNext,),
                         ),
                       );
                     },

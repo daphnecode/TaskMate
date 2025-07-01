@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
 import 'task.dart';
 import 'daily_edit.dart';
 
 
 class PlannerEditPage extends StatefulWidget {
-  const PlannerEditPage({Key? key}) : super(key: key);
+  final void Function(int) onNext;
+  const PlannerEditPage({required this.onNext, super.key});
+  
 
   @override
-  _PlannerEditPageState createState() => _PlannerEditPageState();
+  _PlannerEditPageState createState() => _PlannerEditPageState(onNext: onNext);
 }
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
+  final void Function(int) onNext;
+  _PlannerEditPageState({required this.onNext});
 
   bool showFullRepeat =false;
   bool showFullToday = false;
@@ -118,7 +121,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const PlannerEditPage(),
+                        builder: (context) => PlannerEditPage(onNext: onNext,),
                       ),
                     );
                   },
@@ -126,7 +129,9 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
               ),
               IconButton(
                 icon: Icon(Icons.home),
-                onPressed: () {},
+                onPressed: () {
+                  onNext(0); // 홈으로 이동
+                },
               ),
               IconButton(
                 icon: Icon(Icons.settings),
