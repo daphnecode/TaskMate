@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
-import 'package:planner/task.dart';
-import 'package:planner/daily_edit.dart';
+import 'task.dart';
+import 'daily_edit.dart';
 
 
 class PlannerEditPage extends StatefulWidget {

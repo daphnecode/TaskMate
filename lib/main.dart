@@ -50,10 +50,22 @@ class _MyHomePageState extends State<MyHomePage> {
           currentWidget = Petmain(onNext: goNext);
           break;
         case 1:
-          currentWidget = ItemlistPage(onNext: goNext);
+          currentWidget = ItemCategory(onNext: goNext);
           break;
         case 2:
           currentWidget = PetChoose(onNext: goNext);
+          break;
+        case 3:
+          currentWidget = ItemlistPage1(onNext: goNext);
+          break;
+        case 4:
+          currentWidget = ItemlistPage2(onNext: goNext);
+          break;
+        case 5:
+          currentWidget = ItemlistPage3(onNext: goNext);
+          break;
+        case 6:
+          currentWidget = ItemlistPage4(onNext: goNext);
           break;
         default:
           currentWidget = Text('기본');

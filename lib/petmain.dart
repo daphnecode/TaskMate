@@ -120,72 +120,138 @@ class Petmain extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Colors.grey[100],
-              child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                     onNext(1); // Navigate to ItemlistPage
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                  onNext(1); // Navigate to ItemlistPage
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue[100],
+                                  ),
+                                  child: Center(
+                                    child: Text("창고", style: TextStyle(fontSize: 16)),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 0, top: 0,
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.blueAccent,
+                                    radius: 35,
+                                    child: Image.asset(
+                                      "assets/icons/icon-list-alt.png", 
+                                      fit: BoxFit.fill, width: 50, height: 50
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 10.0,),
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                  onNext(1); // Navigate to ItemlistPage
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue[100],
+                                  ),
+                                  child: Center(
+                                    child: Text("상점", style: TextStyle(fontSize: 16)),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 0, top: 0,
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.blueAccent,
+                                    radius: 35,
+                                    child: Image.asset(
+                                      "assets/icons/icon-store.png", 
+                                      fit: BoxFit.fill, width: 50, height: 50
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Center(child: Text('Area 2')),
-                  ),
-                ),
-                SizedBox(height: 10.0,),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Handle button press
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
+                    SizedBox(height: 10.0,),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    // Handle button press
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue[100],
+                                  ),
+                                  child: Center(
+                                    child: Text("청소", style: TextStyle(fontSize: 16)),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 0, top: 0,
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.blueAccent,
+                                    radius: 35,
+                                    child: Image.asset(
+                                      "assets/icons/icon-paintbrush.png", 
+                                      fit: BoxFit.fill, width: 50, height: 50
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 10.0,),
+                          Expanded(
+                            child:Stack(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                  onNext(1); // Navigate to ItemlistPage
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue[100],
+                                  ),
+                                  child: Center(
+                                    child: Text("놀이", style: TextStyle(fontSize: 16)),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 0, top: 0,
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.blueAccent,
+                                    radius: 35,
+                                    child: Image.asset(
+                                      "assets/icons/icon-raceflag.png", 
+                                      fit: BoxFit.fill, width: 50, height: 50
+                                    ),
+                                  ), 
+                                ),
+                              ],
+                            )
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Center(child: Text('Area 3')),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          SizedBox(width: 10.0,),
-          Expanded(
-            child: Column(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Handle button press
-                      onNext(1); // Navigate to ItemlistPage
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
-                    ),
-                    child: Center(child: Text('Area 4')),
-                  ),
-                ),
-                SizedBox(height: 10.0,),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Handle button press
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[100],
-                    ),
-                    child: Center(child: Text('Area 5')),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-              // SubArea()로 변경
               ),
             ),
         ],
