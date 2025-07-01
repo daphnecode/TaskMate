@@ -418,7 +418,12 @@ class ItemCategory extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                              onNext(3); // Navigate to ItemlistPage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ItemlistPage1(onNext: onNext,),
+                                ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -436,7 +441,7 @@ class ItemCategory extends StatelessWidget {
                             child: ElevatedButton(
                               onPressed: () {
                                 // Handle button press
-                                onNext(5); // Navigate to ItemlistPage
+                                onNext(4); // Navigate to ItemlistPage
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -459,7 +464,7 @@ class ItemCategory extends StatelessWidget {
                             child: ElevatedButton(
                               onPressed: () {
                                 // Handle button press
-                                onNext(4); // Navigate to ItemlistPage
+                                onNext(5); // Navigate to ItemlistPage
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],

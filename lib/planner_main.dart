@@ -3,19 +3,18 @@ import 'task.dart';
 import 'planner_edit.dart';
 import 'statistics.dart';
 
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class PlannerMain extends StatefulWidget {
+  final void Function(int) onNext;
+  const PlannerMain({required this.onNext,super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<PlannerMain> createState() => _PlannerMainState(onNext: onNext);
 }
 
-class _MyAppState extends State<MyApp> {
+class _PlannerMainState extends State<PlannerMain> {
+  final void Function(int) onNext;
+  _PlannerMainState({required this.onNext});
+
   List<Task> repeatTaskList = [
     Task(text: '할 일 추가해보세요', isChecked: true, point: 0),
     Task(text: '할 일 추가해보세요', isChecked: false, point: 0),
@@ -244,7 +243,9 @@ class _MyAppState extends State<MyApp> {
                 ),
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {},
+                  onPressed: () {
+                    onNext(0); // Call onNext to switch to ItemlistPage
+                  },
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),

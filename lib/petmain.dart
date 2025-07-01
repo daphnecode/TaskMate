@@ -81,7 +81,7 @@ class Mainarea extends StatelessWidget {
                   Positioned(
                     left: 150.0, top: 150.0,
                     child: Image.asset(
-                      "assets/images/dragon.png", 
+                      "assets/images/unicon.png", 
                       fit: BoxFit.cover, 
                       height: 180.0, width: 180.0
                     ),
@@ -224,7 +224,7 @@ class Petmain extends StatelessWidget {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
-                                  onNext(1); // Navigate to ItemlistPage
+                                    // Handle button press
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue[100],
@@ -261,6 +261,7 @@ class Petmain extends StatelessWidget {
           // Handle bottom navigation bar tap
           if (index == 0) {
             // Navigate to planner
+            onNext(3); // Call onNext to switch to PlannerMain
           } else if (index == 1) {
             // Navigate to home
             onNext(0); // Call onNext to switch to ItemlistPage
