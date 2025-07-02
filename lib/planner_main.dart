@@ -13,6 +13,8 @@ class PlannerMain extends StatefulWidget {
 
 class _PlannerMainState extends State<PlannerMain> {
   final void Function(int) onNext;
+  bool isEditMode = false;
+
   _PlannerMainState({required this.onNext});
 
   List<Task> repeatTaskList = [
@@ -88,6 +90,15 @@ class _PlannerMainState extends State<PlannerMain> {
 
   @override
   Widget build(BuildContext context) {
+    if (isEditMode){
+      return PlannerEditPage(
+        onBackToMain: () {
+          setState(() {
+            isEditMode = false;
+          });
+        }
+      );
+    }
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -110,16 +121,39 @@ class _PlannerMainState extends State<PlannerMain> {
           actions: [
             TextButton(
               onPressed: () {
-                setState(() {
-                  _isSubmitted = true;
-                });
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: const Text('정말 제출하겠습니까?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            setState(() {
+                              _isSubmitted = true;
+                            });
+                          },
+                          child: const Text('예'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('아니요'),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
-              child: Text(
+              child: const Text(
                 '제출',
                 style: TextStyle(color: Colors.black),
               ),
             )
           ],
+
         ),
         body: showFullRepeat
             ? RepeatTaskFullScreen(
@@ -224,22 +258,17 @@ class _PlannerMainState extends State<PlannerMain> {
         bottomNavigationBar: BottomAppBar(
           color: Colors.white,
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Builder( // ✅ context 재정의!
-                  builder: (context) => IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PlannerEditPage(),
-                        ),
-                      );
-                    },
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () {
+                    setState(() {
+                      isEditMode = true; // 편집모드 전환
+                    });
+                  },
                 ),
                 IconButton(
                   icon: Icon(Icons.home),

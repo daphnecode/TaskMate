@@ -5,7 +5,9 @@ import 'daily_edit.dart';
 
 
 class PlannerEditPage extends StatefulWidget {
-  const PlannerEditPage({Key? key}) : super(key: key);
+  final VoidCallback onBackToMain;
+
+  const PlannerEditPage({Key? key,required this.onBackToMain}) : super(key: key);
 
   @override
   _PlannerEditPageState createState() => _PlannerEditPageState();
@@ -50,7 +52,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const DailyTaskEditPage(),
+                  builder: (context) => DailyTaskEditPage(),
             ),
             );// 일일 리스트 편집 이동
           },
@@ -115,14 +117,10 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
                 builder: (context) => IconButton(
                   icon: Icon(Icons.calendar_month),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PlannerEditPage(),
-                      ),
-                    );
+                    widget.onBackToMain();
                   },
                 ),
+
               ),
               IconButton(
                 icon: Icon(Icons.home),
