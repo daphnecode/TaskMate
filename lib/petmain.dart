@@ -108,7 +108,7 @@ class Petmain extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
@@ -116,7 +116,7 @@ class Petmain extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Colors.grey[100],
@@ -160,7 +160,7 @@ class Petmain extends StatelessWidget {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
-                                  onNext(1); // Navigate to ItemlistPage
+                                  onNext(5); // Navigate to ItemlistPage
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue[100],

@@ -262,6 +262,7 @@ class _PlannerMainState extends State<PlannerMain> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+<<<<<<< HEAD
                 IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
@@ -269,6 +270,20 @@ class _PlannerMainState extends State<PlannerMain> {
                       isEditMode = true; // 편집모드 전환
                     });
                   },
+=======
+                Builder( // ✅ context 재정의!
+                  builder: (context) => IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PlannerEditPage(onNext: onNext,),
+                        ),
+                      );
+                    },
+                  ),
+>>>>>>> 05d37471a85305ad38e565f91e842852908bb4f4
                 ),
                 IconButton(
                   icon: Icon(Icons.home),

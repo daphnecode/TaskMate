@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
 import 'task.dart';
 import 'daily_edit.dart';
 
 
 class PlannerEditPage extends StatefulWidget {
+<<<<<<< HEAD
   final VoidCallback onBackToMain;
 
   const PlannerEditPage({Key? key,required this.onBackToMain}) : super(key: key);
+=======
+  final void Function(int) onNext;
+  const PlannerEditPage({required this.onNext, super.key});
+  
+>>>>>>> 05d37471a85305ad38e565f91e842852908bb4f4
 
   @override
-  _PlannerEditPageState createState() => _PlannerEditPageState();
+  _PlannerEditPageState createState() => _PlannerEditPageState(onNext: onNext);
 }
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
+  final void Function(int) onNext;
+  _PlannerEditPageState({required this.onNext});
 
   bool showFullRepeat =false;
   bool showFullToday = false;
@@ -117,14 +124,25 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
                 builder: (context) => IconButton(
                   icon: Icon(Icons.calendar_month),
                   onPressed: () {
+<<<<<<< HEAD
                     widget.onBackToMain();
+=======
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PlannerEditPage(onNext: onNext,),
+                      ),
+                    );
+>>>>>>> 05d37471a85305ad38e565f91e842852908bb4f4
                   },
                 ),
 
               ),
               IconButton(
                 icon: Icon(Icons.home),
-                onPressed: () {},
+                onPressed: () {
+                  onNext(0); // 홈으로 이동
+                },
               ),
               IconButton(
                 icon: Icon(Icons.settings),

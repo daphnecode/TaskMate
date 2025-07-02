@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'planner_main.dart';
+import 'planner_edit.dart';
 import 'itemlist.dart';
 import 'petmain.dart';
 import 'petchoose.dart';
@@ -58,6 +59,12 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
         case 3:
           currentWidget = PlannerMain(onNext: goNext);
+          break;
+        case 4:
+          currentWidget = PlannerEditPage(onNext: goNext);
+          break;
+        case 5:
+          currentWidget = ShopCategory(onNext: goNext);
           break;
         default:
           currentWidget = Text('기본');
