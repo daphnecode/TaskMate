@@ -62,6 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
         case 4:
           currentWidget = PlannerEditPage(onNext: goNext);
+          break;
+        case 5:
+          currentWidget = ShopCategory(onNext: goNext);
+          break;
         default:
           currentWidget = Text('기본');
     }

@@ -160,7 +160,7 @@ class Petmain extends StatelessWidget {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
-                                  onNext(1); // Navigate to ItemlistPage
+                                  onNext(5); // Navigate to ItemlistPage
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue[100],
