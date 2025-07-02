@@ -27,12 +27,23 @@ class ItemlistPage1 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainareaaceholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -101,12 +112,23 @@ class ItemlistPage2 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -177,12 +199,23 @@ class ItemlistPage3 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -251,12 +284,23 @@ class ItemlistPage4 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -325,12 +369,23 @@ class ShoplistPage1 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -399,12 +454,23 @@ class ShoplistPage2 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -475,12 +541,23 @@ class ShoplistPage3 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -549,12 +626,23 @@ class ShoplistPage4 extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -617,13 +705,23 @@ class ItemCategory extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
               // MainArea()로 변경
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
@@ -778,13 +876,24 @@ class ShopCategory extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Container(
               color: Colors.white,
               child: Mainarea(onNext: onNext,),
               // MainArea()로 변경
             ),
           ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(8.0),
+              color: Colors.grey[100],
+              child: Text("아이템 목록", 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+            ),
+          ), // Placeholder for Mainarea
           Expanded(
             flex: 3,
             child: Container(
