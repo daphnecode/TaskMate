@@ -64,33 +64,34 @@ class ItemlistPage1 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -149,33 +150,34 @@ class ItemlistPage2 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -236,33 +238,34 @@ class ItemlistPage3 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -321,33 +324,34 @@ class ItemlistPage4 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -406,33 +410,34 @@ class ShoplistPage1 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -491,33 +496,34 @@ class ShoplistPage2 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -578,33 +584,34 @@ class ShoplistPage3 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -663,33 +670,34 @@ class ShoplistPage4 extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -834,33 +842,34 @@ class ItemCategory extends StatelessWidget {
             ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -1006,33 +1015,34 @@ class ShopCategory extends StatelessWidget {
             ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          // Handle bottom navigation bar tap
-          if (index == 0) {
-            // Navigate to planner
-          } else if (index == 1) {
-            // Navigate to home
-            onNext(0); // Call onNext to switch to ItemlistPage
-          } else if (index == 2) {
-            // Navigate to settings
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'planner',
+      bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {},
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'setting',
-          ),
-        ],
-      ),
+        ),
     );
   }
 }
