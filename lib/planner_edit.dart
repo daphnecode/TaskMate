@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'task.dart';
 import 'daily_edit.dart';
+import 'main.dart';
 
 
 class PlannerEditPage extends StatefulWidget {
-<<<<<<< HEAD
+
   final VoidCallback onBackToMain;
 
-  const PlannerEditPage({Key? key,required this.onBackToMain}) : super(key: key);
-=======
   final void Function(int) onNext;
-  const PlannerEditPage({required this.onNext, super.key});
-  
->>>>>>> 05d37471a85305ad38e565f91e842852908bb4f4
+  const PlannerEditPage({
+    required this.onNext,
+    required this.onBackToMain,
+    super.key});
 
   @override
   _PlannerEditPageState createState() => _PlannerEditPageState(onNext: onNext);
@@ -32,6 +32,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
   ];
 
   List<Task> todayTaskList = [
+    Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
   ];
@@ -124,16 +125,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
                 builder: (context) => IconButton(
                   icon: Icon(Icons.calendar_month),
                   onPressed: () {
-<<<<<<< HEAD
                     widget.onBackToMain();
-=======
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlannerEditPage(onNext: onNext,),
-                      ),
-                    );
->>>>>>> 05d37471a85305ad38e565f91e842852908bb4f4
                   },
                 ),
 

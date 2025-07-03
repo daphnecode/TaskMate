@@ -61,7 +61,14 @@ class _MyHomePageState extends State<MyHomePage> {
           currentWidget = PlannerMain(onNext: goNext);
           break;
         case 4:
-          currentWidget = PlannerEditPage(onNext: goNext);
+          currentWidget = PlannerEditPage(
+              onNext: goNext,
+              onBackToMain: () {
+                setState(() {
+                  _currentIndex = 3; //플래너 메인으로 돌아가기
+                });
+              },
+          );
           break;
         case 5:
           currentWidget = ShopCategory(onNext: goNext);
