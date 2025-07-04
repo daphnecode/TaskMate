@@ -35,12 +35,21 @@ class ItemlistPage1 extends StatelessWidget {
           ),
           Expanded(
             flex: 1,
-            child: Container(
+            child:Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-list-alt.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("창고 - 음식", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainareaaceholder for Mainarea
@@ -124,9 +133,18 @@ class ItemlistPage2 extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-list-alt.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("창고 - 장난감", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -212,9 +230,18 @@ class ItemlistPage3 extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-list-alt.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("창고 - 배경", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -298,9 +325,18 @@ class ItemlistPage4 extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-list-alt.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("창고 - 스타일", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -384,9 +420,26 @@ class ShoplistPage1 extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-store.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("상점 - 음식", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      child: Text("100pt", 
+                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -470,9 +523,26 @@ class ShoplistPage2 extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-store.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("상점 - 장난감", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      child: Text("100pt", 
+                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -558,9 +628,26 @@ class ShoplistPage3 extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-store.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("상점 - 배경", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      child: Text("100pt", 
+                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -644,9 +731,26 @@ class ShoplistPage4 extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-store.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("상점 - 스타일", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      child: Text("100pt", 
+                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -722,11 +826,21 @@ class ItemCategory extends StatelessWidget {
           ),
           Expanded(
             flex: 1,
-            child: Container(
+            child:Container(
+              alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-list-alt.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("창고", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
@@ -897,9 +1011,26 @@ class ShopCategory extends StatelessWidget {
             child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: Text("아이템 목록", 
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              color: Colors.blue,
+              child: Row(
+                children: [
+                  Image.asset(
+                    "assets/icons/icon-store.png", 
+                    width: 30, height: 30,
+                  ),
+                  SizedBox(width: 10.0,),
+                  Text("상점", 
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      child: Text("100pt", 
+                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ), // Placeholder for Mainarea
