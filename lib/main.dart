@@ -4,7 +4,7 @@ import 'planner_edit.dart';
 import 'itemlist.dart';
 import 'petmain.dart';
 import 'petchoose.dart';
-
+import 'task.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -36,6 +36,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
+
+  List<Task> repeatTaskList = [
+    Task(text: '반복할 일 1', isChecked: false, point: 0),
+    Task(text: '반복할 일 2', isChecked: true, point: 5),
+  ];
+
+  List<Task> todayTaskList = [
+    Task(text: '오늘 할 일 1', isChecked: false, point: 0),
+    Task(text: '오늘 할 일 2', isChecked: true, point: 10),
+  ];
   
   void goNext(int index) {
     setState(() {
@@ -68,6 +78,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   _currentIndex = 3; //플래너 메인으로 돌아가기
                 });
               },
+            repeatTaskList: repeatTaskList,
+            todayTaskList: todayTaskList,
+            onUpdateTasks: (updatedRepeat, updatedToday) {
+                setState(() {
+                  repeatTaskList = updatedRepeat;
+                  todayTaskList = updatedToday;
+                });
+            }
           );
           break;
         case 5:

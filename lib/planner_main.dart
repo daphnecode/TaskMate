@@ -94,6 +94,15 @@ class _PlannerMainState extends State<PlannerMain> {
     if (isEditMode){
       return PlannerEditPage(
         onNext: onNext,
+        repeatTaskList: repeatTaskList,
+        todayTaskList: todayTaskList,
+        onUpdateTasks: (updateRepeatLists, updateTodayList) {
+          setState(() {
+            repeatTaskList = updateRepeatLists;
+            todayTaskList = updateTodayList;
+            isEditMode = false;
+          });
+        },
         onBackToMain: () {
           setState(() {
             isEditMode = false;

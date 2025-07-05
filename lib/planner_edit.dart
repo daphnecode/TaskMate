@@ -7,24 +7,41 @@ import 'main.dart';
 class PlannerEditPage extends StatefulWidget {
 
   final VoidCallback onBackToMain;
-
   final void Function(int) onNext;
+  final List<Task> repeatTaskList;
+  final List<Task> todayTaskList;
+  final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList) onUpdateTasks;
+
   const PlannerEditPage({
     required this.onNext,
     required this.onBackToMain,
+    required this.repeatTaskList,
+    required this.todayTaskList,
+    required this.onUpdateTasks,
     super.key});
 
   @override
-  _PlannerEditPageState createState() => _PlannerEditPageState(onNext: onNext);
+  _PlannerEditPageState createState() => _PlannerEditPageState();
 }
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
+
+  late List<Task> repeatTaskList;
+  late List<Task> todayTaskList;
+  /*
   final void Function(int) onNext;
   _PlannerEditPageState({required this.onNext});
-
+*/
   bool showFullRepeat =false;
   bool showFullToday = false;
 
+  @override
+  void initState() {
+    super.initState(); // 부모 위젯으로부터 전달받은 리스트 복사
+    repeatTaskList = List.from(widget.repeatTaskList);
+    todayTaskList = List.from(widget.todayTaskList);
+  }
+/*
   List<Task> repeatTaskList = [
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
@@ -36,7 +53,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
     Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
   ];
-
+ */
   void updateRepeatTasks(List<Task> newTasks) {
     setState(() {
       repeatTaskList = newTasks;
@@ -48,6 +65,15 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       todayTaskList = updatedTasks;
     });
   }
+  void saveAndExitToMain() {
+    widget.onUpdateTasks(repeatTaskList, todayTaskList);
+    widget.onBackToMain();
+  } //플래너 메인으로 이동할 때
+
+  void saveAndGoHome() {
+    widget.onUpdateTasks(repeatTaskList, todayTaskList);
+    widget.onNext(0);
+  } // 펫 메인화면으로 이동할 때
 
 
   @override
@@ -124,17 +150,13 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
               Builder(
                 builder: (context) => IconButton(
                   icon: Icon(Icons.calendar_month),
-                  onPressed: () {
-                    widget.onBackToMain();
-                  },
+                  onPressed: saveAndExitToMain,
                 ),
 
               ),
               IconButton(
                 icon: Icon(Icons.home),
-                onPressed: () {
-                  onNext(0); // 홈으로 이동
-                },
+                onPressed: saveAndGoHome,
               ),
               IconButton(
                 icon: Icon(Icons.settings),
