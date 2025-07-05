@@ -71,22 +71,29 @@ class Mainarea extends StatelessWidget {
             },
             child: Container(
               color: Colors.white,
-              child: Stack(
-                children: [
-                  Image.asset(
-                    "assets/images/beach.png", 
-                    fit: BoxFit.cover, 
-                    height: double.infinity, width: double.infinity
-                    ),
-                  Positioned(
-                    left: 150.0, top: 150.0,
-                    child: Image.asset(
-                      "assets/images/unicon.png", 
-                      fit: BoxFit.cover, 
-                      height: 180.0, width: 180.0
-                    ),
-                  ),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  final height = constraints.maxHeight;
+
+                  return Stack(
+                    children: [
+                      Image.asset(
+                        "assets/images/beach.png", 
+                        fit: BoxFit.cover, 
+                        height: double.infinity, width: double.infinity
+                        ),
+                      Positioned(
+                        left: width * 0.4, top: height * 0.5,
+                        child: Image.asset(
+                          "assets/images/unicon.png", 
+                          fit: BoxFit.cover, 
+                          height: 180.0, width: 180.0
+                        ),
+                      ),
+                    ],
+                  );
+                }
               ),
           ),),
         ),
