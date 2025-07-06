@@ -1,0 +1,38 @@
+[
+  {
+    "icon": "mountains",
+    "name": "기본",
+    "count": 0,
+    "price": 0
+  },
+  {
+    "icon": "mountains",
+    "name": "초원",
+    "count": 0,
+    "price": 200
+  },
+  {
+    "icon": "mountains",
+    "name": "바다",
+    "count": 0,
+    "price": 300
+  },
+  {
+    "icon": "mountains",
+    "name": "구름",
+    "count": 0,
+    "price": 400
+  },
+  {
+    "icon": "mountains",
+    "name": "화산",
+    "count": 0,
+    "price": 500
+  },
+  {
+    "icon": "mountains",
+    "name": "야경",
+    "count": 0,
+    "price": 600
+  }
+]

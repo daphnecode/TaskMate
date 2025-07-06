@@ -1,0 +1,20 @@
+[
+  {
+    "icon": "pivotx",
+    "name": "기본",
+    "count": 0,
+    "price": 0
+  },
+  {
+    "icon": "pivotx",
+    "name": "버블 오라",
+    "count": 0,
+    "price": 150
+  },
+  {
+    "icon": "pivotx",
+    "name": "별빛 오라",
+    "count": 0,
+    "price": 200
+  }
+]

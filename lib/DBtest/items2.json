@@ -1,0 +1,20 @@
+[
+  {
+    "icon": "teddybear",
+    "name": "뼈다귀",
+    "count": 5,
+    "price": 100
+  },
+  {
+    "icon": "teddybear",
+    "name": "공",
+    "count": 3,
+    "price": 50
+  },
+  {
+    "icon": "teddybear",
+    "name": "낚싯대",
+    "count": 2,
+    "price": 150
+  }
+]
