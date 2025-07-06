@@ -1,0 +1,20 @@
+[
+  {
+    "icon": "soup",
+    "name": "버섯 수프",
+    "count": 5,
+    "price": 100
+  },
+  {
+    "icon": "strawberry",
+    "name": "딸기",
+    "count": 3,
+    "price": 50
+  },
+  {
+    "icon": "cupcake",
+    "name": "푸딩",
+    "count": 2,
+    "price": 150
+  }
+]

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
 import 'petmain.dart';
 
 class Item {
@@ -8,17 +10,61 @@ class Item {
   final int price;
 
   Item({required this.icon, required this.name, required this.count, required this.price});
+
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
+      icon: _imageFromString(json['icon']),
+      name: json['name'],
+      count: json['count'],
+      price: json['price'],
+    );
+  }
+
+  static Image _imageFromString(String iconName) {
+    switch (iconName) {
+      case 'soup':
+        return Image.asset("assets/icons/icon-soup.png");
+      case 'strawberry':
+        return Image.asset("assets/icons/icon-strawberry.png");
+      case 'cupcake':
+        return Image.asset("assets/icons/icon-cupcake.png");
+      default:
+        return Image.asset("assets/icons/icon-chicken.png");
+    }
+  }
 }
 
-class ItemlistPage1 extends StatelessWidget {
+class ItemlistPage1 extends StatefulWidget {
   final void Function(int) onNext;
   ItemlistPage1({required this.onNext, super.key});
-  
-  final List<Item> items1 = [
-    Item(icon: Image.asset("assets/icons/icon-soup.png"), name: '버섯 수프', count: 5, price: 100),
-    Item(icon: Image.asset("assets/icons/icon-strawberry.png"), name: '딸기', count: 3, price: 50),
-    Item(icon: Image.asset("assets/icons/icon-cupcake.png"), name: '푸딩', count: 2, price: 150),
-  ];
+
+  @override
+  State<ItemlistPage1> createState() => _ItemlistPage1State();
+}
+
+class _ItemlistPage1State extends State<ItemlistPage1> {
+  // final List<Item> items1 = [
+  //   Item(icon: Image.asset("assets/icons/icon-soup.png"), name: '버섯 수프', count: 5, price: 100),
+  //   Item(icon: Image.asset("assets/icons/icon-strawberry.png"), name: '딸기', count: 3, price: 50),
+  //   Item(icon: Image.asset("assets/icons/icon-cupcake.png"), name: '푸딩', count: 2, price: 150),
+  // ];
+  List<Item> items1 = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadItems();
+  }
+
+  Future<void> loadItems() async {
+    final String jsonStr = await rootBundle.loadString('lib/DBtest/items.json');
+    final List<dynamic> jsonData = json.decode(jsonStr);
+    final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
+
+    setState(() {
+      items1 = loadedItems;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +76,7 @@ class ItemlistPage1 extends StatelessWidget {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext,),
+              child: Mainarea(onNext: widget.onNext,),
             ),
           ),
           Expanded(
@@ -84,13 +130,13 @@ class ItemlistPage1 extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
-                    onNext(3); // Navigate to PlannerMain
+                    widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {onNext(0);
+                  onPressed: () {widget.onNext(0);
                   },
                 ),
                 IconButton(
