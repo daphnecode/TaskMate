@@ -1,18 +1,18 @@
 [
   {
-    "icon": "soup",
+    "icon": "assets/icons/icon-soup.png",
     "name": "버섯 수프",
     "count": 5,
     "price": 100
   },
   {
-    "icon": "strawberry",
+    "icon": "assets/icons/icon-strawberry.png",
     "name": "딸기",
     "count": 3,
     "price": 50
   },
   {
-    "icon": "cupcake",
+    "icon": "assets/icons/icon-cupcake.png",
     "name": "푸딩",
     "count": 2,
     "price": 150

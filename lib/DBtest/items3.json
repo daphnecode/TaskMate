@@ -1,36 +1,36 @@
 [
   {
-    "icon": "mountains",
+    "icon": "assets/icons/icon-mountains.png",
     "name": "기본",
     "count": 0,
     "price": 0
   },
   {
-    "icon": "mountains",
+    "icon": "assets/icons/icon-mountains.png",
     "name": "초원",
     "count": 0,
     "price": 200
   },
   {
-    "icon": "mountains",
+    "icon": "assets/icons/icon-mountains.png",
     "name": "바다",
     "count": 0,
     "price": 300
   },
   {
-    "icon": "mountains",
+    "icon": "assets/icons/icon-mountains.png",
     "name": "구름",
     "count": 0,
     "price": 400
   },
   {
-    "icon": "mountains",
+    "icon": "assets/icons/icon-mountains.png",
     "name": "화산",
     "count": 0,
     "price": 500
   },
   {
-    "icon": "mountains",
+    "icon": "assets/icons/icon-mountains.png",
     "name": "야경",
     "count": 0,
     "price": 600

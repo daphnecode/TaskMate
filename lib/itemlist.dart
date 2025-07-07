@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'petmain.dart';
 
 class Item {
-  final Image icon;
+  final String icon;
   final String name;
   final int count;
   final int price;
@@ -13,30 +13,11 @@ class Item {
 
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
-      icon: _imageFromString(json['icon']),
+      icon: json['icon'],
       name: json['name'],
       count: json['count'],
       price: json['price'],
     );
-  }
-
-  static Image _imageFromString(String iconName) {
-    switch (iconName) {
-      case 'soup':
-        return Image.asset("assets/icons/icon-soup.png");
-      case 'strawberry':
-        return Image.asset("assets/icons/icon-strawberry.png");
-      case 'cupcake':
-        return Image.asset("assets/icons/icon-cupcake.png");
-      case 'teddybear':
-        return Image.asset("assets/icons/icon-teddybear.png");
-      case 'mountains':
-        return Image.asset("assets/icons/icon-mountains.png");
-      case 'pivotx':
-        return Image.asset("assets/icons/icon-pivotx.png");
-      default:
-        return Image.asset("assets/icons/icon-chicken.png");
-    }
   }
 }
 
@@ -115,7 +96,34 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 itemBuilder: (context, index) {
                   final item = items1[index];
                   return ListTile(
-                    leading: item.icon,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 사용')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 사용하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('사용'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
                   );
@@ -205,7 +213,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 itemBuilder: (context, index) {
                   final item = items1[index];
                   return ListTile(
-                    leading: item.icon,
+                    leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                   );
@@ -323,7 +331,34 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                 itemBuilder: (context, index) {
                   final item = items2[index];
                   return ListTile(
-                    leading: item.icon,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 사용')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 사용하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('사용'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
                   );
@@ -412,7 +447,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   itemBuilder: (context, index) {
                     final item = items2[index];
                     return ListTile(
-                      leading: item.icon,
+                      leading: Image.asset(item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                     );
@@ -530,7 +565,34 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 itemBuilder: (context, index) {
                   final item = items3[index];
                   return ListTile(
-                    leading: item.icon,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 사용')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 사용하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('사용'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text(''),
                   );
@@ -619,7 +681,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 itemBuilder: (context, index) {
                   final item = items3[index];
                   return ListTile(
-                    leading: item.icon,
+                    leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                   );
@@ -738,7 +800,34 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 itemBuilder: (context, index) {
                   final item = items4[index];
                   return ListTile(
-                    leading: item.icon,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 사용')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 사용하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('사용'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text(''),
                   );
@@ -827,7 +916,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 itemBuilder: (context, index) {
                   final item = items4[index];
                   return ListTile(
-                    leading: item.icon,
+                    leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                   );
@@ -935,7 +1024,7 @@ class ItemCategory extends StatelessWidget {
                               child: Center(
                                 child: Image.asset(
                                   "assets/icons/icon-chicken.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),
@@ -956,7 +1045,7 @@ class ItemCategory extends StatelessWidget {
                               ),
                               child: Center(child: Image.asset(
                                   "assets/icons/icon-teddybear.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),
@@ -984,7 +1073,7 @@ class ItemCategory extends StatelessWidget {
                               child: Center(
                                 child: Image.asset(
                                   "assets/icons/icon-mountains.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),
@@ -1005,7 +1094,7 @@ class ItemCategory extends StatelessWidget {
                               ),
                               child: Center(child: Image.asset(
                                   "assets/icons/icon-pivotx.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),
@@ -1125,7 +1214,7 @@ class ShopCategory extends StatelessWidget {
                               child: Center(
                                 child: Image.asset(
                                   "assets/icons/icon-chicken.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),
@@ -1146,7 +1235,7 @@ class ShopCategory extends StatelessWidget {
                               ),
                               child: Center(child: Image.asset(
                                   "assets/icons/icon-teddybear.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),
@@ -1174,7 +1263,7 @@ class ShopCategory extends StatelessWidget {
                               child: Center(
                                 child: Image.asset(
                                   "assets/icons/icon-mountains.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),
@@ -1195,7 +1284,7 @@ class ShopCategory extends StatelessWidget {
                               ),
                               child: Center(child: Image.asset(
                                   "assets/icons/icon-pivotx.png", 
-                                  width: 50, height: 50
+                                  width: 30, height: 30
                                 ),
                               ),
                             ),

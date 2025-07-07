@@ -1,18 +1,18 @@
 [
   {
-    "icon": "pivotx",
+    "icon": "assets/icons/icon-pivotx.png",
     "name": "기본",
     "count": 0,
     "price": 0
   },
   {
-    "icon": "pivotx",
+    "icon": "assets/icons/icon-pivotx.png",
     "name": "버블 오라",
     "count": 0,
     "price": 150
   },
   {
-    "icon": "pivotx",
+    "icon": "assets/icons/icon-pivotx.png",
     "name": "별빛 오라",
     "count": 0,
     "price": 200
