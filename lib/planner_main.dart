@@ -6,6 +6,7 @@ import 'main.dart';
 
 class PlannerMain extends StatefulWidget {
   final void Function(int) onNext;
+
   const PlannerMain({required this.onNext,super.key});
 
   @override
@@ -15,6 +16,8 @@ class PlannerMain extends StatefulWidget {
 class _PlannerMainState extends State<PlannerMain> {
   final void Function(int) onNext;
   bool isEditMode = false;
+  Map<String, List<Task>> dailyTaskMap ={};
+  late DateTime selectedDate;
 
   _PlannerMainState({required this.onNext});
 
@@ -34,6 +37,11 @@ class _PlannerMainState extends State<PlannerMain> {
   bool showFullRepeat = false;
   bool showFullToday = false;
   bool _isSubmitted = false;
+
+  String _dateKey(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
 
   void toggleRepeatCheck(int index) {
     setState(() {
@@ -88,8 +96,23 @@ class _PlannerMainState extends State<PlannerMain> {
       );
     });
   }
+  void _syncTodayTaskWithMap() {
+    final key = _dateKey(selectedDate);
+    todayTaskList = dailyTaskMap[key] ?? [];
+  }
+
+  void _updateDailyTaskMap() {
+    final key = _dateKey(selectedDate);
+    dailyTaskMap[key] = todayTaskList;
+  }
+
 
   @override
+  void initState() {
+    super.initState();
+    selectedDate = DateTime.now();
+    _syncTodayTaskWithMap(); // 오늘 날짜와 일일 리스트 연동
+  }
   Widget build(BuildContext context) {
     if (isEditMode){
       return PlannerEditPage(
@@ -100,12 +123,23 @@ class _PlannerMainState extends State<PlannerMain> {
           setState(() {
             repeatTaskList = updateRepeatLists;
             todayTaskList = updateTodayList;
+
+            final key = _dateKey(selectedDate);
+            dailyTaskMap[key] = updateTodayList;
+
             isEditMode = false;
           });
         },
         onBackToMain: () {
           setState(() {
             isEditMode = false;
+          });
+        },
+        dailyTaskMap: dailyTaskMap,
+        selectedDate: selectedDate,
+        onDailyMapChanged: (newMap) {
+          setState(() {
+            dailyTaskMap = newMap;
           });
         }
       );

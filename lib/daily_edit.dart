@@ -4,7 +4,18 @@ import 'task.dart'; // Task 클래스 정의된 파일 import
 import 'planner_edit.dart'; // TodayEditBox 위젯 정의
 
 class DailyTaskEditPage extends StatefulWidget {
-  const DailyTaskEditPage({Key? key}) : super(key: key);
+
+  final Map<String, List<Task>> dailyTaskMap;
+  final DateTime selectedDate;
+  final void Function(Map<String, List<Task>>) onUpdateDailyTaskMap;
+
+
+  const DailyTaskEditPage({
+    required this.dailyTaskMap,
+    required this.selectedDate,
+    required this.onUpdateDailyTaskMap,
+    super.key,
+  });
 
   @override
   State<DailyTaskEditPage> createState() => _DailyTaskEditPageState();
@@ -12,7 +23,10 @@ class DailyTaskEditPage extends StatefulWidget {
 
 class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   DateTime _selectedDate = DateTime.now();
-  final Map<String, List<Task>> _dailyTaskMap = {};
+  Map<String, List<Task>> _dailyTaskMap = {};
+  late List<Task> taskList;
+
+
 
   // 날짜 키 문자열 (예: 2025-06-27)
   String _dateKey(DateTime date) {
@@ -20,19 +34,45 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   }
 
   // 할 일 업데이트
-  void _updateTaskList(List<Task> tasks) {
+  void _updateTaskList(List<Task> updatedList) {
+    final key = _dateKey(_selectedDate);
     setState(() {
-      _dailyTaskMap[_dateKey(_selectedDate)] = tasks;
+      _dailyTaskMap[key] = updatedList;
     });
+    widget.onUpdateDailyTaskMap(_dailyTaskMap); // 변경 즉시 상위에도 반영
   }
 
+
+  void _saveTasksForDate(DateTime date, List<Task> tasks) {
+    final key = _dateKey(date);
+    final updatedMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
+    updatedMap[key] = tasks;
+    widget.onUpdateDailyTaskMap(updatedMap); // PlannerMain 또는 PlannerEditPage에 반영
+  }
+
+
   @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.selectedDate;
+    _dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
+    taskList = List.from(_dailyTaskMap[_dateKey(_selectedDate)] ?? []);
+  }
   Widget build(BuildContext context) {
     List<Task> taskList = _dailyTaskMap[_dateKey(_selectedDate)] ?? [];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('일일 리스트 편집'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: () {
+              widget.onUpdateDailyTaskMap(_dailyTaskMap);
+              Navigator.pop(context);
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -70,10 +110,10 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TodayEditBox(
-                taskList: taskList,
+                taskList: _dailyTaskMap[_dateKey(_selectedDate)] ?? [],
                 onTaskListUpdated: _updateTaskList,
                 selectedDate: _selectedDate,
-                onExpand: () {}, // ✅ 이거 추가! 확장 기능 필요 없으면 빈 함수로
+                onExpand: () {},
               ),
             ),
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'task.dart';
 import 'daily_edit.dart';
 import 'main.dart';
+import 'package:intl/intl.dart';
 
 
 class PlannerEditPage extends StatefulWidget {
@@ -11,6 +12,10 @@ class PlannerEditPage extends StatefulWidget {
   final List<Task> repeatTaskList;
   final List<Task> todayTaskList;
   final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList) onUpdateTasks;
+  final Map<String, List<Task>> dailyTaskMap;
+  final DateTime selectedDate;
+  final void Function(Map<String, List<Task>>) onDailyMapChanged;
+
 
   const PlannerEditPage({
     required this.onNext,
@@ -18,6 +23,9 @@ class PlannerEditPage extends StatefulWidget {
     required this.repeatTaskList,
     required this.todayTaskList,
     required this.onUpdateTasks,
+    required this.dailyTaskMap,
+    required this.selectedDate,
+    required this.onDailyMapChanged,
     super.key});
 
   @override
@@ -26,8 +34,16 @@ class PlannerEditPage extends StatefulWidget {
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
 
+  String _dateKey(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+
   late List<Task> repeatTaskList;
   late List<Task> todayTaskList;
+  late DateTime selectedDate;
+  late Map<String, List<Task>> dailyTaskMap;
+
   /*
   final void Function(int) onNext;
   _PlannerEditPageState({required this.onNext});
@@ -40,6 +56,8 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     super.initState(); // 부모 위젯으로부터 전달받은 리스트 복사
     repeatTaskList = List.from(widget.repeatTaskList);
     todayTaskList = List.from(widget.todayTaskList);
+    selectedDate =widget.selectedDate;
+    dailyTaskMap =  Map<String, List<Task>>.from(widget.dailyTaskMap);
   }
 /*
   List<Task> repeatTaskList = [
@@ -66,6 +84,30 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     });
   }
   void saveAndExitToMain() {
+    final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
+    final key = _dateKey(widget.selectedDate);
+    newMap[key] = todayTaskList;
+
+    widget.onDailyMapChanged(newMap); // planner_main에 전달
+    widget.onUpdateTasks(repeatTaskList, todayTaskList);
+    widget.onBackToMain();
+  }
+
+  void saveAndGoHome() {
+    final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
+    final key = _dateKey(widget.selectedDate);
+    newMap[key] = todayTaskList;
+
+    widget.onDailyMapChanged(newMap);
+    widget.onUpdateTasks(repeatTaskList, todayTaskList);
+    widget.onNext(0);
+  }
+
+
+
+
+  /*
+  void saveAndExitToMain() {
     widget.onUpdateTasks(repeatTaskList, todayTaskList);
     widget.onBackToMain();
   } //플래너 메인으로 이동할 때
@@ -74,7 +116,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     widget.onUpdateTasks(repeatTaskList, todayTaskList);
     widget.onNext(0);
   } // 펫 메인화면으로 이동할 때
-
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +125,19 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
         IconButton(
           icon: Icon(Icons.calendar_today),
           onPressed: () {
+            final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
+            final key = _dateKey(widget.selectedDate);
+            newMap[key] = todayTaskList;
+
+            widget.onDailyMapChanged(newMap); // 최신화
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DailyTaskEditPage(),
+                  builder: (context) => DailyTaskEditPage(
+                    dailyTaskMap: widget.dailyTaskMap,
+                    selectedDate: widget.selectedDate,
+                    onUpdateDailyTaskMap: widget.onDailyMapChanged,
+                  ),
             ),
             );// 일일 리스트 편집 이동
           },
@@ -111,6 +162,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             showFullToday = false;
           });
         },
+        selectedDate: selectedDate,
       )
           : SingleChildScrollView(
         child: Padding(
@@ -134,6 +186,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
                     showFullToday = true;
                   });
                 },
+                selectedDate: selectedDate,
               ),
             ],
           ),
@@ -482,6 +535,16 @@ class _TodayEditBoxState extends State<TodayEditBox> {
       widget.onTaskListUpdated(_localTaskList);
     });
   }
+
+  @override
+  void didUpdateWidget(covariant TodayEditBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.taskList != widget.taskList) {
+      _localTaskList = List.from(widget.taskList); // 새로운 리스트로 갱신
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {

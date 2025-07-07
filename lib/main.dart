@@ -37,6 +37,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
 
+  Map<String, List<Task>> dailyTaskMap = {};
+  DateTime selectedDate = DateTime.now();
+  String _dateKey(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+
+
+
   List<Task> repeatTaskList = [
     Task(text: '반복할 일 1', isChecked: false, point: 0),
     Task(text: '반복할 일 2', isChecked: true, point: 5),
@@ -84,8 +93,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   repeatTaskList = updatedRepeat;
                   todayTaskList = updatedToday;
+                  final key = _dateKey(selectedDate);
+                  dailyTaskMap[key] = updatedToday;
                 });
-            }
+            },
+            dailyTaskMap: dailyTaskMap,
+            selectedDate: selectedDate,
+            onDailyMapChanged: (newMap) {
+                setState(() {
+                  dailyTaskMap = newMap;
+                });
+            },
           );
           break;
         case 5:
