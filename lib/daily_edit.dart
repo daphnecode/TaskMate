@@ -58,6 +58,8 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     _dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
     taskList = List.from(_dailyTaskMap[_dateKey(_selectedDate)] ?? []);
   }
+
+  @override
   Widget build(BuildContext context) {
     List<Task> taskList = _dailyTaskMap[_dateKey(_selectedDate)] ?? [];
 

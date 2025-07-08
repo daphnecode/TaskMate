@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'task.dart';
 import 'planner_edit.dart';
 import 'statistics.dart';
-import 'main.dart';
 
 class PlannerMain extends StatefulWidget {
   final void Function(int) onNext;
@@ -113,6 +112,7 @@ class _PlannerMainState extends State<PlannerMain> {
     selectedDate = DateTime.now();
     _syncTodayTaskWithMap(); // 오늘 날짜와 일일 리스트 연동
   }
+  @override
   Widget build(BuildContext context) {
     if (isEditMode){
       return PlannerEditPage(
