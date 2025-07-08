@@ -213,6 +213,33 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 itemBuilder: (context, index) {
                   final item = items1[index];
                   return ListTile(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 구매')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 구매하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('구매'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
@@ -447,6 +474,33 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   itemBuilder: (context, index) {
                     final item = items2[index];
                     return ListTile(
+                      onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 구매')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 구매하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('구매'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                       leading: Image.asset(item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
@@ -681,6 +735,33 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 itemBuilder: (context, index) {
                   final item = items3[index];
                   return ListTile(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 구매')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 구매하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('구매'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
@@ -916,6 +997,33 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 itemBuilder: (context, index) {
                   final item = items4[index];
                   return ListTile(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Center(child: Text('아이템 구매')),
+                          content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                SizedBox(height: 10),
+                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 구매하시겠습니까?', 
+                                style: TextStyle(fontSize: 16))),
+                              ],
+                            ),
+                          actions: [
+                            TextButton(
+                              child: Text('취소'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              child: Text('구매'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                     leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
