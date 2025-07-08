@@ -6,136 +6,174 @@ class Mainarea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          color: Colors.white10,
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold), 
-                      "LV 13",),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      ],
-                    )
-                  ),
-                ],
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(Icons.question_mark,),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Image.asset(
-                                        "assets/images/petTuto1.png",
-                                        height: 600.0,
-                                        width: 250.0,
-                                      ),
-                                      Text(
-                                        "펫 키우기 메인화면 입니다.",
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(height: 10.0),
-                                      Text(
-                                        "여러 기능을 사용할 수 있습니다.",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      SizedBox(height: 20.0),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text("닫기"),
-                                      ),
-                                    ],
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "펫 상태창입니다.",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10.0),
+                    Text(
+                      "펫의 세부상태와 통계를 확인할 수 있습니다.",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("닫기"),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            color: Colors.white10,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold), 
+                        "LV 13",),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        ],
+                      )
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          icon: Icon(Icons.question_mark,),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
                                   ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        )
-                      ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                      ],
-                    )
-                  ),
-                ],
-              ),
-            ],
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                          "assets/images/petTuto1.png",
+                                          height: 600.0,
+                                          width: 250.0,
+                                        ),
+                                        Text(
+                                          "펫 키우기 메인화면 입니다.",
+                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(height: 10.0),
+                                        Text(
+                                          "여러 기능을 사용할 수 있습니다.",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        SizedBox(height: 20.0),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("닫기"),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          )
+                        ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        ],
+                      )
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: GestureDetector(
-            onLongPress: () {
-              // Handle long press
-              onNext(2); // Navigate to PetChoose
-            },
-            child: Container(
-              color: Colors.white,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = constraints.maxWidth;
-                  final height = constraints.maxHeight;
-
-                  return Stack(
-                    children: [
-                      Image.asset(
-                        "assets/images/beach.png", 
-                        fit: BoxFit.cover, 
-                        height: double.infinity, width: double.infinity
-                        ),
-                      Positioned(
-                        left: width * 0.4, top: height * 0.5,
-                        child: Image.asset(
-                          "assets/images/unicon.png", 
+          Expanded(
+            child: GestureDetector(
+              onLongPress: () {
+                // Handle long press
+                onNext(2); // Navigate to PetChoose
+              },
+              child: Container(
+                color: Colors.white,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    final height = constraints.maxHeight;
+      
+                    return Stack(
+                      children: [
+                        Image.asset(
+                          "assets/images/beach.png", 
                           fit: BoxFit.cover, 
-                          height: 180.0, width: 180.0
+                          height: double.infinity, width: double.infinity
+                          ),
+                        Positioned(
+                          left: width * 0.4, top: height * 0.5,
+                          child: Image.asset(
+                            "assets/images/unicon.png", 
+                            fit: BoxFit.cover, 
+                            height: 180.0, width: 180.0
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                }
-              ),
-          ),),
-        ),
-      ],
+                      ],
+                    );
+                  }
+                ),
+            ),),
+          ),
+        ],
+      ),
     );
   }
 }
