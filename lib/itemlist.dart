@@ -29,9 +29,9 @@ class Item {
   };
 }
 
-Future<void> saveItemsToFile(List<Item> items) async {
+Future<void> saveItemsToFile(List<Item> items, int index) async {
   final directory = await getApplicationDocumentsDirectory();
-  final file = File('${directory.path}/items.json');
+  final file = File('${directory.path}/items$index.json');
 
   final jsonString = jsonEncode(items.map((e) => e.toJson()).toList());
 
@@ -57,13 +57,40 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
   @override
   void initState() {
     super.initState();
+    initJsonIfNotExists();
     loadItems();
     loadShop();
   }
 
+  Future<void> initJsonIfNotExists() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file1 = File('${dir.path}/items1.json');
+    final file2 = File('${dir.path}/items2.json');
+    final file3 = File('${dir.path}/items3.json');
+    final file4 = File('${dir.path}/items4.json');
+
+    if (!await file1.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
+      await file1.writeAsString(assetJson);
+    }
+    if (!await file2.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
+      await file2.writeAsString(assetJson);
+    }
+    if (!await file3.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
+      await file3.writeAsString(assetJson);
+    }
+    if (!await file4.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
+      await file4.writeAsString(assetJson);
+    }
+  }
+
+
   Future<void> loadItems() async {
     final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/items.json').readAsString();
+    String jsonStr = await File('${testDirectory.path}/items1.json').readAsString();    
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
 
@@ -154,7 +181,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   setState(() {
                                     item.count--;
                                   });
-                                  saveItemsToFile(inventory);
+                                  saveItemsToFile(inventory, 1);
                                 }
                                 Navigator.pop(context);
                                 },
@@ -275,12 +302,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                             TextButton(
                               child: Text('구매'),
                               onPressed: () {
-                                if(item.count > 0) {
-                                  setState(() {
-                                    item.count++;
-                                  });
-                                  saveItemsToFile(inventory);
-                                }
                                 Navigator.pop(context);
                                 },
                             ),
@@ -344,23 +365,64 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
   final void Function(int) onNext;
   final bool isUseItem;
   _ItemlistPage2State({required this.onNext, required this.isUseItem});
-  List<Item> items2 = [];
+  List<Item> inventory = [];
+  List<Item> shopList = [];
 
   @override
   void initState() {
     super.initState();
+    initJsonIfNotExists();
     loadItems();
+    loadShop();
   }
 
+  Future<void> initJsonIfNotExists() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file1 = File('${dir.path}/items1.json');
+    final file2 = File('${dir.path}/items2.json');
+    final file3 = File('${dir.path}/items3.json');
+    final file4 = File('${dir.path}/items4.json');
+
+    if (!await file1.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
+      await file1.writeAsString(assetJson);
+    }
+    if (!await file2.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
+      await file2.writeAsString(assetJson);
+    }
+    if (!await file3.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
+      await file3.writeAsString(assetJson);
+    }
+    if (!await file4.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
+      await file4.writeAsString(assetJson);
+    }
+  }
+
+
   Future<void> loadItems() async {
+    final testDirectory = await getApplicationDocumentsDirectory();
+    String jsonStr = await File('${testDirectory.path}/items2.json').readAsString();    
+    final List<dynamic> jsonData = json.decode(jsonStr);
+    final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
+
+    setState(() {
+      inventory = loadedItems;
+    });
+  }
+
+  Future<void> loadShop() async {
     final String jsonStr = await rootBundle.loadString('lib/DBtest/items2.json');
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
 
     setState(() {
-      items2 = loadedItems;
+      shopList = loadedItems;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -402,9 +464,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               padding: EdgeInsets.all(8.0),
               color: Colors.grey[100],
               child: ListView.builder(
-                itemCount: items2.length,
+                itemCount: inventory.length,
                 itemBuilder: (context, index) {
-                  final item = items2[index];
+                  final item = inventory[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -427,7 +489,15 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                             ),
                             TextButton(
                               child: Text('사용'),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                if(item.count > 0) {
+                                  setState(() {
+                                    item.count--;
+                                  });
+                                  saveItemsToFile(inventory, 2);
+                                }
+                                Navigator.pop(context);
+                                },
                             ),
                           ],
                         ),
@@ -518,9 +588,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                 padding: EdgeInsets.all(8.0),
                 color: Colors.grey[100],
                 child: ListView.builder(
-                  itemCount: items2.length,
+                  itemCount: shopList.length,
                   itemBuilder: (context, index) {
-                    final item = items2[index];
+                    final item = shopList[index];
                     return ListTile(
                       onTap: () {
                       showDialog(
@@ -543,7 +613,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                             ),
                             TextButton(
                               child: Text('구매'),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                },
                             ),
                           ],
                         ),
