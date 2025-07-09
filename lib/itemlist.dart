@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 import 'petmain.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class Item {
   final String icon;
   final String name;
-  final int count;
+  int count;
   final int price;
 
   Item({required this.icon, required this.name, required this.count, required this.price});
@@ -19,6 +21,21 @@ class Item {
       price: json['price'],
     );
   }
+   Map<String, dynamic> toJson() => {
+    'icon': icon,
+    'name': name,
+    'count': count,
+    'price': price,
+  };
+}
+
+Future<void> saveItemsToFile(List<Item> items) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File('${directory.path}/items.json');
+
+  final jsonString = jsonEncode(items.map((e) => e.toJson()).toList());
+
+  await file.writeAsString(jsonString);
 }
 
 class ItemlistPage1 extends StatefulWidget {
@@ -34,21 +51,34 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
   final void Function(int) onNext;
   final bool isUseItem;
   _ItemlistPage1State({required this.onNext, required this.isUseItem});
-  List<Item> items1 = [];
+  List<Item> inventory = [];
+  List<Item> shopList = [];
 
   @override
   void initState() {
     super.initState();
     loadItems();
+    loadShop();
   }
 
   Future<void> loadItems() async {
+    final testDirectory = await getApplicationDocumentsDirectory();
+    String jsonStr = await File('${testDirectory.path}/items.json').readAsString();
+    final List<dynamic> jsonData = json.decode(jsonStr);
+    final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
+
+    setState(() {
+      inventory = loadedItems;
+    });
+  }
+
+  Future<void> loadShop() async {
     final String jsonStr = await rootBundle.loadString('lib/DBtest/items1.json');
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
 
     setState(() {
-      items1 = loadedItems;
+      shopList = loadedItems;
     });
   }
 
@@ -92,9 +122,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               padding: EdgeInsets.all(8.0),
               color: Colors.grey[100],
               child: ListView.builder(
-                itemCount: items1.length,
+                itemCount: inventory.length,
                 itemBuilder: (context, index) {
-                  final item = items1[index];
+                  final item = inventory[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -113,11 +143,21 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                           actions: [
                             TextButton(
                               child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                },
                             ),
                             TextButton(
                               child: Text('사용'),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                if(item.count > 0) {
+                                  setState(() {
+                                    item.count--;
+                                  });
+                                  saveItemsToFile(inventory);
+                                }
+                                Navigator.pop(context);
+                                },
                             ),
                           ],
                         ),
@@ -209,9 +249,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               padding: EdgeInsets.all(8.0),
               color: Colors.grey[100],
               child: ListView.builder(
-                itemCount: items1.length,
+                itemCount: shopList.length,
                 itemBuilder: (context, index) {
-                  final item = items1[index];
+                  final item = shopList[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -234,7 +274,15 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                             ),
                             TextButton(
                               child: Text('구매'),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                if(item.count > 0) {
+                                  setState(() {
+                                    item.count++;
+                                  });
+                                  saveItemsToFile(inventory);
+                                }
+                                Navigator.pop(context);
+                                },
                             ),
                           ],
                         ),

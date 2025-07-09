@@ -111,7 +111,8 @@ class PetChoose extends StatelessWidget {
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {onNext(0);
+                  onPressed: () {
+                    onNext(0);
                   },
                 ),
                 IconButton(
