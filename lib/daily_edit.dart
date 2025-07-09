@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'task.dart'; // Task 클래스 정의된 파일 import
+import 'DBtest/task.dart'; // Task 클래스 정의된 파일 import
 import 'planner_edit.dart'; // TodayEditBox 위젯 정의
 
 class DailyTaskEditPage extends StatefulWidget {
