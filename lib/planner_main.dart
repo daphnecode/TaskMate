@@ -4,11 +4,13 @@ import 'package:taskmate/DBtest/task_data.dart';
 import 'planner_edit.dart';
 import 'statistics.dart';
 
+
 //위젯
 import 'package:taskmate/widgets/date_badge.dart';
 import 'package:taskmate/widgets/checklist_item.dart';
 import 'package:taskmate/widgets/repeat_task_box.dart';
 import 'package:taskmate/widgets/today_task_box.dart';
+
 
 class PlannerMain extends StatefulWidget {
   final void Function(int) onNext;
@@ -80,7 +82,6 @@ class _PlannerMainState extends State<PlannerMain> {
     selectedDate = DateTime.now();
     _syncTodayTaskWithMap(); // 오늘 날짜와 일일 리스트 연동
   }
-
 
   @override
   Widget build(BuildContext context) {
