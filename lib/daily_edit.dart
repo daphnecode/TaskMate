@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'DBtest/task.dart'; // Task 클래스 정의된 파일 import
-import 'planner_edit.dart'; // TodayEditBox 위젯 정의
+
+//위젯
+import 'package:taskmate/widgets/today_edit_box.dart';
 
 class DailyTaskEditPage extends StatefulWidget {
 
@@ -24,7 +26,7 @@ class DailyTaskEditPage extends StatefulWidget {
 class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   DateTime _selectedDate = DateTime.now();
   Map<String, List<Task>> _dailyTaskMap = {};
-  late List<Task> taskList;
+
 
 
 
@@ -33,7 +35,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
-  // 할 일 업데이트
+  // 수정된 리스트를 저장
   void _updateTaskList(List<Task> updatedList) {
     final key = _dateKey(_selectedDate);
     setState(() {
@@ -43,20 +45,11 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   }
 
 
-  void _saveTasksForDate(DateTime date, List<Task> tasks) {
-    final key = _dateKey(date);
-    final updatedMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
-    updatedMap[key] = tasks;
-    widget.onUpdateDailyTaskMap(updatedMap); // PlannerMain 또는 PlannerEditPage에 반영
-  }
-
-
   @override
   void initState() {
     super.initState();
     _selectedDate = widget.selectedDate;
     _dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
-    taskList = List.from(_dailyTaskMap[_dateKey(_selectedDate)] ?? []);
   }
 
   @override

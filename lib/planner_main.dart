@@ -7,7 +7,6 @@ import 'statistics.dart';
 
 //위젯
 import 'package:taskmate/widgets/date_badge.dart';
-import 'package:taskmate/widgets/checklist_item.dart';
 import 'package:taskmate/widgets/repeat_task_box.dart';
 import 'package:taskmate/widgets/today_task_box.dart';
 
@@ -65,6 +64,7 @@ class _PlannerMainState extends State<PlannerMain> {
     });
   }
 
+  //dailyTaskMap이 초기화되어 있지 않거나 해당 날짜 키가 없으면 빈 리스트로 초기화
   void _syncTodayTaskWithMap() {
     final key = _dateKey(selectedDate);
     todayTaskList = dailyTaskMap[key] ?? [];

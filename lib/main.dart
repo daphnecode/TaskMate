@@ -54,64 +54,64 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     Widget currentWidget;
-    
+
     switch (_currentIndex) {
-        case 0:
-          currentWidget = Petmain(onNext: goNext);
-          break;
-        case 1:
-          currentWidget = ItemCategory(onNext: goNext);
-          break;
-        case 2:
-          currentWidget = PetChoose(onNext: goNext);
-          break;
-        case 3:
-          currentWidget = PlannerMain(onNext: goNext);
-          break;
-        case 4:
-          currentWidget = PlannerEditPage(
-              onNext: goNext,
-              onBackToMain: () {
-                setState(() {
-                  _currentIndex = 3; //플래너 메인으로 돌아가기
-                });
-              },
+      case 0:
+        currentWidget = Petmain(onNext: goNext);
+        break;
+      case 1:
+        currentWidget = ItemCategory(onNext: goNext);
+        break;
+      case 2:
+        currentWidget = PetChoose(onNext: goNext);
+        break;
+      case 3:
+        currentWidget = PlannerMain(onNext: goNext);
+        break;
+      case 4:
+        currentWidget = PlannerEditPage(
+          onNext: goNext,
+          onBackToMain: () {
+            setState(() {
+              _currentIndex = 3; //플래너 메인으로 돌아가기
+            });
+          },
 
-            repeatTaskList: repeatTaskList,
-            todayTaskList: todayTaskList,
+          repeatTaskList: repeatTaskList,
+          todayTaskList: todayTaskList,
 
-            onUpdateTasks: (updatedRepeat, updatedToday) {
-                setState(() {
-                  repeatTaskList
-                    ..clear()
-                    ..addAll(updatedRepeat);
-                  todayTaskList
-                    ..clear()
-                    ..addAll(updatedToday);
+          onUpdateTasks: (updatedRepeat, updatedToday) {
+            setState(() {
+              repeatTaskList
+                ..clear()
+                ..addAll(updatedRepeat);
+              todayTaskList
+                ..clear()
+                ..addAll(updatedToday);
 
-                  final key = _dateKey(selectedDate);
-                  dailyTaskMap[key] = updatedToday;
-                });
-            },
+              final key = _dateKey(selectedDate);
+              dailyTaskMap[key] = updatedToday;
+            });
+          },
 
-            dailyTaskMap: dailyTaskMap,
-            selectedDate: selectedDate,
-            onDailyMapChanged: (newMap) {
-                setState(() {
-                  dailyTaskMap = newMap;
-                });
-            },
-          );
-          break;
-        case 5:
-          currentWidget = ShopCategory(onNext: goNext);
-          break;
-        default:
-          currentWidget = Text('기본');
+          dailyTaskMap: dailyTaskMap,
+          selectedDate: selectedDate,
+          onDailyMapChanged: (newMap) {
+            setState(() {
+              dailyTaskMap = newMap;
+            });
+          },
+        );
+        break;
+      case 5:
+        currentWidget = ShopCategory(onNext: goNext);
+        break;
+      default:
+        currentWidget = Text('기본');
     }
-    
+
     return Scaffold(
-      body:currentWidget
-    );  
+        body:currentWidget
+    );
   }
 }
