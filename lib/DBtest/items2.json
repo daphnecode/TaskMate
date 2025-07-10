@@ -2,19 +2,19 @@
   {
     "icon": "assets/icons/icon-teddybear.png",
     "name": "뼈다귀",
-    "count": 5,
+    "count": 1,
     "price": 100
   },
   {
     "icon": "assets/icons/icon-teddybear.png",
     "name": "공",
-    "count": 3,
+    "count": 1,
     "price": 50
   },
   {
     "icon": "assets/icons/icon-teddybear.png",
     "name": "낚싯대",
-    "count": 2,
+    "count": 1,
     "price": 150
   }
 ]
