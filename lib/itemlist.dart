@@ -21,7 +21,7 @@ class Item {
       price: json['price'],
     );
   }
-   Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
     'icon': icon,
     'name': name,
     'count': count,
@@ -63,25 +63,10 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
   Future<void> initJsonIfNotExists() async {
     final dir = await getApplicationDocumentsDirectory();
     final file1 = File('${dir.path}/items1.json');
-    final file2 = File('${dir.path}/items2.json');
-    final file3 = File('${dir.path}/items3.json');
-    final file4 = File('${dir.path}/items4.json');
 
     if (!await file1.exists()) {
       final assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
       await file1.writeAsString(assetJson);
-    }
-    if (!await file2.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
-      await file2.writeAsString(assetJson);
-    }
-    if (!await file3.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
-      await file3.writeAsString(assetJson);
-    }
-    if (!await file4.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
-      await file4.writeAsString(assetJson);
     }
   }
 
@@ -663,7 +648,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 
   Future<void> loadItems() async {
     final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/items2.json').readAsString();    
+    String jsonStr = await File('${testDirectory.path}/items3.json').readAsString();    
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
 
@@ -745,7 +730,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                     },
                     leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text(''),
+                    trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
                   );
                 },
               ),
@@ -938,7 +923,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 
   Future<void> loadItems() async {
     final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/items2.json').readAsString();    
+    String jsonStr = await File('${testDirectory.path}/items4.json').readAsString();    
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
 
@@ -1020,7 +1005,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                     },
                     leading: Image.asset(item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text(''),
+                    trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
                   );
                 },
               ),
