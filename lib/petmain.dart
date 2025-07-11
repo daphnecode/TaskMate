@@ -170,10 +170,16 @@ class _MainareaState extends State<Mainarea> {
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Image.asset(
-                                          pet1.image,
-                                          height: 600.0,
-                                          width: 250.0,
+                                        Row(
+                                          children: [
+                                            Icon(Icons.arrow_left,),
+                                            Image.asset(
+                                              "assets/images/petTuto1.png",
+                                              height: 600.0,
+                                              width: 250.0,
+                                            ),
+                                            Icon(Icons.arrow_right,),
+                                          ],
                                         ),
                                         Text(
                                           "펫 키우기 메인화면 입니다.",
@@ -235,7 +241,7 @@ class _MainareaState extends State<Mainarea> {
                         Positioned(
                           left: width * 0.4, top: height * 0.5,
                           child: Image.asset(
-                            "assets/images/unicon.png", 
+                            pet1.image, 
                             fit: BoxFit.cover, 
                             height: 180.0, width: 180.0
                           ),
