@@ -45,10 +45,6 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
   late DateTime selectedDate;
   late Map<String, List<Task>> dailyTaskMap;
 
-  /*
-  final void Function(int) onNext;
-  _PlannerEditPageState({required this.onNext});
-*/
   bool showFullRepeat =false;
   bool showFullToday = false;
 
@@ -61,19 +57,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     dailyTaskMap =  Map<String, List<Task>>.from(widget.dailyTaskMap);
   }
 
-/*
-  List<Task> repeatTaskList = [
-    Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
-    Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
-    Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
-  ];
 
-  List<Task> todayTaskList = [
-    Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
-    Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
-    Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
-  ];
- */
   void updateTasks(int type, List<Task> newTasks) {
     setState(() {
       if (type == 0) {
@@ -85,19 +69,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     });
   }
 
-  /*
-  void updateRepeatTasks(List<Task> newTasks) {
-    setState(() {
-      repeatTaskList = newTasks;
-    });
-  }
 
-  void updateTodayTasks(List<Task> updatedTasks) {
-    setState(() {
-      todayTaskList = updatedTasks;
-    });
-  }
-   */
   void saveAndNavigate(int target) {
     final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
     final key = _dateKey(widget.selectedDate);
@@ -113,42 +85,6 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       widget.onBackToMain(); //플래너 메인화면으로 이동
     }
   }
-  /*
-  void saveAndExitToMain() {
-    final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
-    final key = _dateKey(widget.selectedDate);
-    newMap[key] = todayTaskList;
-
-    widget.onDailyMapChanged(newMap); // planner_main에 전달
-    widget.onUpdateTasks(repeatTaskList, todayTaskList);
-    widget.onBackToMain();
-  }
-
-  void saveAndGoHome() {
-    final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
-    final key = _dateKey(widget.selectedDate);
-    newMap[key] = todayTaskList;
-
-    widget.onDailyMapChanged(newMap);
-    widget.onUpdateTasks(repeatTaskList, todayTaskList);
-    widget.onNext(0);
-  }
-   */
-
-
-
-
-  /*
-  void saveAndExitToMain() {
-    widget.onUpdateTasks(repeatTaskList, todayTaskList);
-    widget.onBackToMain();
-  } //플래너 메인으로 이동할 때
-
-  void saveAndGoHome() {
-    widget.onUpdateTasks(repeatTaskList, todayTaskList);
-    widget.onNext(0);
-  } // 펫 메인화면으로 이동할 때
-*/
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +102,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
               context,
               MaterialPageRoute(
                   builder: (context) => DailyTaskEditPage(
-                    dailyTaskMap: widget.dailyTaskMap,
+                    dailyTaskMap: newMap,
                     selectedDate: widget.selectedDate,
                     onUpdateDailyTaskMap: widget.onDailyMapChanged,
                   ),
