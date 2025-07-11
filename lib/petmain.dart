@@ -1,8 +1,88 @@
 import 'package:flutter/material.dart';
+import 'object.dart';
 
-class Mainarea extends StatelessWidget {
+List<Image> hungerStatus(int nowHunger) {
+  List<Image> now = [];
+
+  int check = (nowHunger / 20).truncate();
+  
+  switch (check) {
+    case 0:
+      now = [
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+      ];
+      return now;
+    case 1:
+      now = [
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+      ];
+      return now;
+    case 2:
+      now = [
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+      ];
+      return now;
+    case 3:
+      now = [
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+      ];
+      return now;
+    case 4:
+      now = [
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+      ];
+      return now;
+    default:
+      now = [
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+      ];
+      return now;
+  }
+  
+}
+
+class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
   const Mainarea({required this.onNext, super.key});
+
+  @override
+  State<Mainarea> createState() => _MainareaState();
+}
+
+class _MainareaState extends State<Mainarea> {
+  Pets pet1 = Pets(
+    image: "assets/images/dragon.png",
+    name: "드래곤",
+    hunger: 40,
+    happy: 70,
+    level: 33,
+    currentExp: 50,
+  );
+    
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +171,7 @@ class Mainarea extends StatelessWidget {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Image.asset(
-                                          "assets/images/petTuto1.png",
+                                          pet1.image,
                                           height: 600.0,
                                           width: 250.0,
                                         ),
@@ -124,13 +204,7 @@ class Mainarea extends StatelessWidget {
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        ],
+                        children: hungerStatus(pet1.hunger),
                       )
                     ),
                   ],
@@ -142,7 +216,7 @@ class Mainarea extends StatelessWidget {
             child: GestureDetector(
               onLongPress: () {
                 // Handle long press
-                onNext(2); // Navigate to PetChoose
+                widget.onNext(2); // Navigate to PetChoose
               },
               child: Container(
                 color: Colors.white,
