@@ -700,37 +700,43 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
                   final item = inventory[index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text('아이템 사용')),
-                          content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
-                                SizedBox(height: 10),
-                                Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 사용하시겠습니까?', 
-                                style: TextStyle(fontSize: 16))),
-                              ],
-                            ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('사용'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: Image.asset(item.icon, width: 30, height: 30),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
+                  final isHighlighted = item.name == "바다";
+                  return Container(
+                    color: isHighlighted ? Colors.yellow : Colors.transparent,
+                    child: ListTile(
+                      onTap: () {
+                        if (!isHighlighted) {
+                          showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Center(child: Text('아이템 사용')),
+                            content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                  SizedBox(height: 10),
+                                  Center(child: Text('아직 설명을 넣지 않았어요.\n${item.name}을(를) 사용하시겠습니까?', 
+                                  style: TextStyle(fontSize: 16))),
+                                ],
+                              ),
+                            actions: [
+                              TextButton(
+                                child: Text('취소'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              TextButton(
+                                child: Text('사용'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                          ),
+                        );
+                        }
+                      },
+                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      title: Text(item.name, style: TextStyle(fontSize: 18)),
+                      trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
+                    ),
                   );
                 },
               ),
