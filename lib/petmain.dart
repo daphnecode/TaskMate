@@ -77,7 +77,7 @@ class _MainareaState extends State<Mainarea> {
   Pets pet1 = Pets(
     image: "assets/images/dragon.png",
     name: "드래곤",
-    hunger: 40,
+    hunger:50,
     happy: 70,
     level: 33,
     currentExp: 50,

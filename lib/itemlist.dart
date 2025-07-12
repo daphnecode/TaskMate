@@ -627,6 +627,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
   final bool isUseItem;
   _ItemlistPage3State({required this.onNext, required this.isUseItem});
   List<Item> inventory = [];
+  String usedItem = "바다";
 
   @override
   void initState() {
@@ -700,7 +701,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
                   final item = inventory[index];
-                  final isHighlighted = item.name == "바다";
+                  final isHighlighted = item.name == usedItem;
                   return Container(
                     color: isHighlighted ? Colors.yellow : Colors.transparent,
                     child: ListTile(
@@ -726,7 +727,12 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                               ),
                               TextButton(
                                 child: Text('사용'),
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () {
+                                  setState(() {
+                                    usedItem = item.name;
+                                  });
+                                  Navigator.pop(context);
+                                  },
                               ),
                             ],
                           ),
@@ -844,7 +850,13 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                             ),
                             TextButton(
                               child: Text('구매'),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                setState(() {
+                                  item.count++;
+                                });
+                                useItemsSave(inventory, 3);
+                                Navigator.pop(context);
+                                },
                             ),
                           ],
                         ),
@@ -908,6 +920,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
   final bool isUseItem;
   _ItemlistPage4State({required this.onNext, required this.isUseItem});
   List<Item> inventory = [];
+  String usedItem = "기본";
 
   @override
   void initState() {
@@ -981,7 +994,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
                   final item = inventory[index];
-                  final isHighlighted = item.name == "기본";
+                  final isHighlighted = item.name == usedItem;
 
                   return Container(
                     color: isHighlighted ? Colors.yellow : Colors.transparent,
@@ -1008,7 +1021,12 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                 ),
                                 TextButton(
                                   child: Text('사용'),
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () {
+                                    setState(() {
+                                      usedItem = item.name;
+                                    });
+                                    Navigator.pop(context);
+                                    },
                                 ),
                               ],
                             ),
@@ -1126,7 +1144,14 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                             ),
                             TextButton(
                               child: Text('구매'),
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                if (item.count == 0) {
+                                  setState(() {
+                                    item.count++;
+                                  });
+                                  useItemsSave(inventory, 4);
+                                }
+                              },
                             ),
                           ],
                         ),
