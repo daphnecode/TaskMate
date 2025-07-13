@@ -5,6 +5,15 @@ import 'dart:io';
 import 'dart:convert';
 import 'object.dart';
 
+Future<void> changeStatusSave(Pets pet, int index) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File('${directory.path}/pet$index.json');
+
+  final jsonString = jsonEncode(pet.toJson());
+
+  await file.writeAsString(jsonString);
+}
+
 Row hungerStatus(int nowHunger) {
   int check = (nowHunger / 20).truncate() + 1;
   
@@ -28,13 +37,43 @@ class Mainarea extends StatefulWidget {
 
 class _MainareaState extends State<Mainarea> {
   Pets pet1 = Pets(
-    image: "assets/images/dragon.png",
-    name: "드래곤",
-    hunger:50,
-    happy: 70,
-    level: 33,
-    currentExp: 50,
+    image: "",
+    name: "",
+    hunger:0,
+    happy: 0,
+    level: 0,
+    currentExp: 0,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    initJsonIfNotExists();
+    loadItems();
+  }
+
+  Future<void> initJsonIfNotExists() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file1 = File('${dir.path}/pet1.json');
+
+    final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
+    await file1.writeAsString(assetJson);
+    // if (!await file1.exists()) {
+    //   final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
+    //   await file1.writeAsString(assetJson);
+    // }
+  }
+
+  Future<void> loadItems() async {
+    final testDirectory = await getApplicationDocumentsDirectory();
+    String jsonStr = await File('${testDirectory.path}/pet1.json').readAsString();    
+    final Map<String, dynamic> jsonData = json.decode(jsonStr);
+    final Pets loadedItems = Pets.fromJson(jsonData);
+
+    setState(() {
+      pet1 = loadedItems;
+    });
+  }
     
 
   @override
