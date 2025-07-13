@@ -1,68 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'dart:convert';
 import 'object.dart';
 
-List<Image> hungerStatus(int nowHunger) {
-  List<Image> now = [];
-
-  int check = (nowHunger / 20).truncate();
+Row hungerStatus(int nowHunger) {
+  int check = (nowHunger / 20).truncate() + 1;
   
-  switch (check) {
-    case 0:
-      now = [
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-      ];
-      return now;
-    case 1:
-      now = [
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-      ];
-      return now;
-    case 2:
-      now = [
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-      ];
-      return now;
-    case 3:
-      now = [
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenaltW.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-      ];
-      return now;
-    case 4:
-      now = [
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-      ];
-      return now;
-    default:
-      now = [
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-        Image.asset("assets/icons/icon-chickenalt.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-      ];
-      return now;
-  }
-  
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: List.generate(5, (index) {
+      return Image.asset(
+        index < check ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',);
+      },
+      )
+    );
 }
 
 class Mainarea extends StatefulWidget {
@@ -208,10 +161,7 @@ class _MainareaState extends State<Mainarea> {
                         ),
                     ),
                     Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: hungerStatus(pet1.hunger),
-                      )
+                      child: hungerStatus(pet1.hunger),
                     ),
                   ],
                 ),
