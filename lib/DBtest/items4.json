@@ -1,20 +1,52 @@
 [
   {
     "icon": "assets/icons/icon-pivotx.png",
-    "name": "기본",
+    "category": 4,
+    "name": "회오리 오라",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 0
+    "price": 100,
+    "itemText": "멋들어진 기운이 넘칩니다."
   },
   {
     "icon": "assets/icons/icon-pivotx.png",
-    "name": "버블 오라",
+    "category": 4,
+    "name": "불꽃 꼬리",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 150
+    "price": 150,
+    "itemText": "멋들어진 기운이 넘칩니다."
   },
   {
     "icon": "assets/icons/icon-pivotx.png",
+    "category": 4,
     "name": "별빛 오라",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 200
+    "price": 300,
+    "itemText": "멋들어진 기운이 넘칩니다."
+  },
+  {
+    "icon": "assets/icons/icon-pivotx.png",
+    "category": 4,
+    "name": "버블",
+    "hunger": 0,
+    "happy": 0,
+    "count": 0,
+    "price": 500,
+    "itemText": "멋들어진 기운이 넘칩니다."
+  },
+  {
+    "icon": "assets/icons/icon-pivotx.png",
+    "category": 4,
+    "name": "잔상",
+    "hunger": 0,
+    "happy": 0,
+    "count": 0,
+    "price": 1000,
+    "itemText": "멋들어진 기운이 넘칩니다."
   }
 ]

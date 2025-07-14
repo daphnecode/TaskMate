@@ -1,38 +1,62 @@
 [
   {
     "icon": "assets/icons/icon-mountains.png",
-    "name": "기본",
-    "count": 0,
-    "price": 0
-  },
-  {
-    "icon": "assets/icons/icon-mountains.png",
+    "category": 3,
     "name": "초원",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 200
+    "price": 0,
+    "itemText": "펫이 아늑함을 느낌니다."
   },
   {
     "icon": "assets/icons/icon-mountains.png",
-    "name": "바다",
+    "category": 3,
+    "name": "바닷가",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 300
+    "price": 150,
+    "itemText": "펫이 아늑함을 느낌니다."
   },
   {
     "icon": "assets/icons/icon-mountains.png",
-    "name": "구름",
+    "category": 3,
+    "name": "숲 속",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 400
+    "price": 300,
+    "itemText": "펫이 아늑함을 느낌니다."
   },
   {
     "icon": "assets/icons/icon-mountains.png",
+    "category": 3,
+    "name": "구름 위",
+    "hunger": 0,
+    "happy": 0,
+    "count": 0,
+    "price": 300,
+    "itemText": "펫이 아늑함을 느낌니다."
+  },
+  {
+    "icon": "assets/icons/icon-mountains.png",
+    "category": 3,
     "name": "화산",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 500
+    "price": 500,
+    "itemText": "펫이 아늑함을 느낌니다."
   },
   {
     "icon": "assets/icons/icon-mountains.png",
+    "category": 3,
     "name": "야경",
+    "hunger": 0,
+    "happy": 0,
     "count": 0,
-    "price": 600
+    "price": 600,
+    "itemText": "펫이 아늑함을 느낌니다."
   }
 ]

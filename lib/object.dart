@@ -1,9 +1,9 @@
 class Item {
   final String icon;
   final int category;
+  final String name;
   final int hunger;
   final int happy;
-  final String name;
   int count;
   final int price;
   final String itemText;
@@ -12,9 +12,9 @@ class Item {
     {
       required this.icon, 
       required this.category,
+      required this.name, 
       required this.hunger,
       required this.happy,
-      required this.name, 
       required this.count, 
       required this.price,
       required this.itemText,
@@ -25,9 +25,9 @@ class Item {
     return Item(
       icon: json['icon'],
       category: json['category'],
+      name: json['name'],
       hunger: json['hunger'],
       happy: json['happy'],
-      name: json['name'],
       count: json['count'],
       price: json['price'],
       itemText: json['itemText'],
@@ -36,9 +36,9 @@ class Item {
   Map<String, dynamic> toJson() => {
     'icon': icon,
     'category': category,
+    'name': name,
     'hunger': hunger,
     'happy': happy,
-    'name': name,
     'count': count,
     'price': price,
     'itemText': itemText,

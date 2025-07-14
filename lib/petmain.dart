@@ -19,11 +19,11 @@ Row hungerStatus(int nowHunger) {
   
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
-    children: List.generate(5, (index) {
-      return Image.asset(
-        index < check ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',);
-      },
-      )
+    // children: List.generate(5, (index) {
+    //   return Image.asset(
+    //     index < check ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',);
+    //   },
+    //   )
     );
 }
 
@@ -48,8 +48,8 @@ class _MainareaState extends State<Mainarea> {
   @override
   void initState() {
     super.initState();
-    initJsonIfNotExists();
-    loadItems();
+  //   initJsonIfNotExists();
+  //   loadItems();
   }
 
   Future<void> initJsonIfNotExists() async {
@@ -132,10 +132,10 @@ class _MainareaState extends State<Mainarea> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
-                        Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        // Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        // Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        // Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
+                        // Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
                         Image.asset("assets/icons/icon-heart.png", fit: BoxFit.cover, height: 30.0, width: 30.0),
                         ],
                       )

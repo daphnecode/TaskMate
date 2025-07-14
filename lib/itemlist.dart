@@ -2,32 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 import 'petmain.dart';
+import 'object.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-
-class Item {
-  final String icon;
-  final String name;
-  int count;
-  final int price;
-
-  Item({required this.icon, required this.name, required this.count, required this.price});
-
-  factory Item.fromJson(Map<String, dynamic> json) {
-    return Item(
-      icon: json['icon'],
-      name: json['name'],
-      count: json['count'],
-      price: json['price'],
-    );
-  }
-  Map<String, dynamic> toJson() => {
-    'icon': icon,
-    'name': name,
-    'count': count,
-    'price': price,
-  };
-}
 
 Future<void> useItemsSave(List<Item> items, int index) async {
   final directory = await getApplicationDocumentsDirectory();
