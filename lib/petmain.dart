@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'object.dart';
+import 'petstatus.dart';
 
 Future<void> changeStatusSave(Pets pet, int index) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -21,7 +22,10 @@ Row hungerStatus(int nowHunger) {
     mainAxisAlignment: MainAxisAlignment.end,
     children: List.generate(5, (index) {
       return Image.asset(
-        index < check ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',);
+        (index < check) ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',
+        width: 30,
+        height: 30,
+        );
       },
       )
     );
@@ -34,7 +38,10 @@ Row happyStatus(int nowHappy) {
     mainAxisAlignment: MainAxisAlignment.end,
     children: List.generate(5, (index) {
       return Image.asset(
-        index < check ? 'assets/icons/icon-heart.png' : 'assets/icons/icon-heartW.png',);
+        index < check ? 'assets/icons/icon-heart.png' : 'assets/icons/icon-heartW.png',
+        width: 30,
+        height: 30,
+        );
       },
       )
     );
@@ -49,6 +56,19 @@ class Mainarea extends StatefulWidget {
 }
 
 class _MainareaState extends State<Mainarea> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // 미리 이미지 로딩
+    for (int i = 0; i < 5; i++) {
+      precacheImage(AssetImage('assets/icons/icon-heart.png'), context);
+      precacheImage(AssetImage('assets/icons/icon-heartW.png'), context);
+      precacheImage(AssetImage('assets/icons/icon-chickenalt.png'), context);
+      precacheImage(AssetImage('assets/icons/icon-chickenaltW.png'), context);
+    }
+  }
+  
   Pets pet1 = Pets(
     image: "assets/images/dragon.png",
     name: "",
@@ -104,30 +124,7 @@ class _MainareaState extends State<Mainarea> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "펫 상태창입니다.",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10.0),
-                        Text(
-                          "펫의 세부상태와 통계를 확인할 수 있습니다.",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 20.0),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("닫기"),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: PetStatus(),
                 );
               },
             );
