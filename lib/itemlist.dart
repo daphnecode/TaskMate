@@ -33,8 +33,12 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
   @override
   void initState() {
     super.initState();
-    initJsonIfNotExists();
-    loadItems();
+    initAsync();
+  }
+
+  Future<void> initAsync() async {
+    await initJsonIfNotExists(); // 먼저 파일 복사
+    await loadItems();           // 복사 완료 후 파일 읽기
   }
 
   Future<void> initJsonIfNotExists() async {
@@ -324,8 +328,12 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
   @override
   void initState() {
     super.initState();
-    initJsonIfNotExists();
-    loadItems();
+    initAsync();
+  }
+
+  Future<void> initAsync() async {
+    await initJsonIfNotExists(); // 먼저 파일 복사
+    await loadItems();           // 복사 완료 후 파일 읽기
   }
 
   Future<void> initJsonIfNotExists() async {
@@ -609,8 +617,12 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
   @override
   void initState() {
     super.initState();
-    initJsonIfNotExists();
-    loadItems();
+    initAsync();
+  }
+
+  Future<void> initAsync() async {
+    await initJsonIfNotExists(); // 먼저 파일 복사
+    await loadItems();           // 복사 완료 후 파일 읽기
   }
 
   Future<void> initJsonIfNotExists() async {
@@ -902,8 +914,12 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
   @override
   void initState() {
     super.initState();
-    initJsonIfNotExists();
-    loadItems();
+    initAsync();
+  }
+
+  Future<void> initAsync() async {
+    await initJsonIfNotExists(); // 먼저 파일 복사
+    await loadItems();           // 복사 완료 후 파일 읽기
   }
 
   Future<void> initJsonIfNotExists() async {

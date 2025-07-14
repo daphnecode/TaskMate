@@ -19,11 +19,11 @@ Row hungerStatus(int nowHunger) {
   
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
-    // children: List.generate(5, (index) {
-    //   return Image.asset(
-    //     index < check ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',);
-    //   },
-    //   )
+    children: List.generate(5, (index) {
+      return Image.asset(
+        index < check ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',);
+      },
+      )
     );
 }
 
@@ -37,7 +37,7 @@ class Mainarea extends StatefulWidget {
 
 class _MainareaState extends State<Mainarea> {
   Pets pet1 = Pets(
-    image: "",
+    image: "assets/images/dragon.png",
     name: "",
     hunger:0,
     happy: 0,
@@ -48,20 +48,22 @@ class _MainareaState extends State<Mainarea> {
   @override
   void initState() {
     super.initState();
-  //   initJsonIfNotExists();
-  //   loadItems();
+    initAsync();
+  }
+
+  Future<void> initAsync() async {
+    await initJsonIfNotExists(); // 먼저 파일 복사
+    await loadItems();           // 복사 완료 후 파일 읽기
   }
 
   Future<void> initJsonIfNotExists() async {
     final dir = await getApplicationDocumentsDirectory();
     final file1 = File('${dir.path}/pet1.json');
 
-    final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
-    await file1.writeAsString(assetJson);
-    // if (!await file1.exists()) {
-    //   final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
-    //   await file1.writeAsString(assetJson);
-    // }
+    if (!await file1.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
+      await file1.writeAsString(assetJson);
+    }
   }
 
   Future<void> loadItems() async {
