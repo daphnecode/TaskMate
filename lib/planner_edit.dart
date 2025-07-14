@@ -92,23 +92,36 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       appBar: AppBar(actions: [
         IconButton(
           icon: Icon(Icons.calendar_today),
-          onPressed: () {
-            final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
-            final key = _dateKey(widget.selectedDate);
-            newMap[key] = todayTaskList;
+      onPressed: () async {
+        final newMap = Map<String, List<Task>>.from(dailyTaskMap);
+        final key = _dateKey(selectedDate);
+        newMap[key] = todayTaskList;
 
-            widget.onDailyMapChanged(newMap); // 최신화
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DailyTaskEditPage(
-                    dailyTaskMap: newMap,
-                    selectedDate: widget.selectedDate,
-                    onUpdateDailyTaskMap: widget.onDailyMapChanged,
-                  ),
+        // 화면 이동 + 결과 기다림
+        final result = await Navigator.push<Map<String, List<Task>>>(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DailyTaskEditPage(
+              dailyTaskMap: newMap,
+              selectedDate: selectedDate,
+              onUpdateDailyTaskMap: (updatedMap) {
+                //Navigator.pop(context, updatedMap); // ✅ 수정된 map을 반환
+              },
             ),
-            );// 일일 리스트 편집 이동
-          },
+          ),
+        );
+
+        // 돌아왔을 때 result가 null 아니면 상태 반영
+        if (result != null) {
+          setState(() {
+            dailyTaskMap = result;
+            todayTaskList = result[_dateKey(selectedDate)] ?? [];
+          });
+
+          // 부모 위젯에도 전달
+          widget.onDailyMapChanged(result);
+        }
+      }
         )
       ]),
       body: showFullRepeat

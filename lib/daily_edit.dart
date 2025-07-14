@@ -64,7 +64,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
             icon: Icon(Icons.save),
             onPressed: () {
               widget.onUpdateDailyTaskMap(_dailyTaskMap);
-              Navigator.pop(context);
+              Navigator.pop(context, _dailyTaskMap);
             },
           )
         ],
