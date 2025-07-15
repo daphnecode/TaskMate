@@ -139,6 +139,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                 if(item.count > 0) {
                                   setState(() {
                                     item.count--;
+                                    widget.pet.hunger += item.hunger;
+                                    widget.pet.happy += item.happy;
                                   });
                                   useItemsSave(inventory, 1);
                                 }
@@ -443,6 +445,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                 if(item.count > 0) {
                                   setState(() {
                                     item.count--;
+                                    widget.pet.happy += item.happy;
                                   });
                                   useItemsSave(inventory, 2);
                                 }

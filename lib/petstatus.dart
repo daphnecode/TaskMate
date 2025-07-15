@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'object.dart';
 
 class PetStatus extends StatelessWidget{
+  final Pets pet1;
+  const PetStatus({required this.pet1, super.key});
+
   
   @override
   Widget build(BuildContext context) {
@@ -32,9 +36,9 @@ class PetStatus extends StatelessWidget{
           Row(
             children: [
               Expanded(child: Image.asset("assets/icons/icon-heart.png")),
-              Expanded(child: Text("100/100")),
+              Expanded(child: Text("${pet1.happy}/100")),
               Expanded(child: Image.asset("assets/icons/icon-chickenalt.png")),
-              Expanded(child: Text(" 90/100")),
+              Expanded(child: Text("${pet1.hunger}/100")),
             ],
           ),
           SizedBox(height: 40,),

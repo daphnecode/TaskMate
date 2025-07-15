@@ -84,7 +84,7 @@ class _MainareaState extends State<Mainarea> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  child: PetStatus(),
+                  child: PetStatus(pet1: widget.pet),
                 );
               },
             );
