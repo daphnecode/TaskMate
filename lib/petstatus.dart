@@ -5,7 +5,7 @@ class PetStatus extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(20.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -29,14 +29,50 @@ class PetStatus extends StatelessWidget{
               ),
             ],
           ),
-          Text(
-            "펫 상태창입니다.",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              Expanded(child: Image.asset("assets/icons/icon-heart.png")),
+              Expanded(child: Text("100/100")),
+              Expanded(child: Image.asset("assets/icons/icon-chickenalt.png")),
+              Expanded(child: Text(" 90/100")),
+            ],
           ),
-          SizedBox(height: 10.0),
-          Text(
-            "펫의 세부상태와 통계를 확인할 수 있습니다.",
-            style: TextStyle(fontSize: 16),
+          SizedBox(height: 40,),
+          Row(
+            children: [
+              Expanded(child: Text("총 달린 거리", style: TextStyle(fontSize: 16),)),
+              Expanded(child: Text("15km", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Text("행복도 증가 횟수", style: TextStyle(fontSize: 16),)),
+              Expanded(child: Text("124번", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Text("먹이 준 횟수", style: TextStyle(fontSize: 16),)),
+              Expanded(child: Text("56번", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Text("가장 많이 준 먹이", style: TextStyle(fontSize: 16),)),
+              Expanded(child: Text("딸기", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Text("경험치 총 획득량", style: TextStyle(fontSize: 16),)),
+              Expanded(child: Text("1130pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Text("포인트 총 소비량", style: TextStyle(fontSize: 16),)),
+              Expanded(child: Text("830pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+            ],
           ),
           SizedBox(height: 20.0),
           ElevatedButton(
