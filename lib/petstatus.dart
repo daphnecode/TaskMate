@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'object.dart';
 
 class PetStatus extends StatelessWidget{
-  final Pets pet1;
-  const PetStatus({required this.pet1, super.key});
+  final Pets pet;
+  const PetStatus({required this.pet, super.key});
 
   
   @override
@@ -18,7 +18,7 @@ class PetStatus extends StatelessWidget{
               Expanded(
                 flex: 2,
                 child: Text(
-                  "LV 13",
+                  "LV ${pet.level}",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -27,7 +27,7 @@ class PetStatus extends StatelessWidget{
                 child: Column(
                   children: [
                     Text("------------------------"),
-                    Text("111/157"),
+                    Text("${pet.currentExp}/157"),
                   ],
                 ),
               ),
@@ -36,9 +36,9 @@ class PetStatus extends StatelessWidget{
           Row(
             children: [
               Expanded(child: Image.asset("assets/icons/icon-heart.png")),
-              Expanded(child: Text("${pet1.happy}/100")),
+              Expanded(child: Text("${pet.happy}/100")),
               Expanded(child: Image.asset("assets/icons/icon-chickenalt.png")),
-              Expanded(child: Text("${pet1.hunger}/100")),
+              Expanded(child: Text("${pet.hunger}/100")),
             ],
           ),
           SizedBox(height: 40,),

@@ -1,0 +1,8 @@
+{
+    "image": "assets/images/unicon.png",
+    "name": "유니콘",
+    "hunger": 80,
+    "happy": 43,
+    "level": 61,
+    "currentExp": 150
+}

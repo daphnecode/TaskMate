@@ -29,6 +29,7 @@ class Subarea1 extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red[100],
@@ -42,6 +43,7 @@ class Subarea1 extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green[100],
@@ -54,6 +56,7 @@ class Subarea1 extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[100],

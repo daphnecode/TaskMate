@@ -43,8 +43,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
+  String nowBack = "assets/images/prairie.png";
   Pets pet1 = Pets(
     image: "assets/images/dragon.png",
+    name: "",
+    hunger:0,
+    happy: 0,
+    level: 0,
+    currentExp: 0,
+  );
+  Pets pet2 = Pets(
+    image: "assets/images/unicon.png",
     name: "",
     hunger:0,
     happy: 0,
@@ -66,21 +75,30 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> initJsonIfNotExists() async {
     final dir = await getApplicationDocumentsDirectory();
     final file1 = File('${dir.path}/pet1.json');
+    final file2 = File('${dir.path}/pet2.json');
 
-    if (!await file1.exists()) {
+    if (await file1.exists()) {
       final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
       await file1.writeAsString(assetJson);
+    }
+    if (await file2.exists()) {
+      final assetJson = await rootBundle.loadString('lib/DBtest/pet2.json');
+      await file2.writeAsString(assetJson);
     }
   }
 
   Future<void> loadItems() async {
     final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/pet1.json').readAsString();    
-    final Map<String, dynamic> jsonData = json.decode(jsonStr);
-    final Pets loadedItems = Pets.fromJson(jsonData);
+    String jsonStr1 = await File('${testDirectory.path}/pet1.json').readAsString();    
+    final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
+    final Pets loadedItems1 = Pets.fromJson(jsonData1);
+    String jsonStr2 = await File('${testDirectory.path}/pet2.json').readAsString();    
+    final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
+    final Pets loadedItems2 = Pets.fromJson(jsonData2);
 
     setState(() {
-      pet1 = loadedItems;
+      pet1 = loadedItems1;
+      pet2 = loadedItems2;
     });
   }
 
@@ -102,10 +120,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext, pet1: pet1,);
+        currentWidget = Petmain(onNext: goNext, pet: pet1, nowBack: nowBack);
         break;
       case 1:
-        currentWidget = ItemCategory(onNext: goNext, pet1: pet1,);
+        currentWidget = ItemCategory(onNext: goNext, pet: pet1, nowBack: nowBack,);
         break;
       case 2:
         currentWidget = PetChoose(onNext: goNext);
@@ -149,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 5:
-        currentWidget = ShopCategory(onNext: goNext, pet1: pet1,);
+        currentWidget = ShopCategory(onNext: goNext, pet: pet1, nowBack: nowBack,);
         break;
       default:
         currentWidget = Text('기본');

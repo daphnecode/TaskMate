@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'object.dart';
+import 'petchoose.dart';
 import 'petstatus.dart';
 
 Future<void> changeStatusSave(Pets pet, int index) async {
@@ -50,7 +50,8 @@ Row happyStatus(int nowHappy) {
 class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
-  const Mainarea({required this.onNext, required this.pet, super.key});
+  String nowBack;
+  Mainarea({required this.onNext, required this.pet, required this.nowBack, super.key});
 
   @override
   State<Mainarea> createState() => _MainareaState();
@@ -84,7 +85,7 @@ class _MainareaState extends State<Mainarea> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
-                  child: PetStatus(pet1: widget.pet),
+                  child: PetStatus(pet: widget.pet),
                 );
               },
             );
@@ -172,7 +173,10 @@ class _MainareaState extends State<Mainarea> {
           child: GestureDetector(
             onLongPress: () {
               // Handle long press
-              widget.onNext(2); // Navigate to PetChoose
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PetChoose(onNext: widget.onNext),));
             },
             child: Container(
               color: Colors.white,
@@ -184,7 +188,7 @@ class _MainareaState extends State<Mainarea> {
                   return Stack(
                     children: [
                       Image.asset(
-                        "assets/images/beach.png", 
+                        widget.nowBack, 
                         fit: BoxFit.cover, 
                         height: double.infinity, width: double.infinity
                         ),
@@ -209,8 +213,9 @@ class _MainareaState extends State<Mainarea> {
 
 class Petmain extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet1;
-  const Petmain({required this.onNext, required this.pet1,super.key});
+  final Pets pet;
+  String nowBack;
+  Petmain({required this.onNext, required this.pet, required this.nowBack, super.key});
 
   @override
   State<Petmain> createState() => _PetmainState();
@@ -228,7 +233,7 @@ class _PetmainState extends State<Petmain> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet1),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
               // MainArea()로 변경
             ),
           ),
