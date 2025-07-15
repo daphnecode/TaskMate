@@ -17,17 +17,15 @@ Future<void> useItemsSave(List<Item> items, int index) async {
 
 class ItemlistPage1 extends StatefulWidget {
   final void Function(int) onNext;
+  final Pets pet;
   final bool isUseItem;
-  const ItemlistPage1({required this.onNext, required this.isUseItem, super.key});
+  const ItemlistPage1({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
-  State<ItemlistPage1> createState() => _ItemlistPage1State(onNext: onNext, isUseItem: isUseItem);
+  State<ItemlistPage1> createState() => _ItemlistPage1State();
 }
 
 class _ItemlistPage1State extends State<ItemlistPage1> {
-  final void Function(int) onNext;
-  final bool isUseItem;
-  _ItemlistPage1State({required this.onNext, required this.isUseItem});
   List<Item> inventory = [];
 
   @override
@@ -65,7 +63,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 
   @override
   Widget build(BuildContext context) {
-    if (isUseItem) {
+    if (widget.isUseItem) {
       return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -74,7 +72,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet,),
             ),
           ),
           Expanded(
@@ -200,7 +198,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet,),
             ),
           ),
           Expanded(
@@ -302,13 +300,13 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
-                    onNext(3); // Navigate to PlannerMain
+                    widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {onNext(0);
+                  onPressed: () {widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -326,17 +324,15 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 
 class ItemlistPage2 extends StatefulWidget {
   final void Function(int) onNext;
+  final Pets pet;
   final bool isUseItem;
-  const ItemlistPage2({required this.onNext, required this.isUseItem, super.key});
+  const ItemlistPage2({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
-  State<ItemlistPage2> createState() => _ItemlistPage2State(onNext: onNext, isUseItem: isUseItem);
+  State<ItemlistPage2> createState() => _ItemlistPage2State();
 }
 
 class _ItemlistPage2State extends State<ItemlistPage2> {
-  final void Function(int) onNext;
-  final bool isUseItem;
-  _ItemlistPage2State({required this.onNext, required this.isUseItem});
   List<Item> inventory = [];
 
   @override
@@ -374,7 +370,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 
   @override
   Widget build(BuildContext context) {
-    if (isUseItem) {
+    if (widget.isUseItem) {
       return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -383,7 +379,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet,),
             ),
           ),
           Expanded(
@@ -505,7 +501,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               flex: 6,
               child: Container(
                 color: Colors.white,
-                child: Mainarea(onNext: onNext,),
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet),
               ),
             ),
             Expanded(
@@ -606,13 +602,13 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   IconButton(
                     icon: const Icon(Icons.calendar_month),
                     onPressed: () {
-                      onNext(3); // Navigate to PlannerMain
+                      widget.onNext(3); // Navigate to PlannerMain
                     },
                   ),
 
                   IconButton(
                     icon: Icon(Icons.home),
-                    onPressed: () {onNext(0);
+                    onPressed: () {widget.onNext(0);
                     },
                   ),
                   IconButton(
@@ -630,17 +626,15 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 
 class ItemlistPage3 extends StatefulWidget {
   final void Function(int) onNext;
+  final Pets pet;
   final bool isUseItem;
-  const ItemlistPage3({required this.onNext, required this.isUseItem, super.key});
+  const ItemlistPage3({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
-  State<ItemlistPage3> createState() => _ItemlistPage3State(onNext: onNext, isUseItem: isUseItem);
+  State<ItemlistPage3> createState() => _ItemlistPage3State();
 }
 
 class _ItemlistPage3State extends State<ItemlistPage3> {
-  final void Function(int) onNext;
-  final bool isUseItem;
-  _ItemlistPage3State({required this.onNext, required this.isUseItem});
   List<Item> inventory = [];
   String usedItem = "바다";
 
@@ -679,7 +673,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 
   @override
   Widget build(BuildContext context) {
-    if (isUseItem) {
+    if (widget.isUseItem) {
       return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -688,7 +682,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet,),
             ),
           ),
           Expanded(
@@ -807,7 +801,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet,),
             ),
           ),
           Expanded(
@@ -902,13 +896,13 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
-                    onNext(3); // Navigate to PlannerMain
+                    widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {onNext(0);
+                  onPressed: () {widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -927,17 +921,15 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 
 class ItemlistPage4 extends StatefulWidget {
   final void Function(int) onNext;
+  final Pets pet;
   final bool isUseItem;
-  const ItemlistPage4({required this.onNext, required this.isUseItem, super.key});
+  const ItemlistPage4({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
-  State<ItemlistPage4> createState() => _ItemlistPage4State(onNext: onNext, isUseItem: isUseItem);
+  State<ItemlistPage4> createState() => _ItemlistPage4State();
 }
 
 class _ItemlistPage4State extends State<ItemlistPage4> {
-  final void Function(int) onNext;
-  final bool isUseItem;
-  _ItemlistPage4State({required this.onNext, required this.isUseItem});
   List<Item> inventory = [];
   String usedItem = "기본";
 
@@ -976,7 +968,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 
   @override
   Widget build(BuildContext context) {
-    if (isUseItem) {
+    if (widget.isUseItem) {
       return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -985,7 +977,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet,),
             ),
           ),
           Expanded(
@@ -1105,7 +1097,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet,),
             ),
           ),
           Expanded(
@@ -1201,13 +1193,13 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
-                    onNext(3); // Navigate to PlannerMain
+                    widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {onNext(0);
+                  onPressed: () {widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -1225,7 +1217,8 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 
 class ItemCategory extends StatelessWidget {
   final void Function(int) onNext;
-  const ItemCategory({required this.onNext, super.key});
+  final Pets pet1;
+  const ItemCategory({required this.onNext, required this.pet1, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1237,7 +1230,7 @@ class ItemCategory extends StatelessWidget {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext,),
+              child: Mainarea(onNext: onNext, pet: pet1,),
               // MainArea()로 변경
             ),
           ),
@@ -1278,7 +1271,7 @@ class ItemCategory extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(onNext: onNext, isUseItem: true,),
+                                    builder: (context) => ItemlistPage1(onNext: onNext, pet: pet1,isUseItem: true,),
                                 ),
                                 );
                               },
@@ -1300,7 +1293,7 @@ class ItemCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(onNext: onNext, isUseItem: true,),
+                                    builder: (context) => ItemlistPage2(onNext: onNext, pet: pet1, isUseItem: true,),
                                 ),
                                 );
                               },
@@ -1327,7 +1320,7 @@ class ItemCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: onNext, isUseItem:  true,),
+                                    builder: (context) => ItemlistPage3(onNext: onNext, pet: pet1, isUseItem:  true,),
                                 ),
                                 );
                               },
@@ -1349,7 +1342,7 @@ class ItemCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: onNext, isUseItem: true,),
+                                    builder: (context) => ItemlistPage4(onNext: onNext, pet: pet1, isUseItem: true,),
                                 ),
                                 );
                               },
@@ -1407,7 +1400,8 @@ class ItemCategory extends StatelessWidget {
 
 class ShopCategory extends StatelessWidget {
   final void Function(int) onNext;
-  const ShopCategory({required this.onNext, super.key});
+  final Pets pet1;
+  const ShopCategory({required this.onNext, required this.pet1, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1419,7 +1413,7 @@ class ShopCategory extends StatelessWidget {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext,),
+              child: Mainarea(onNext: onNext, pet: pet1),
               // MainArea()로 변경
             ),
           ),
@@ -1468,7 +1462,7 @@ class ShopCategory extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(onNext: onNext, isUseItem: false,),
+                                    builder: (context) => ItemlistPage1(onNext: onNext, pet: pet1, isUseItem: false,),
                                 ),
                                 );
                               },
@@ -1490,7 +1484,7 @@ class ShopCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(onNext: onNext, isUseItem: false,),
+                                    builder: (context) => ItemlistPage2(onNext: onNext, pet: pet1, isUseItem: false,),
                                 ),
                                 );
                               },
@@ -1517,7 +1511,7 @@ class ShopCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: onNext, isUseItem: false,),
+                                    builder: (context) => ItemlistPage3(onNext: onNext, pet: pet1, isUseItem: false,),
                                 ),
                                 );
                               },
@@ -1539,7 +1533,7 @@ class ShopCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: onNext, isUseItem: false,),
+                                    builder: (context) => ItemlistPage4(onNext: onNext, pet: pet1, isUseItem: false,),
                                 ),
                                 );
                               },

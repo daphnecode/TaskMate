@@ -49,7 +49,8 @@ Row happyStatus(int nowHappy) {
 
 class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
-  const Mainarea({required this.onNext, super.key});
+  final Pets pet;
+  const Mainarea({required this.onNext, required this.pet, super.key});
 
   @override
   State<Mainarea> createState() => _MainareaState();
@@ -67,47 +68,6 @@ class _MainareaState extends State<Mainarea> {
       precacheImage(AssetImage('assets/icons/icon-chickenalt.png'), context);
       precacheImage(AssetImage('assets/icons/icon-chickenaltW.png'), context);
     }
-  }
-  
-  Pets pet1 = Pets(
-    image: "assets/images/dragon.png",
-    name: "",
-    hunger:0,
-    happy: 0,
-    level: 0,
-    currentExp: 0,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    initAsync();
-  }
-
-  Future<void> initAsync() async {
-    await initJsonIfNotExists(); // 먼저 파일 복사
-    await loadItems();           // 복사 완료 후 파일 읽기
-  }
-
-  Future<void> initJsonIfNotExists() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file1 = File('${dir.path}/pet1.json');
-
-    if (!await file1.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
-      await file1.writeAsString(assetJson);
-    }
-  }
-
-  Future<void> loadItems() async {
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/pet1.json').readAsString();    
-    final Map<String, dynamic> jsonData = json.decode(jsonStr);
-    final Pets loadedItems = Pets.fromJson(jsonData);
-
-    setState(() {
-      pet1 = loadedItems;
-    });
   }
     
 
@@ -139,7 +99,7 @@ class _MainareaState extends State<Mainarea> {
                       "LV 13",),
                   ),
                   Expanded(
-                    child: happyStatus(pet1.happy),
+                    child: happyStatus(widget.pet.happy),
                   ),
                 ],
               ),
@@ -201,7 +161,7 @@ class _MainareaState extends State<Mainarea> {
                       ),
                   ),
                   Expanded(
-                    child: hungerStatus(pet1.hunger),
+                    child: hungerStatus(widget.pet.hunger),
                   ),
                 ],
               ),
@@ -231,7 +191,7 @@ class _MainareaState extends State<Mainarea> {
                       Positioned(
                         left: width * 0.4, top: height * 0.5,
                         child: Image.asset(
-                          pet1.image, 
+                          widget.pet.image, 
                           fit: BoxFit.cover, 
                           height: 180.0, width: 180.0
                         ),
@@ -247,11 +207,16 @@ class _MainareaState extends State<Mainarea> {
   }
 }
 
-class Petmain extends StatelessWidget {
+class Petmain extends StatefulWidget {
   final void Function(int) onNext;
-  const Petmain({required this.onNext, super.key});
+  final Pets pet1;
+  const Petmain({required this.onNext, required this.pet1,super.key});
 
+  @override
+  State<Petmain> createState() => _PetmainState();
+}
 
+class _PetmainState extends State<Petmain> {
   @override
   Widget build(BuildContext context) {
     
@@ -263,7 +228,7 @@ class Petmain extends StatelessWidget {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet1),
               // MainArea()로 변경
             ),
           ),
@@ -283,7 +248,7 @@ class Petmain extends StatelessWidget {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
-                                  onNext(1); // Navigate to ItemlistPage
+                                  widget.onNext(1); // Navigate to ItemlistPage
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue[100],
@@ -312,7 +277,7 @@ class Petmain extends StatelessWidget {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
-                                  onNext(5); // Navigate to ItemlistPage
+                                  widget.onNext(5); // Navigate to ItemlistPage
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue[100],
@@ -419,13 +384,13 @@ class Petmain extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
-                    onNext(3); // Navigate to PlannerMain
+                    widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {onNext(0);
+                  onPressed: () {widget.onNext(0);
                   },
                 ),
                 IconButton(
