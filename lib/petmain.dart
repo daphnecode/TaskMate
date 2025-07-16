@@ -59,7 +59,18 @@ class _MainareaState extends State<Mainarea> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PetChoose(onNext: widget.onNext),));
+                  builder: (context) => PetChoose(onNext: widget.onNext),
+                  )
+                ).then((newPet) {
+                  setState(() {
+                    widget.pet.image = newPet.image;
+                    widget.pet.name = newPet.name;
+                    widget.pet.hunger = newPet.hunger;
+                    widget.pet.happy = newPet.happy;
+                    widget.pet.level = newPet.level;
+                    widget.pet.currentExp = newPet.currentExp;
+                  });
+                });
             },
             child: Container(
               color: Colors.white,

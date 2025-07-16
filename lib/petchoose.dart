@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'object.dart';
 
 class Mainarea1 extends StatelessWidget {
   const Mainarea1({super.key});
@@ -17,9 +21,23 @@ class Mainarea1 extends StatelessWidget {
   }
 }
 
-class Subarea1 extends StatelessWidget {
+class Subarea1 extends StatefulWidget {
   const Subarea1({super.key});
 
+  @override
+  State<Subarea1> createState() => _Subarea1State();
+}
+
+class _Subarea1State extends State<Subarea1> {
+  Future<Pets> loadPet(String currentPet) async {
+    final testDirectory = await getApplicationDocumentsDirectory();
+    String jsonStr2 = await File('${testDirectory.path}/$currentPet.json').readAsString();    
+    final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
+    final Pets loadedItems2 = Pets.fromJson(jsonData2);
+
+    return loadedItems2;
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -43,7 +61,7 @@ class Subarea1 extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
-                Navigator.pop(context);
+                Navigator.pop(context, loadPet("pet2"));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green[100],

@@ -46,8 +46,8 @@ class Item {
 }
 
 class Pets {
-  final String image;
-  final String name;
+  String image;
+  String name;
   int hunger;
   int happy;
   int level;
@@ -82,6 +82,17 @@ class Pets {
     'level': level,
     'currentExp': currentExp,
   };
+
+  factory Pets.copyPet(Pets newPet) {
+    return Pets(
+      image: newPet.image,
+      name: newPet.name,
+      hunger: newPet.hunger,
+      happy: newPet.happy,
+      level: newPet.level,
+      currentExp: newPet.currentExp,
+    );
+  }
 }
 
 class Users {
