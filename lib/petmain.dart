@@ -322,7 +322,12 @@ class _PetmainState extends State<Petmain> {
                                   onPressed: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (_) => CleanGameScreen()),
+                                      MaterialPageRoute(builder: (_) => CleanGameScreen(
+                                        onNext: (int index) {
+                                          Navigator.pop(context);
+                                          widget.onNext(index);
+                                        },
+                                      )),
                                     );
                                     // Handle button press
                                   },
