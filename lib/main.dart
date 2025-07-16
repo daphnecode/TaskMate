@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'planner_main.dart';
 import 'planner_edit.dart';
 import 'itemlist.dart';
@@ -9,6 +10,7 @@ import 'petmain.dart';
 import 'petchoose.dart';
 import 'package:taskmate/DBtest/task.dart';
 import 'package:taskmate/DBtest/task_data.dart';
+import 'object.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,11 +43,29 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
+  Users user = Users(
+    point: 0,
+    image: "",
+    name: ""
+  );
+  Pets pet = Pets(
+    image: "assets/images/dragon.png",
+    name: "",
+    hunger:0,
+    happy: 0,
+    level: 0,
+    currentExp: 0,
+  );  
 
   @override
   void initState() {
     super.initState();
-    initJsonIfNotExists();
+    initAsync();
+  }
+
+  Future<void> initAsync() async {
+    await initJsonIfNotExists();
+    await loadItems();
   }
 
   Future<void> initJsonIfNotExists() async {
@@ -72,6 +92,22 @@ class _MyHomePageState extends State<MyHomePage> {
     // await file6.writeAsString(assetJson);
   }
 
+  Future<void> loadItems() async {
+    final testDirectory = await getApplicationDocumentsDirectory();
+    String jsonStr1 = await File('${testDirectory.path}/user1.json').readAsString();    
+    final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
+    final Users loadedItems1 = Users.fromJson(jsonData1);
+
+    String jsonStr2 = await File('${testDirectory.path}/pet1.json').readAsString();    
+    final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
+    final Pets loadedItems2 = Pets.fromJson(jsonData2);
+
+    setState(() {
+      user = loadedItems1;
+      pet = loadedItems2;
+    });
+  }
+
   Map<String, List<Task>> dailyTaskMap = {};
   DateTime selectedDate = DateTime.now();
   String _dateKey(DateTime date) {
@@ -90,10 +126,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext);
+        currentWidget = Petmain(onNext: goNext, pet: pet, user: user,);
         break;
       case 1:
-        currentWidget = ItemCategory(onNext: goNext);
+        currentWidget = ItemCategory(onNext: goNext, pet: pet, user: user);
         break;
       case 2:
         currentWidget = PetChoose(onNext: goNext);
@@ -137,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 5:
-        currentWidget = ShopCategory(onNext: goNext);
+        currentWidget = ShopCategory(onNext: goNext, pet: pet, user: user,);
         break;
       default:
         currentWidget = Text('기본');
