@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'dart:convert';
 import 'planner_main.dart';
 import 'planner_edit.dart';
 import 'itemlist.dart';
@@ -10,7 +9,6 @@ import 'petmain.dart';
 import 'petchoose.dart';
 import 'package:taskmate/DBtest/task.dart';
 import 'package:taskmate/DBtest/task_data.dart';
-import 'object.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,65 +41,35 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  String nowBack = "assets/images/prairie.png";
-  Pets pet1 = Pets(
-    image: "assets/images/dragon.png",
-    name: "",
-    hunger:0,
-    happy: 0,
-    level: 0,
-    currentExp: 0,
-  );
-  Pets pet2 = Pets(
-    image: "assets/images/unicon.png",
-    name: "",
-    hunger:0,
-    happy: 0,
-    level: 0,
-    currentExp: 0,
-  );
 
   @override
   void initState() {
     super.initState();
-    initAsync();
-  }
-
-  Future<void> initAsync() async {
-    await initJsonIfNotExists(); // 먼저 파일 복사
-    await loadItems();           // 복사 완료 후 파일 읽기s
+    initJsonIfNotExists();
   }
 
   Future<void> initJsonIfNotExists() async {
     final dir = await getApplicationDocumentsDirectory();
     final file1 = File('${dir.path}/pet1.json');
-    final file2 = File('${dir.path}/items1.json');
-    final file3 = File('${dir.path}/items2.json');
-    final file4 = File('${dir.path}/items3.json');
-    final file5 = File('${dir.path}/items4.json');
+    // final file2 = File('${dir.path}/items1.json');
+    // final file3 = File('${dir.path}/items2.json');
+    // final file4 = File('${dir.path}/items3.json');
+    // final file5 = File('${dir.path}/items4.json');
+    // final file6 = File('${dir.path}/user1.json');
     String assetJson;
 
     assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
     await file1.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
-    await file2.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
-    await file3.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
-    await file4.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
-    await file5.writeAsString(assetJson);
-  }
-
-  Future<void> loadItems() async {
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr1 = await File('${testDirectory.path}/pet1.json').readAsString();    
-    final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
-    final Pets loadedItems1 = Pets.fromJson(jsonData1);
-
-    setState(() {
-      pet1 = loadedItems1;
-    });
+    // assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
+    // await file2.writeAsString(assetJson);
+    // assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
+    // await file3.writeAsString(assetJson);
+    // assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
+    // await file4.writeAsString(assetJson);
+    // assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
+    // await file5.writeAsString(assetJson);
+    // assetJson = await rootBundle.loadString('lib/DBtest/user1.json');
+    // await file6.writeAsString(assetJson);
   }
 
   Map<String, List<Task>> dailyTaskMap = {};
@@ -122,10 +90,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext, pet: pet1);
+        currentWidget = Petmain(onNext: goNext);
         break;
       case 1:
-        currentWidget = ItemCategory(onNext: goNext, pet: pet1);
+        currentWidget = ItemCategory(onNext: goNext);
         break;
       case 2:
         currentWidget = PetChoose(onNext: goNext);
@@ -169,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 5:
-        currentWidget = ShopCategory(onNext: goNext, pet: pet1);
+        currentWidget = ShopCategory(onNext: goNext);
         break;
       default:
         currentWidget = Text('기본');

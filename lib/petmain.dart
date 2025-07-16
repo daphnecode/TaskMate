@@ -9,57 +9,63 @@ import 'petstatus.dart';
 //청소게임
 import 'clean_game_screen.dart';
 
-Future<void> changeStatusSave(Pets pet, int index) async {
+Future<void> changeStatusSave(Pets pet) async {
   final directory = await getApplicationDocumentsDirectory();
-  final file = File('${directory.path}/pet$index.json');
+  final file = File('${directory.path}/pet1.json');
 
   final jsonString = jsonEncode(pet.toJson());
 
   await file.writeAsString(jsonString);
 }
 
-Row hungerStatus(int nowHunger) {
-  int check = (nowHunger / 20).truncate() + 1;
-  
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: List.generate(5, (index) {
-      return Image.asset(
-        (index < check) ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',
-        width: 30,
-        height: 30,
-        );
-      },
-      )
-    );
-}
-
-Row happyStatus(int nowHappy) {
-  int check = (nowHappy / 20).truncate() + 1;
-  
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: List.generate(5, (index) {
-      return Image.asset(
-        index < check ? 'assets/icons/icon-heart.png' : 'assets/icons/icon-heartW.png',
-        width: 30,
-        height: 30,
-        );
-      },
-      )
-    );
-}
-
 class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
-  const Mainarea({required this.onNext, required this.pet, super.key});
+  const Mainarea({required this.onNext, super.key});
 
   @override
   State<Mainarea> createState() => _MainareaState();
 }
 
 class _MainareaState extends State<Mainarea> {
+  Users user = Users(
+    point: 0,
+    image: "",
+    name: ""
+  );
+  Pets pet = Pets(
+    image: "",
+    name: "",
+    hunger:0,
+    happy: 0,
+    level: 0,
+    currentExp: 0,
+  );
+  
+  
+  @override
+  void initState() {
+    super.initState();
+    loadItems();
+  }
+
+  Future<void> loadItems() async {
+    final testDirectory = await getApplicationDocumentsDirectory();
+    String jsonStr = await File('${testDirectory.path}/user1.json').readAsString();    
+    final Map<String, dynamic> jsonData = json.decode(jsonStr);
+    final Users loadedItems = Users.fromJson(jsonData);
+
+    String jsonStr1 = await File('${testDirectory.path}/pet1.json').readAsString();    
+    final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
+    final Pets loadedItems1 = Pets.fromJson(jsonData1);
+
+    setState(() {
+      user = loadedItems;
+      pet = loadedItems1;
+    });
+  }
+
+  
+  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -76,101 +82,13 @@ class _MainareaState extends State<Mainarea> {
 
   @override
   Widget build(BuildContext context) {
+    if (user.image == "" || pet.image == "") {
+      return Center(child: CircularProgressIndicator());
+    }
+    
     return Column(
       children: [
-        GestureDetector(
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: PetStatus(pet: widget.pet),
-                );
-              },
-            );
-          },
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold), 
-                      "LV 13",),
-                  ),
-                  Expanded(
-                    child: happyStatus(widget.pet.happy),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(Icons.question_mark,),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.arrow_left,),
-                                          Image.asset(
-                                            "assets/images/petTuto1.png",
-                                            height: 600.0,
-                                            width: 250.0,
-                                          ),
-                                          Icon(Icons.arrow_right,),
-                                        ],
-                                      ),
-                                      Text(
-                                        "펫 키우기 메인화면 입니다.",
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                      ),
-                                      SizedBox(height: 10.0),
-                                      Text(
-                                        "여러 기능을 사용할 수 있습니다.",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      SizedBox(height: 20.0),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text("닫기"),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        )
-                      ),
-                  ),
-                  Expanded(
-                    child: hungerStatus(widget.pet.hunger),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+        PetStatArea(pet: pet),
         Expanded(
           child: GestureDetector(
             onLongPress: () {
@@ -190,14 +108,14 @@ class _MainareaState extends State<Mainarea> {
                   return Stack(
                     children: [
                       Image.asset(
-                        "assets/images/volcano.png", 
+                        user.image, 
                         fit: BoxFit.cover, 
                         height: double.infinity, width: double.infinity
                         ),
                       Positioned(
                         left: width * 0.4, top: height * 0.5,
                         child: Image.asset(
-                          widget.pet.image, 
+                          pet.image, 
                           fit: BoxFit.cover, 
                           height: 180.0, width: 180.0
                         ),
@@ -215,8 +133,7 @@ class _MainareaState extends State<Mainarea> {
 
 class Petmain extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
-  const Petmain({required this.onNext, required this.pet, super.key});
+  const Petmain({required this.onNext, super.key});
 
   @override
   State<Petmain> createState() => _PetmainState();
@@ -234,7 +151,7 @@ class _PetmainState extends State<Petmain> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
+              child: Mainarea(onNext: widget.onNext),
               // MainArea()로 변경
             ),
           ),
