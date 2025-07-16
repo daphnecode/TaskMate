@@ -80,7 +80,7 @@ class _MainareaState extends State<Mainarea> {
                         child: Image.asset(
                           widget.pet.image, 
                           fit: BoxFit.cover, 
-                          height: 180.0, width: 180.0
+                          height: height * 0.5, width: width * 0.4
                         ),
                       ),
                     ],
