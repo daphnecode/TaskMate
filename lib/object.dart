@@ -51,7 +51,7 @@ class Pets {
   int hunger;
   int happy;
   int level;
-  int currentExp;
+  double currentExp;
 
   Pets(
     {

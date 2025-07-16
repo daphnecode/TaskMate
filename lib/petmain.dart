@@ -118,7 +118,9 @@ class Petmain extends StatefulWidget {
 class _PetmainState extends State<Petmain> { 
   @override
   Widget build(BuildContext context) {
-    
+    if (widget.user.image == "" || widget.pet.image == "") {
+      return Center(child: CircularProgressIndicator());
+    }
     return Scaffold(
       appBar: AppBar(),
       body: Column(

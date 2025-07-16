@@ -65,7 +65,7 @@ class _PetStatAreaState extends State<PetStatArea> {
               Expanded(
                 child: Text(
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold), 
-                  "LV 13",),
+                  "LV ${widget.pet.level}",),
               ),
               Expanded(
                 child: happyStatus(widget.pet.happy),
@@ -147,6 +147,7 @@ class PetStatus extends StatelessWidget{
   
   @override
   Widget build(BuildContext context) {
+    double progress = pet.currentExp / 157;
     return Padding(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -165,7 +166,20 @@ class PetStatus extends StatelessWidget{
                 flex: 3,
                 child: Column(
                   children: [
-                    Text("------------------------"),
+                    Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 8,
+                          backgroundColor: Colors.white,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                    ],
+                  ),
                     Text("${pet.currentExp}/157"),
                   ],
                 ),

@@ -47,7 +47,7 @@ class _Subarea1State extends State<Subarea1> {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
-                Navigator.pop(context);
+                Navigator.pop(context, loadPet("pet1"));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red[100],
@@ -74,7 +74,7 @@ class _Subarea1State extends State<Subarea1> {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
-                Navigator.pop(context);
+                Navigator.pop(context, loadPet("pet2"));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[100],

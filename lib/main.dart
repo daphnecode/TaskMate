@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     name: ""
   );
   Pets pet = Pets(
-    image: "assets/images/dragon.png",
+    image: "",
     name: "",
     hunger:0,
     happy: 0,
