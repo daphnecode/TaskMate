@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // final file3 = File('${dir.path}/items2.json');
     // final file4 = File('${dir.path}/items3.json');
     // final file5 = File('${dir.path}/items4.json');
-    // final file6 = File('${dir.path}/user1.json');
+    final file6 = File('${dir.path}/user1.json');
     String assetJson;
 
     assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
@@ -88,8 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // await file4.writeAsString(assetJson);
     // assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
     // await file5.writeAsString(assetJson);
-    // assetJson = await rootBundle.loadString('lib/DBtest/user1.json');
-    // await file6.writeAsString(assetJson);
+    assetJson = await rootBundle.loadString('lib/DBtest/user1.json');
+    await file6.writeAsString(assetJson);
   }
 
   Future<void> loadItems() async {

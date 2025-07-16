@@ -14,7 +14,7 @@ Future<void> useItemsSave(List<Item> items, int index) async {
   await file.writeAsString(jsonString);
 }
 
-Future<void> useBackSave(Users user) async {
+Future<void> userSave(Users user) async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/user1.json');
 
@@ -36,14 +36,6 @@ class ItemlistPage1 extends StatefulWidget {
 
 class _ItemlistPage1State extends State<ItemlistPage1> {
   List<Item> inventory = [];
-  Pets pet = Pets(
-    image: "assets/images/dragon.png",
-    name: "",
-    hunger:0,
-    happy: 0,
-    level: 0,
-    currentExp: 0,
-  );
 
   @override
   void initState() {
@@ -57,13 +49,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
 
-    String jsonStr1 = await File('${testDirectory.path}/pet1.json').readAsString();    
-    final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
-    final Pets loadedItems1 = Pets.fromJson(jsonData1);
-
     setState(() {
       inventory = loadedItems;
-      pet = loadedItems1;
     });
   }
 
@@ -78,7 +65,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: pet, user: widget.user,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user,),
             ),
           ),
           Expanded(
@@ -145,9 +132,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                 if(item.count > 0) {
                                   setState(() {
                                     item.count--;
-                                    pet.hunger += item.hunger;
-                                    pet.happy += item.happy;
-                                    changeStatusSave(pet);
+                                    widget.pet.hunger += item.hunger;
+                                    widget.pet.happy += item.happy;
+                                    changeStatusSave(widget.pet);
                                     useItemsSave(inventory, 1);
                                   });
                                 }
@@ -229,7 +216,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("100pt", 
+                      child: Text("${widget.user.point}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -278,8 +265,12 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                               child: Text('구매'),
                               onPressed: () {
                                 setState(() {
+                                  if (item.price < widget.user.point) {
+                                  widget.user.point -= item.price;
                                   item.count++;
                                   useItemsSave(inventory, 1);
+                                  userSave(widget.user);
+                                  }
                                 });
                                 Navigator.pop(context);
                                 },
@@ -531,7 +522,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                     Expanded(
                       child: Container(
                         alignment: Alignment.centerRight,
-                        child: Text("100pt", 
+                        child: Text("${widget.user.point}pt", 
                           style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -768,7 +759,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                     widget.user.image = nameChange(item.name);
                                     widget.user.name = item.name;
                                   });
-                                  useBackSave(widget.user);                                  
+                                  userSave(widget.user);                                  
                                   Navigator.pop(context);
                                 },
                               ),
@@ -850,7 +841,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("100pt", 
+                      child: Text("${widget.user.point}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -1132,7 +1123,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("100pt", 
+                      child: Text("${widget.user.point}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -1292,7 +1283,11 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 MaterialPageRoute(
                                     builder: (context) => ItemlistPage1(onNext: widget.onNext, pet: widget.pet, user: widget.user, isUseItem: true,),
                                 )
-                                );
+                                ).then((value) {
+                                  setState(() {
+
+                                  });
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -1314,7 +1309,11 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 MaterialPageRoute(
                                     builder: (context) => ItemlistPage2(onNext: widget.onNext, pet: widget.pet, user: widget.user, isUseItem: true,),
                                 ),
-                                );
+                                ).then((value) {
+                                  setState(() {
+
+                                  });
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -1366,7 +1365,11 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 MaterialPageRoute(
                                     builder: (context) => ItemlistPage4(onNext: widget.onNext, pet: widget.pet, user: widget.user, isUseItem: true,),
                                 ),
-                                );
+                                ).then((value) {
+                                  setState(() {
+
+                                  });
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -1464,7 +1467,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("100pt", 
+                      child: Text("${widget.user.point}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -1492,7 +1495,11 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 MaterialPageRoute(
                                     builder: (context) => ItemlistPage1(onNext: widget.onNext, pet: widget.pet, user: widget.user,isUseItem: false,),
                                 ),
-                                );
+                                ).then((value) {
+                                  setState(() {
+
+                                  });
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -1514,7 +1521,11 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 MaterialPageRoute(
                                     builder: (context) => ItemlistPage2(onNext: widget.onNext, pet: widget.pet, user: widget.user, isUseItem: false,),
                                 ),
-                                );
+                                ).then((value) {
+                                  setState(() {
+
+                                  });
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
@@ -1543,7 +1554,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 ),
                                 ).then((value) {
                                   setState(() {
-                                    
+
                                   });
                                 });
                               },
@@ -1567,7 +1578,11 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 MaterialPageRoute(
                                     builder: (context) => ItemlistPage4(onNext: widget.onNext, pet: widget.pet, user: widget.user, isUseItem: false,),
                                 ),
-                                );
+                                ).then((value) {
+                                  setState(() {
+
+                                  });
+                                });
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue[100],
