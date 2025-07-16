@@ -83,3 +83,31 @@ class Pets {
     'currentExp': currentExp,
   };
 }
+
+class Users {
+  int point;
+  String image;
+  String name;
+
+  Users(
+    {
+      required this.point,
+      required this.image,
+      required this.name,
+    }
+  );
+
+  factory Users.fromJson(Map<String, dynamic> json) {
+    return Users(
+      point: json['point'],
+      image: json['image'],
+      name: json['name'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'point': point,
+    'image': image,
+    'name': name,
+  };
+}

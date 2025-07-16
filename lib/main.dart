@@ -69,22 +69,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> initAsync() async {
     await initJsonIfNotExists(); // 먼저 파일 복사
-    await loadItems();           // 복사 완료 후 파일 읽기
+    await loadItems();           // 복사 완료 후 파일 읽기s
   }
 
   Future<void> initJsonIfNotExists() async {
     final dir = await getApplicationDocumentsDirectory();
     final file1 = File('${dir.path}/pet1.json');
-    final file2 = File('${dir.path}/pet2.json');
+    final file2 = File('${dir.path}/items1.json');
+    final file3 = File('${dir.path}/items2.json');
+    final file4 = File('${dir.path}/items3.json');
+    final file5 = File('${dir.path}/items4.json');
+    String assetJson;
 
-    if (await file1.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
-      await file1.writeAsString(assetJson);
-    }
-    if (await file2.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/pet2.json');
-      await file2.writeAsString(assetJson);
-    }
+    assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
+    await file1.writeAsString(assetJson);
+    assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
+    await file2.writeAsString(assetJson);
+    assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
+    await file3.writeAsString(assetJson);
+    assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
+    await file4.writeAsString(assetJson);
+    assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
+    await file5.writeAsString(assetJson);
   }
 
   Future<void> loadItems() async {
@@ -92,13 +98,9 @@ class _MyHomePageState extends State<MyHomePage> {
     String jsonStr1 = await File('${testDirectory.path}/pet1.json').readAsString();    
     final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
     final Pets loadedItems1 = Pets.fromJson(jsonData1);
-    String jsonStr2 = await File('${testDirectory.path}/pet2.json').readAsString();    
-    final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
-    final Pets loadedItems2 = Pets.fromJson(jsonData2);
 
     setState(() {
       pet1 = loadedItems1;
-      pet2 = loadedItems2;
     });
   }
 
@@ -120,10 +122,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext, pet: pet1, nowBack: nowBack);
+        currentWidget = Petmain(onNext: goNext, pet: pet1);
         break;
       case 1:
-        currentWidget = ItemCategory(onNext: goNext, pet: pet1, nowBack: nowBack,);
+        currentWidget = ItemCategory(onNext: goNext, pet: pet1);
         break;
       case 2:
         currentWidget = PetChoose(onNext: goNext);
@@ -167,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 5:
-        currentWidget = ShopCategory(onNext: goNext, pet: pet1, nowBack: nowBack,);
+        currentWidget = ShopCategory(onNext: goNext, pet: pet1);
         break;
       default:
         currentWidget = Text('기본');

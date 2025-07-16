@@ -18,9 +18,8 @@ Future<void> useItemsSave(List<Item> items, int index) async {
 class ItemlistPage1 extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
   final bool isUseItem;
-  ItemlistPage1({required this.onNext, required this.pet, required this.nowBack, required this.isUseItem, super.key});
+  const ItemlistPage1({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
   State<ItemlistPage1> createState() => _ItemlistPage1State();
@@ -32,24 +31,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
   @override
   void initState() {
     super.initState();
-    initAsync();
+    loadItems();
   }
-
-  Future<void> initAsync() async {
-    await initJsonIfNotExists(); // 먼저 파일 복사
-    await loadItems();           // 복사 완료 후 파일 읽기
-  }
-
-  Future<void> initJsonIfNotExists() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file1 = File('${dir.path}/items1.json');
-
-    if (!await file1.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
-      await file1.writeAsString(assetJson);
-    }
-  }
-
 
   Future<void> loadItems() async {
     final testDirectory = await getApplicationDocumentsDirectory();
@@ -73,7 +56,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
             ),
           ),
           Expanded(
@@ -201,7 +184,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
             ),
           ),
           Expanded(
@@ -328,9 +311,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 class ItemlistPage2 extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
   final bool isUseItem;
-  ItemlistPage2({required this.onNext, required this.pet, required this.nowBack, required this.isUseItem, super.key});
+  const ItemlistPage2({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
   State<ItemlistPage2> createState() => _ItemlistPage2State();
@@ -342,24 +324,8 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
   @override
   void initState() {
     super.initState();
-    initAsync();
+    loadItems();
   }
-
-  Future<void> initAsync() async {
-    await initJsonIfNotExists(); // 먼저 파일 복사
-    await loadItems();           // 복사 완료 후 파일 읽기
-  }
-
-  Future<void> initJsonIfNotExists() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file2 = File('${dir.path}/items2.json');
-
-    if (!await file2.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
-      await file2.writeAsString(assetJson);
-    }
-  }
-
 
   Future<void> loadItems() async {
     final testDirectory = await getApplicationDocumentsDirectory();
@@ -383,7 +349,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
             ),
           ),
           Expanded(
@@ -506,7 +472,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               flex: 6,
               child: Container(
                 color: Colors.white,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet),
               ),
             ),
             Expanded(
@@ -632,9 +598,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 class ItemlistPage3 extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
+  
   final bool isUseItem;
-  ItemlistPage3({required this.onNext, required this.pet, required this.nowBack, required this.isUseItem, super.key});
+  ItemlistPage3({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
   State<ItemlistPage3> createState() => _ItemlistPage3State();
@@ -647,24 +613,8 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
   @override
   void initState() {
     super.initState();
-    initAsync();
+    loadItems();
   }
-
-  Future<void> initAsync() async {
-    await initJsonIfNotExists(); // 먼저 파일 복사
-    await loadItems();           // 복사 완료 후 파일 읽기
-  }
-
-  Future<void> initJsonIfNotExists() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file2 = File('${dir.path}/items3.json');
-
-    if (!await file2.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
-      await file2.writeAsString(assetJson);
-    }
-  }
-
 
   Future<void> loadItems() async {
     final testDirectory = await getApplicationDocumentsDirectory();
@@ -688,7 +638,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
             ),
           ),
           Expanded(
@@ -748,7 +698,6 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                 child: Text('사용'),
                                 onPressed: () {
                                   setState(() {
-                                    widget.nowBack = item.icon;
                                     usedItem = item.name;
                                   });
                                   Navigator.pop(context);
@@ -808,7 +757,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
             ),
           ),
           Expanded(
@@ -929,9 +878,9 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 class ItemlistPage4 extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
+  
   final bool isUseItem;
-  ItemlistPage4({required this.onNext, required this.pet, required this.nowBack, required this.isUseItem, super.key});
+  ItemlistPage4({required this.onNext, required this.pet, required this.isUseItem, super.key});
 
   @override
   State<ItemlistPage4> createState() => _ItemlistPage4State();
@@ -944,22 +893,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
   @override
   void initState() {
     super.initState();
-    initAsync();
-  }
-
-  Future<void> initAsync() async {
-    await initJsonIfNotExists(); // 먼저 파일 복사
-    await loadItems();           // 복사 완료 후 파일 읽기
-  }
-
-  Future<void> initJsonIfNotExists() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file2 = File('${dir.path}/items4.json');
-
-    if (!await file2.exists()) {
-      final assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
-      await file2.writeAsString(assetJson);
-    }
+    loadItems();
   }
 
 
@@ -985,7 +919,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
             ),
           ),
           Expanded(
@@ -1105,7 +1039,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
             ),
           ),
           Expanded(
@@ -1226,8 +1160,8 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 class ItemCategory extends StatelessWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
-  ItemCategory({required this.onNext, required this.pet, required this.nowBack, super.key});
+  
+  ItemCategory({required this.onNext, required this.pet, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1239,7 +1173,7 @@ class ItemCategory extends StatelessWidget {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext, pet: pet, nowBack: nowBack,),
+              child: Mainarea(onNext: onNext, pet: pet),
               // MainArea()로 변경
             ),
           ),
@@ -1280,7 +1214,7 @@ class ItemCategory extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(onNext: onNext, pet: pet, nowBack: nowBack,isUseItem: true,),
+                                    builder: (context) => ItemlistPage1(onNext: onNext, pet: pet, isUseItem: true,),
                                 ),
                                 );
                               },
@@ -1302,7 +1236,7 @@ class ItemCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(onNext: onNext, pet: pet, nowBack: nowBack, isUseItem: true,),
+                                    builder: (context) => ItemlistPage2(onNext: onNext, pet: pet, isUseItem: true,),
                                 ),
                                 );
                               },
@@ -1329,7 +1263,7 @@ class ItemCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: onNext, pet: pet, nowBack: nowBack, isUseItem:  true,),
+                                    builder: (context) => ItemlistPage3(onNext: onNext, pet: pet, isUseItem:  true,),
                                 ),
                                 );
                               },
@@ -1351,7 +1285,7 @@ class ItemCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: onNext, pet: pet, nowBack: nowBack, isUseItem: true,),
+                                    builder: (context) => ItemlistPage4(onNext: onNext, pet: pet, isUseItem: true,),
                                 ),
                                 );
                               },
@@ -1410,8 +1344,7 @@ class ItemCategory extends StatelessWidget {
 class ShopCategory extends StatelessWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
-  ShopCategory({required this.onNext, required this.pet, required this.nowBack, super.key});
+  const ShopCategory({required this.onNext, required this.pet, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1423,7 +1356,7 @@ class ShopCategory extends StatelessWidget {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: onNext, pet: pet, nowBack: nowBack,),
+              child: Mainarea(onNext: onNext, pet: pet),
               // MainArea()로 변경
             ),
           ),
@@ -1472,7 +1405,7 @@ class ShopCategory extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(onNext: onNext, pet: pet, nowBack: nowBack, isUseItem: false,),
+                                    builder: (context) => ItemlistPage1(onNext: onNext, pet: pet, isUseItem: false,),
                                 ),
                                 );
                               },
@@ -1494,7 +1427,7 @@ class ShopCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(onNext: onNext, pet: pet, nowBack: nowBack, isUseItem: false,),
+                                    builder: (context) => ItemlistPage2(onNext: onNext, pet: pet, isUseItem: false,),
                                 ),
                                 );
                               },
@@ -1521,7 +1454,7 @@ class ShopCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: onNext, pet: pet, nowBack: nowBack, isUseItem: false,),
+                                    builder: (context) => ItemlistPage3(onNext: onNext, pet: pet, isUseItem: false,),
                                 ),
                                 );
                               },
@@ -1543,7 +1476,7 @@ class ShopCategory extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: onNext, pet: pet, nowBack: nowBack, isUseItem: false,),
+                                    builder: (context) => ItemlistPage4(onNext: onNext, pet: pet, isUseItem: false,),
                                 ),
                                 );
                               },

@@ -53,8 +53,7 @@ Row happyStatus(int nowHappy) {
 class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
-  Mainarea({required this.onNext, required this.pet, required this.nowBack, super.key});
+  const Mainarea({required this.onNext, required this.pet, super.key});
 
   @override
   State<Mainarea> createState() => _MainareaState();
@@ -191,7 +190,7 @@ class _MainareaState extends State<Mainarea> {
                   return Stack(
                     children: [
                       Image.asset(
-                        widget.nowBack, 
+                        "assets/images/volcano.png", 
                         fit: BoxFit.cover, 
                         height: double.infinity, width: double.infinity
                         ),
@@ -217,8 +216,7 @@ class _MainareaState extends State<Mainarea> {
 class Petmain extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
-  String nowBack;
-  Petmain({required this.onNext, required this.pet, required this.nowBack, super.key});
+  const Petmain({required this.onNext, required this.pet, super.key});
 
   @override
   State<Petmain> createState() => _PetmainState();
@@ -236,7 +234,7 @@ class _PetmainState extends State<Petmain> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, nowBack: widget.nowBack,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet),
               // MainArea()로 변경
             ),
           ),
