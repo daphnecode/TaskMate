@@ -23,6 +23,33 @@ Future<void> userSave(Users user) async {
   await file.writeAsString(jsonString);
 }
 
+String nameChange(String name) {
+    String result;
+    switch (name) {
+      case "초원":
+        result = "assets/images/prairie.png";
+        return result;
+      case "바닷가":
+        result = "assets/images/beach.png";
+        return result;
+      case "숲 속":
+        result = "assets/images/forest.png";
+        return result;
+      case "구름 위":
+        result = "assets/images/cloud.png";
+        return result;
+      case "화산":
+        result = "assets/images/volcano.png";
+        return result;
+      case "야경":
+        result = "assets/images/nightcity.png";
+        return result;
+      default:
+        result = "assets/images/prairie.png";
+        return result;
+    }
+  }
+
 class ItemlistPage1 extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
@@ -637,33 +664,6 @@ class ItemlistPage3 extends StatefulWidget {
 class _ItemlistPage3State extends State<ItemlistPage3> {
   List<Item> inventory = [];
 
-  String nameChange(String name) {
-    String result;
-    switch (name) {
-      case "초원":
-        result = "assets/images/prairie.png";
-        return result;
-      case "바닷가":
-        result = "assets/images/beach.png";
-        return result;
-      case "숲 속":
-        result = "assets/images/forest.png";
-        return result;
-      case "구름 위":
-        result = "assets/images/cloud.png";
-        return result;
-      case "화산":
-        result = "assets/images/volcano.png";
-        return result;
-      case "야경":
-        result = "assets/images/nightcity.png";
-        return result;
-      default:
-        result = "assets/images/prairie.png";
-        return result;
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -859,43 +859,50 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
                   final item = inventory[index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text('${item.name}')),
-                          content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
-                                SizedBox(height: 10),
-                                Text('가격은 ${item.price}pt입니다.', 
-                                style: TextStyle(fontSize: 16)),
+                  final check = (item.count != 0);
+                  
+                  return Container(
+                    color: (check) ? Colors.red : Colors.transparent,
+                    child: ListTile(
+                      onTap: () {
+                        if (!check) {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: Center(child: Text('${item.name}')),
+                              content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                    SizedBox(height: 10),
+                                    Text('가격은 ${item.price}pt입니다.', 
+                                    style: TextStyle(fontSize: 16)),
+                                  ],
+                                ),
+                              actions: [
+                                TextButton(
+                                  child: Text('취소'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                  child: Text('구매'),
+                                  onPressed: () {
+                                    setState(() {
+                                      item.count++;
+                                    });
+                                    useItemsSave(inventory, 3);
+                                    Navigator.pop(context);
+                                    },
+                                ),
                               ],
                             ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('구매'),
-                              onPressed: () {
-                                setState(() {
-                                  item.count++;
-                                });
-                                useItemsSave(inventory, 3);
-                                Navigator.pop(context);
-                                },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: Image.asset(item.icon, width: 30, height: 30),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                          );
+                        }
+                      },
+                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      title: Text(item.name, style: TextStyle(fontSize: 18)),
+                      trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                    ),
                   );
                 },
               ),
@@ -1141,44 +1148,50 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
                   final item = inventory[index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text('${item.name}')),
-                          content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
-                                SizedBox(height: 10),
-                                Text('가격은 ${item.price}pt입니다.', 
-                                style: TextStyle(fontSize: 16)),
+                  final check = (item.count != 0);
+                  return Container(
+                    color: (check) ? Colors.red : Colors.transparent,
+                    child: ListTile(
+                      onTap: () {
+                        if (!check) {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: Center(child: Text('${item.name}')),
+                              content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                    SizedBox(height: 10),
+                                    Text('가격은 ${item.price}pt입니다.', 
+                                    style: TextStyle(fontSize: 16)),
+                                  ],
+                                ),
+                              actions: [
+                                TextButton(
+                                  child: Text('취소'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                  child: Text('구매'),
+                                  onPressed: () {
+                                    if (item.count == 0) {
+                                      setState(() {
+                                        item.count++;
+                                      });
+                                      useItemsSave(inventory, 4);
+                                    }
+                                  },
+                                ),
                               ],
                             ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('구매'),
-                              onPressed: () {
-                                if (item.count == 0) {
-                                  setState(() {
-                                    item.count++;
-                                  });
-                                  useItemsSave(inventory, 4);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: Image.asset(item.icon, width: 30, height: 30),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                          );
+                        }
+                      },
+                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      title: Text(item.name, style: TextStyle(fontSize: 18)),
+                      trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                    ),
                   );
                 },
               ),

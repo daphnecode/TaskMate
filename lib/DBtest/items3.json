@@ -5,7 +5,7 @@
     "name": "초원",
     "hunger": 0,
     "happy": 0,
-    "count": 0,
+    "count": 1,
     "price": 0,
     "itemText": "펫이 아늑함을 느낌니다."
   },
@@ -25,7 +25,7 @@
     "name": "숲 속",
     "hunger": 0,
     "happy": 0,
-    "count": 0,
+    "count": 1,
     "price": 300,
     "itemText": "펫이 아늑함을 느낌니다."
   },
@@ -35,7 +35,7 @@
     "name": "구름 위",
     "hunger": 0,
     "happy": 0,
-    "count": 0,
+    "count": 1,
     "price": 300,
     "itemText": "펫이 아늑함을 느낌니다."
   },
@@ -45,7 +45,7 @@
     "name": "화산",
     "hunger": 0,
     "happy": 0,
-    "count": 0,
+    "count": 1,
     "price": 500,
     "itemText": "펫이 아늑함을 느낌니다."
   },
