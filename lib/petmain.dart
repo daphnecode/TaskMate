@@ -6,6 +6,9 @@ import 'object.dart';
 import 'petchoose.dart';
 import 'petstatus.dart';
 
+//청소게임
+import 'clean_game_screen.dart';
+
 Future<void> changeStatusSave(Pets pet, int index) async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/pet$index.json');
@@ -317,6 +320,10 @@ class _PetmainState extends State<Petmain> {
                               children: [
                                 ElevatedButton(
                                   onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => CleanGameScreen()),
+                                    );
                                     // Handle button press
                                   },
                                   style: ElevatedButton.styleFrom(
