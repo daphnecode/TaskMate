@@ -193,13 +193,16 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -327,13 +330,16 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -500,13 +506,16 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -628,13 +637,16 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   IconButton(
                     icon: const Icon(Icons.calendar_month),
                     onPressed: () {
+                      Navigator.pop(context);
                       widget.onNext(3); // Navigate to PlannerMain
                     },
                   ),
 
                   IconButton(
                     icon: Icon(Icons.home),
-                    onPressed: () {widget.onNext(0);
+                    onPressed: () {
+                      Navigator.pop(context);
+                      widget.onNext(0);
                     },
                   ),
                   IconButton(
@@ -790,6 +802,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
@@ -921,13 +934,16 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -1081,13 +1097,16 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
                   },
                 ),
                 IconButton(
@@ -1210,13 +1229,16 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     widget.onNext(3); // Navigate to PlannerMain
                   },
                 ),
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
                   },
                 ),
                 IconButton(

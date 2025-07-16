@@ -108,6 +108,7 @@ class PetChoose extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
+                    Navigator.pop(context);
                     onNext(3); // Navigate to PlannerMain
                   },
                 ),
@@ -115,6 +116,7 @@ class PetChoose extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.home),
                   onPressed: () {
+                    Navigator.pop(context);
                     onNext(0);
                   },
                 ),
