@@ -1534,7 +1534,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2, isUseItem: false,),
+                                    builder: (context) => ItemlistPage1(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1560,7 +1560,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2, isUseItem: false,),
+                                    builder: (context) => ItemlistPage2(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1591,7 +1591,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2,isUseItem: false,),
+                                    builder: (context) => ItemlistPage3(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1617,7 +1617,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2,isUseItem: false,),
+                                    builder: (context) => ItemlistPage4(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
                                 ),
                                 ).then((value) {
                                   setState(() {

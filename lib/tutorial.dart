@@ -17,11 +17,17 @@ List<Widget> getTutorialPagesFor(int pageType) {
         ];
       case 2:
         return [
-          TutorialPage2(),
+          TutorialPage8(),
+          TutorialPage9(),
+        ];
+      case 3:
+        return [
+          TutorialPage10(),
+          TutorialPage11(),
         ];
       default:
         return [
-          TutorialPage2(),
+          TutorialPage1(),
         ];
     }
 }
@@ -852,6 +858,458 @@ class TutorialPage7 extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       "스타일 아이템을 확인한다.\n펫의 외형에 변화를 준다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage8 extends StatelessWidget {
+  const TutorialPage8({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto4.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "1.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "아이템 목록",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "선택된 카테고리의 아이템이다.\n클릭하면 사용 팝업이 나온다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "2.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "소비형 아이템",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "음식과 장난감 아이템이다.\n펫 상태에 영향을 주고 소모된다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage9 extends StatelessWidget {
+  const TutorialPage9({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto5.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "3.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "배치형 아이템",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "배경과 스타일 아이템이다.\n배치하면 펫 배경과 외형이 바뀐다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "4.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "사용 중",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "현재 배치한 아이템을 확인한다.\n배치형 아이템만 나타난다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage10 extends StatelessWidget {
+  const TutorialPage10({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto6.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "1.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "아이템 목록",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "선택된 카테고리의 아이템이다.\n클릭하면 구매 팝업이 나온다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "2.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "소비형 아이템",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "음식과 장난감 아이템이다.\n구매 개수에 제한이 없다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage11 extends StatelessWidget {
+  const TutorialPage11({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto7.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "3.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "배치형 아이템",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "배경과 스타일 아이템이다.\n구매 개수에 제한이 있다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "4.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "구매 불가",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "더 이상 구매할 수 없는 아이템이다.\n배치형 아이템만 구매 제한이 있다.",
                       style: const TextStyle(
                         fontSize: 14,
                         height: 1.5,
