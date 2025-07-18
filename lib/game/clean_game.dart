@@ -5,10 +5,12 @@ import 'cursor_component.dart';
 import 'dart:math';
 import 'package:flame/components.dart' as flame;
 import 'package:vector_math/vector_math_64.dart' as vmath;
+import 'dart:async';
 
 class CleanGame extends FlameGame {
   final Random _random = Random();
   late CursorComponent cursor;
+  bool _readyToCheckClear = false;
 
   // 🔵 외부 입력 방향을 저장할 변수
   vmath.Vector2 moveDelta = vmath.Vector2.zero();
@@ -42,12 +44,12 @@ class CleanGame extends FlameGame {
       final distance = poop.position.distanceTo(cursor.position);
       if (distance < 40) {
         poop.removeFromParent();
+        cursor.animateShrink();
         print("💩 제거됨!");
         break;
       }
     }
   }
-
   // 🟦 외부에서 조이스틱 방향을 입력받는 함수
   void move(vmath.Vector2 delta) {
     moveDelta = delta;
@@ -76,8 +78,10 @@ class CleanGame extends FlameGame {
 
     //클리어 상태 체크
     if (isClear() && !_clearShown) {
-      overlays.add('ClearPopup');
       _clearShown = true;
+      Future.delayed(const Duration(milliseconds: 100), () {
+        overlays.add('ClearPopup');
+      });
     }
 
   }
