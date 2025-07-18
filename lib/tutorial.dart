@@ -11,6 +11,7 @@ List<Widget> getTutorialPagesFor(int pageType) {
         ];
       case 1:
         return [
+          TutorialPage5(),
           TutorialPage6(),
           TutorialPage7(),
         ];
@@ -535,6 +536,119 @@ class TutorialPage4 extends StatelessWidget {
   }
 }
 
+class TutorialPage5 extends StatelessWidget {
+  const TutorialPage5({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto3.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "1.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "카테고리",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "음식, 장난감, 배경, 스타일로 분류한다.\n아이템 목록으로 이동한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "2.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "포인트",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "상점 페이지에서 포인트를 보여준다.\n아이템 구매에 사용한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class TutorialPage6 extends StatelessWidget {
   const TutorialPage6({super.key});
   @override
@@ -563,7 +677,7 @@ class TutorialPage6 extends StatelessWidget {
               SizedBox(
                 width: 24,
                 child: Text(
-                  "1.",
+                  "3.",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -603,7 +717,7 @@ class TutorialPage6 extends StatelessWidget {
               SizedBox(
                 width: 24,
                 child: Text(
-                  "2.",
+                  "4.",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -661,7 +775,7 @@ class TutorialPage7 extends StatelessWidget {
             children: [
               Icon(Icons.arrow_left,),
               Image.asset(
-                "assets/images/petTuto3.png",
+                "assets/images/petTuto2.png",
                 height: 500.0,
                 width: 250.0,
               ),
@@ -676,7 +790,7 @@ class TutorialPage7 extends StatelessWidget {
               SizedBox(
                 width: 24,
                 child: Text(
-                  "3.",
+                  "5.",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -716,7 +830,7 @@ class TutorialPage7 extends StatelessWidget {
               SizedBox(
                 width: 24,
                 child: Text(
-                  "4.",
+                  "6.",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
