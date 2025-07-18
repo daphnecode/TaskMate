@@ -6,6 +6,8 @@ List<Widget> getTutorialPagesFor(int pageType) {
         return [
           TutorialPage1(),
           TutorialPage2(),
+          TutorialPage3(),
+          TutorialPage4(),
         ];
       case 1:
         return [
@@ -54,20 +56,90 @@ class TutorialPage1 extends StatelessWidget {
               Icon(Icons.arrow_left,),
               Image.asset(
                 "assets/images/petTuto1.png",
-                height: 600.0,
+                height: 500.0,
                 width: 250.0,
               ),
               Icon(Icons.arrow_right,),
             ],
           ),
-          Text(
-            "펫 키우기 메인화면 입니다.",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "1.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "상태창",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "펫의 포만도, 행복도, 레벨을 확인한다.\n클릭하면 상세하게 보여준다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 10.0),
-          Text(
-            "여러 기능을 사용할 수 있습니다.",
-            style: TextStyle(fontSize: 16),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "2.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "게임 기능",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "미니게임을 진행한다.\n아이템을 사용하거나 구매한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 20.0),
           ElevatedButton(
@@ -96,17 +168,355 @@ class TutorialPage2 extends StatelessWidget {
               Icon(Icons.arrow_left,),
               Image.asset(
                 "assets/images/petTuto1.png",
-                height: 600.0,
+                height: 500.0,
                 width: 250.0,
               ),
               Icon(Icons.arrow_right,),
             ],
           ),
-          Text(
-            "메인 화면은 아닙니다.",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "3.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "창고",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "사용자가 보유한 아이템을 보여준다.\n아이템을 사용할 수 있다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "4.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "상점",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "구매 가능한 아이템을 보여준다.\n아이템을 구매할 수 있다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage3 extends StatelessWidget {
+  const TutorialPage3({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto1.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "5.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "청소",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "오염물을 치우는 미니게임이다.\n펫의 행복도가 증가한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "6.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "놀이",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "장애물을 피해 달리는 미니게임이다.\n펫의 포만도가 감소하고 행복도가 증가한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage4 extends StatelessWidget {
+  const TutorialPage4({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto1.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "7.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "캘린더",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "플래너 페이지로 이동한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "8.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "홈",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "펫 키우기 메인 페이지로 이동한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 10.0),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "9.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "설정",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "시스템 설정으로 이동한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
           SizedBox(height: 20.0),
           ElevatedButton(
             onPressed: () {
