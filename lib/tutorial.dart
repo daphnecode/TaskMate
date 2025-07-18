@@ -11,7 +11,8 @@ List<Widget> getTutorialPagesFor(int pageType) {
         ];
       case 1:
         return [
-          TutorialPage1(),
+          TutorialPage6(),
+          TutorialPage7(),
         ];
       case 2:
         return [
@@ -62,6 +63,7 @@ class TutorialPage1 extends StatelessWidget {
               Icon(Icons.arrow_right,),
             ],
           ),
+          SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -174,6 +176,7 @@ class TutorialPage2 extends StatelessWidget {
               Icon(Icons.arrow_right,),
             ],
           ),
+          SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -286,6 +289,7 @@ class TutorialPage3 extends StatelessWidget {
               Icon(Icons.arrow_right,),
             ],
           ),
+          SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -398,6 +402,7 @@ class TutorialPage4 extends StatelessWidget {
               Icon(Icons.arrow_right,),
             ],
           ),
+          SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -507,6 +512,232 @@ class TutorialPage4 extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       "시스템 설정으로 이동한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage6 extends StatelessWidget {
+  const TutorialPage6({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto2.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "1.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "음식",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "음식 아이템을 확인한다.\n펫의 행복도와 포만도에 영향을 준다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "2.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "장난감",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "장난감 아이템을 확인한다.\n펫의 행복도에 영향을 준다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),         
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TutorialPage7 extends StatelessWidget {
+  const TutorialPage7({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.arrow_left,),
+              Image.asset(
+                "assets/images/petTuto3.png",
+                height: 500.0,
+                width: 250.0,
+              ),
+              Icon(Icons.arrow_right,),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "3.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "배경",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "배경 아이템을 확인한다.\n펫의 방을 바꿀 수 있다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "4.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "스타일",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "스타일 아이템을 확인한다.\n펫의 외형에 변화를 준다.",
                       style: const TextStyle(
                         fontSize: 14,
                         height: 1.5,
