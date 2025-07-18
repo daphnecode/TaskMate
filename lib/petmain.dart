@@ -22,7 +22,8 @@ class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
   final Users user;
-  const Mainarea({required this.onNext, required this.pet, required this.user, super.key});
+  final int pageType;
+  const Mainarea({required this.onNext, required this.pet, required this.user, required this.pageType, super.key});
 
   @override
   State<Mainarea> createState() => _MainareaState();
@@ -51,7 +52,7 @@ class _MainareaState extends State<Mainarea> {
     
     return Column(
       children: [
-        PetStatArea(pet: widget.pet),
+        PetStatArea(pet: widget.pet, pageType: widget.pageType,),
         Expanded(
           child: GestureDetector(
             onLongPress: () {
@@ -109,7 +110,8 @@ class Petmain extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
   final Users user;
-  const Petmain({required this.onNext, required this.pet, required this.user, super.key});
+  final int pageType;
+  const Petmain({required this.onNext, required this.pet, required this.user, required this.pageType, super.key});
 
   @override
   State<Petmain> createState() => _PetmainState();
@@ -129,7 +131,7 @@ class _PetmainState extends State<Petmain> {
             flex: 6,
             child: Container(
               color: Colors.white,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user,),
+              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               // MainArea()로 변경
             ),
           ),

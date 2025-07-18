@@ -129,10 +129,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext, pet: pet, user: user,);
+        currentWidget = Petmain(onNext: goNext, pet: pet, user: user, pageType: 0,);
         break;
       case 1:
-        currentWidget = ItemCategory(onNext: goNext, pet: pet, user: user);
+        currentWidget = ItemCategory(onNext: goNext, pet: pet, user: user, pageType: 1,);
         break;
       case 2:
         currentWidget = PetChoose(onNext: goNext);
@@ -176,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 5:
-        currentWidget = ShopCategory(onNext: goNext, pet: pet, user: user,);
+        currentWidget = ShopCategory(onNext: goNext, pet: pet, user: user,  pageType: 1,);
         break;
       default:
         currentWidget = Text('기본');
