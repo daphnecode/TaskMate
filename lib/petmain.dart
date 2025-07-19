@@ -9,6 +9,9 @@ import 'petstatus.dart';
 //청소게임
 import 'clean_game_screen.dart';
 
+//장애물달리기게임
+import 'run_game_screen.dart';
+
 Future<void> changeStatusSave(Pets pet) async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/pet1.json');
@@ -254,6 +257,15 @@ class _PetmainState extends State<Petmain> {
                                 ElevatedButton(
                                   onPressed: () {
                                     // Handle button press
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => RunGameScreen(
+                                        onNext: (int index) {
+                                          Navigator.pop(context);
+                                          widget.onNext(index);
+                                        },
+                                      )),
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue[100],
