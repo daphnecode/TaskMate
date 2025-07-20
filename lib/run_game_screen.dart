@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
-import 'package:taskmate/game/clean_game.dart';
+import 'package:taskmate/game/run_game.dart';
 
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
@@ -11,7 +11,7 @@ class RunGameScreen extends StatefulWidget {
 }
 
 class _RunGameScreenState extends State<RunGameScreen> {
-  final CleanGame _game = CleanGame();
+  final RunGame _game = RunGame();
 
   @override
   Widget build(BuildContext context) {
