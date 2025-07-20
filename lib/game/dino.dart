@@ -8,6 +8,9 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   final FlameGame game;
   Dino(this.game) : super(size: Vector2(128, 128), priority: 10);
 
+  double travelDistance = 0.0; // 진행 거리 (미터)
+  double speed = 100;    // 초당 100미터 속도
+
   @override
   Future<void> onLoad() async {
     final image = await game.images.load('unicon.png');
@@ -23,7 +26,7 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
     add(RectangleHitbox());
   }
   
-   @override
+  @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     if (other is Obstacle) {
       // 충돌 시 게임 오버 처리
@@ -37,5 +40,13 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   void update(double dt) {
     super.update(dt);
     // 점프, 중력 등 처리
+  }
+
+  void run() {
+    // 달리기 애니메이션 설정
+  }
+
+  void idle() {
+    // 대기 애니메이션 설정
   }
 }

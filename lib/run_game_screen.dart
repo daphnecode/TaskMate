@@ -65,7 +65,7 @@ class _RunGameScreenState extends State<RunGameScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-
+                      _game.startGame(100);  // 100m 시작
                     }, 
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(100, 200),
@@ -76,7 +76,7 @@ class _RunGameScreenState extends State<RunGameScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-
+                      _game.startGame(300);  // 100m 시작
                     }, 
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(100, 200),
@@ -87,7 +87,7 @@ class _RunGameScreenState extends State<RunGameScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-
+                      _game.startGame(1000);  // 100m 시작
                     }, 
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(100, 200),
