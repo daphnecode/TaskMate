@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/foundation.dart';
 
 class Obstacle extends SpriteComponent with CollisionCallbacks {
   final FlameGame game;
@@ -12,7 +11,7 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     sprite = await game.loadSprite('dragon.png');
-    position = Vector2(game.size.x - 128, game.size.y - size.y - 48); // 오른쪽에서 시작
+    position = Vector2(game.size.x, game.size.y - size.y); // 오른쪽에서 시작
     add(RectangleHitbox());
   }
 

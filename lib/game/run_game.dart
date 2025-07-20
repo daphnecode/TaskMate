@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'obstacle.dart';
-import 'dart:math';
 import 'dino.dart';
 import 'background.dart';
 
@@ -11,9 +10,18 @@ class RunGame extends FlameGame with HasCollisionDetection {
   int targetDistance = 0;
   late Timer obstacleTimer;
 
+  late double groundY;
+
+  double _currentSpeed = 150;
+  final double _speedIncreaseRate = 20; // 초당 증가량
+
   @override
   Future<void> onLoad() async {
-    _dino = Dino(this);
+    groundY = size.y - 128;
+    
+    _dino = Dino(this, groundY: groundY)
+        ..y = groundY
+        ..x = 50;
     add(_dino);
     add(Ground(this));
     add(Background(this));
@@ -23,8 +31,8 @@ class RunGame extends FlameGame with HasCollisionDetection {
   }
 
   void spawnObstacle() {
-    final randomSpeed = 150 + Random().nextDouble() * 100;
-    add(Obstacle(this, speed: randomSpeed));
+    final obstacle = Obstacle(this, speed: _currentSpeed);
+    add(obstacle);
   }
 
   void startGame(int distance) {
@@ -50,12 +58,13 @@ class RunGame extends FlameGame with HasCollisionDetection {
   void update(double dt) {
     super.update(dt);
     if (!isGameRunning) return;
-    obstacleTimer.update(dt);
     // 진행 거리 체크 (예시)
     _dino.travelDistance += _dino.speed * dt;
     if (_dino.travelDistance >= targetDistance) {
       stopGame();
       overlays.add('ClearPopup'); // 클리어 팝업
     }
+    _currentSpeed += _speedIncreaseRate * dt;
+    obstacleTimer.update(dt);
   }
 }

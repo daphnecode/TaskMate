@@ -28,12 +28,18 @@ class _RunGameScreenState extends State<RunGameScreen> {
                 'ClearPopup': (context, _) => ClearPopup(
                   onClose: () {
                     _game.overlays.remove('ClearPopup');
+                    setState(() {
+                      _isPlaying = false; // 다시 거리 버튼 보이도록
+                    });
                     Navigator.pop(context);
                   },
                 ),
                 'FailPopup' : (context, _) => FailPopup(
                   onClose: () {
                     _game.overlays.remove('FailPopup');
+                    setState(() {
+                      _isPlaying = false; // 다시 거리 버튼 보이도록
+                    });
                     Navigator.pop(context);
                   },
                 )
@@ -100,6 +106,9 @@ class _RunGameScreenState extends State<RunGameScreen> {
                   ElevatedButton(
                     onPressed: () {
                       _game.startGame(300);  // 100m 시작
+                      setState(() {
+                        _isPlaying = true;
+                      });
                     }, 
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(100, 200),
@@ -111,6 +120,9 @@ class _RunGameScreenState extends State<RunGameScreen> {
                   ElevatedButton(
                     onPressed: () {
                       _game.startGame(1000);  // 100m 시작
+                      setState(() {
+                        _isPlaying = true;
+                      });
                     }, 
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(100, 200),
