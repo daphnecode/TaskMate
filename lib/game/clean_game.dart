@@ -18,7 +18,7 @@ class CleanGame extends FlameGame {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-
+    // 오염물 추가
     final poopCount = 4 + _random.nextInt(4);
     for (int i = 0; i < poopCount; i++) {
       final x = _random.nextDouble() * (size.x - 40);
@@ -35,6 +35,10 @@ class CleanGame extends FlameGame {
       ..position = flame.Vector2(size.x / 2, size.y / 2)
       ..anchor = flame.Anchor.center;
     add(cursor);
+
+    await Future.delayed(Duration(milliseconds: 100));
+    _readyToCheckClear = true;
+
   }
 
   // 💩 치우기 기능
@@ -69,7 +73,7 @@ class CleanGame extends FlameGame {
   void update(double dt) {
     super.update(dt);
 
-    const speed = 150.0;
+    const speed = 100.0; // 조이스틱 속도
 
     if (moveDelta != vmath.Vector2.zero()) {
       // 🔁 Flutter vector → Flame vector로 변환
@@ -77,13 +81,12 @@ class CleanGame extends FlameGame {
     }
 
     //클리어 상태 체크
-    if (isClear() && !_clearShown) {
+    if (_readyToCheckClear && isClear() && !_clearShown) {
       _clearShown = true;
       Future.delayed(const Duration(milliseconds: 100), () {
         overlays.add('ClearPopup');
       });
     }
-
   }
 
   @override
