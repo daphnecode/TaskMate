@@ -9,7 +9,7 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   Dino(this.game) : super(size: Vector2(128, 128), priority: 10);
 
   double travelDistance = 0.0; // 진행 거리 (미터)
-  double speed = 100;    // 초당 100미터 속도
+  double speed = 10;    // 초당 100미터 속도
 
   @override
   Future<void> onLoad() async {
@@ -31,6 +31,7 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
     if (other is Obstacle) {
       // 충돌 시 게임 오버 처리
       
+      game.overlays.add('FailPopup');
       game.pauseEngine(); // 게임 일시 정지
       // 또는 gameRef.overlays.add('GameOver'); 등으로 화면 전환
     }
@@ -43,6 +44,10 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   }
 
   void run() {
+    // 달리기 애니메이션 설정
+  }
+
+  void jump() {
     // 달리기 애니메이션 설정
   }
 

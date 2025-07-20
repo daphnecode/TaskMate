@@ -42,6 +42,10 @@ class RunGame extends FlameGame with HasCollisionDetection {
     // 타이머 취소 등
   }
 
+  void jump() {
+    _dino.jump();
+  }
+
   @override
   void update(double dt) {
     super.update(dt);

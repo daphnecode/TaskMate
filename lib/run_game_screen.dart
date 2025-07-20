@@ -12,6 +12,7 @@ class RunGameScreen extends StatefulWidget {
 
 class _RunGameScreenState extends State<RunGameScreen> {
   final RunGame _game = RunGame();
+  bool _isPlaying = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,12 @@ class _RunGameScreenState extends State<RunGameScreen> {
                     Navigator.pop(context);
                   },
                 ),
+                'FailPopup' : (context, _) => FailPopup(
+                  onClose: () {
+                    _game.overlays.remove('FailPopup');
+                    Navigator.pop(context);
+                  },
+                )
               },
               initialActiveOverlays: const [],
             ),
@@ -56,7 +63,20 @@ class _RunGameScreenState extends State<RunGameScreen> {
           ),
           Expanded(
             flex: 3,
-            child: Container(
+            child: _isPlaying ?
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  _game.jump(); // 점프 처리 함수 예시
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(240, 120),
+                  backgroundColor: Colors.green,
+                ),
+                child: Text("Jump", style: TextStyle(fontSize: 24)),
+              ),
+            ) : 
+            Container(
               color: Colors.grey[200],
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -66,6 +86,9 @@ class _RunGameScreenState extends State<RunGameScreen> {
                   ElevatedButton(
                     onPressed: () {
                       _game.startGame(100);  // 100m 시작
+                      setState(() {
+                        _isPlaying = true;
+                      });
                     }, 
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(100, 200),
@@ -156,7 +179,41 @@ class ClearPopup extends StatelessWidget {
               const Text("CLEAR!",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              const Text("행복도 +10"),
+              const Text("행복도 +10 포만도 -10"),
+              const SizedBox(height: 12),
+              ElevatedButton(onPressed: onClose, child: const Text("확인")),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FailPopup extends StatelessWidget {
+  final VoidCallback onClose;
+  const FailPopup({required this.onClose, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 220,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black26)],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("FAIL",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              const Text("다시 도전해요!"),
               const SizedBox(height: 12),
               ElevatedButton(onPressed: onClose, child: const Text("확인")),
             ],
