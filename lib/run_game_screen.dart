@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
+import 'dart:async';
 import 'package:taskmate/game/run_game.dart';
+import 'package:taskmate/game/background.dart';
 
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
@@ -15,6 +17,15 @@ class _RunGameScreenState extends State<RunGameScreen> {
   bool _isPlaying = false;
 
   @override
+  void initState() {
+    super.initState();
+    
+    Timer.periodic(const Duration(milliseconds: 100), (_) {
+      if (mounted) setState(() {}); // elapsedTime 업데이트 반영
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
@@ -22,29 +33,41 @@ class _RunGameScreenState extends State<RunGameScreen> {
           // 🔹 게임 영역
           Expanded(
             flex: 5,
-            child: GameWidget(
-              game: _game,
-              overlayBuilderMap: {
-                'ClearPopup': (context, _) => ClearPopup(
-                  onClose: () {
-                    _game.overlays.remove('ClearPopup');
-                    setState(() {
-                      _isPlaying = false; // 다시 거리 버튼 보이도록
-                    });
-                    Navigator.pop(context);
+            child: 
+            Stack(
+              children: [
+                GameWidget(
+                  game: _game,
+                  overlayBuilderMap: {
+                    'ClearPopup': (context, _) => ClearPopup(
+                      onClose: () {
+                        _game.overlays.remove('ClearPopup');
+                        setState(() {
+                          _isPlaying = false; // 다시 거리 버튼 보이도록
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                    'FailPopup' : (context, _) => FailPopup(
+                      onClose: () {
+                        _game.overlays.remove('FailPopup');
+                        setState(() {
+                          _isPlaying = false; // 다시 거리 버튼 보이도록
+                        });
+                        Navigator.pop(context);
+                      },
+                    )
                   },
+                  initialActiveOverlays: const [],
                 ),
-                'FailPopup' : (context, _) => FailPopup(
-                  onClose: () {
-                    _game.overlays.remove('FailPopup');
-                    setState(() {
-                      _isPlaying = false; // 다시 거리 버튼 보이도록
-                    });
-                    Navigator.pop(context);
-                  },
+                Positioned(
+                  child: 
+                  ProgressBarOverlay(
+                    elapsedTime: _game.elapsedTime,
+                    totalTime: _game.clearTime,
+                  ),
                 )
-              },
-              initialActiveOverlays: const [],
+              ],
             ),
           ),
 
