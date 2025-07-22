@@ -39,14 +39,13 @@ class ProgressBarOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     double progress = (elapsedTime / totalTime).clamp(0.0, 1.0);
 
-    return Expanded(
-      child: LinearProgressIndicator(
+    return LinearProgressIndicator(
         value: progress,
         minHeight: 8,
         backgroundColor: Colors.white,
         valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-      ),
-    );
+      );
+
     // return Align(
     //   alignment: Alignment.topCenter,
     //   child: Container(
