@@ -194,7 +194,8 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
               ),
               IconButton(
                 icon: Icon(Icons.settings),
-                onPressed: () {},
+                onPressed: () {widget.onNext(6);
+                  },
               ),
             ],
           ),

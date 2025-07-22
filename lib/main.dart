@@ -11,6 +11,7 @@ import 'petchoose.dart';
 import 'package:taskmate/DBtest/task.dart';
 import 'package:taskmate/DBtest/task_data.dart';
 import 'object.dart';
+import 'SettingsPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,7 +56,10 @@ class _MyHomePageState extends State<MyHomePage> {
     happy: 0,
     level: 0,
     currentExp: 0,
-  );  
+  );
+
+  bool isDarkMode = false;
+  bool soundEffectsOn = false;
 
   @override
   void initState() {
@@ -178,6 +182,17 @@ class _MyHomePageState extends State<MyHomePage> {
       case 5:
         currentWidget = ShopCategory(onNext: goNext, pet: pet, user: user,  pageType: 1,);
         break;
+
+      case 6:
+        currentWidget = SettingsPage(
+          onNext: goNext,
+          isDarkMode: isDarkMode,
+          soundEffectsEnabled: soundEffectsOn,
+          notificationsEnabled: false,
+          sortingMethod: '기본값',
+        );
+        break;
+
       default:
         currentWidget = Text('기본');
     }

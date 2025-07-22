@@ -319,7 +319,8 @@ class _PetmainState extends State<Petmain> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {widget.onNext(6);
+                    },
                 ),
               ],
             ),

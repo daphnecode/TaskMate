@@ -288,7 +288,8 @@ class _PlannerMainState extends State<PlannerMain> {
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
-                onPressed: () {},
+                onPressed: () {widget.onNext(6);
+                },
               ),
             ],
           ),
