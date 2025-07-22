@@ -1,9 +1,9 @@
 import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
-import 'package:flame/game.dart';
+import 'run_game.dart';
 
 class Obstacle extends SpriteComponent with CollisionCallbacks {
-  final FlameGame game;
+  final RunGame game;
   final double speed;
   Obstacle(this.game, {required this.speed})
       : super(size: Vector2(32, 48)); // 선인장 등 크기 설정
@@ -18,6 +18,8 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
   @override
   void update(double dt) {
     super.update(dt);
+    if (!game.isGameRunning) return;
+    
     position.x -= speed * dt;
 
     if (position.x < -size.x) {
