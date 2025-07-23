@@ -175,7 +175,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       ),
 
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 8),
           child: Row(

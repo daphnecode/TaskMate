@@ -63,9 +63,12 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
               TextButton(
                 onPressed: widget.onExpand,
                 child: Row(
-                  children: const [
+                  children:  [
                     Text('반복해야 할 일',
-                      style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -176,8 +179,11 @@ class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
         TextButton(
           onPressed: widget.onCollapse,
           child: Row(
-            children: const [
-              Text('반복해야 할 일', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            children:  [
+              Text('반복해야 할 일', style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold)),
               Icon(Icons.expand_less),
             ],
           ),

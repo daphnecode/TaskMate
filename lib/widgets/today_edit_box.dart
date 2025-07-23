@@ -80,7 +80,10 @@ class _TodayEditBoxState extends State<TodayEditBox> {
                 onPressed: widget.onExpand,
                 child: Text(
                   formattedDate,
-                  style: const TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -197,7 +200,10 @@ class _TodayEditFullScreenState extends State<TodayEditFullScreen> {
             children: [
               Text(
                 formattedDate,
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style:  TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold),
               ),
               const Icon(Icons.expand_less),
             ],

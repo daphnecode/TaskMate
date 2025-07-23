@@ -41,7 +41,10 @@ class TodayTaskBox extends StatelessWidget {
                 onPressed: onExpand,
                 child: Text(
                   '오늘해야 할 일',
-                  style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -132,8 +135,11 @@ class TodayTaskFullScreen extends StatelessWidget {
         TextButton(
           onPressed: onCollapse,
           child: Row(
-            children: const [
-              Text('오늘해야 할 일', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            children: [
+              Text('오늘해야 할 일', style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold)),
               Icon(Icons.expand_less),
             ],
           ),

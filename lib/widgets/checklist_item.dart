@@ -38,7 +38,9 @@ class ChecklistItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               decoration: isChecked ? TextDecoration.lineThrough : null,
-              color: isChecked ? Colors.grey : Colors.black,
+              color: isChecked
+                  ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6)
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),

@@ -184,7 +184,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -321,7 +321,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -498,7 +498,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
         ],
         ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -629,7 +629,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
           ],
         ),
         bottomNavigationBar: BottomAppBar(
-            color: Colors.white,
+          color: Theme.of(context).bottomAppBarTheme.color,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Row(
@@ -795,7 +795,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -927,7 +927,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -1091,7 +1091,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -1223,7 +1223,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -1432,7 +1432,7 @@ class _ItemCategoryState extends State<ItemCategory> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -1646,7 +1646,7 @@ class _ShopCategoryState extends State<ShopCategory> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(

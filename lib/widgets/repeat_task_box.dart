@@ -41,7 +41,10 @@ class RepeatTaskBox extends StatelessWidget {
                 onPressed: onExpand,
                 child: Text(
                   '반복해야 할 일',
-                  style: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -133,8 +136,12 @@ class RepeatTaskFullScreen extends StatelessWidget {
         TextButton(
           onPressed: onCollapse,
           child: Row(
-            children: const [
-              Text('반복해야 할 일', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            children: [
+              Text('반복해야 할 일', style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              )),
               Icon(Icons.expand_less),
             ],
           ),

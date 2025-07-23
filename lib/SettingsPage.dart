@@ -20,7 +20,7 @@ class SettingsPage extends StatelessWidget {
     required this.soundEffectsEnabled,
     required this.sortingMethod,
     required this.onNext,
-    this.onDarkModeChanged,
+    required this.onDarkModeChanged,
     this.onNotificationsChanged,
     this.onSoundEffectsChanged,
     this.onChangeSortingMethod,
@@ -29,18 +29,19 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           children: [
-            const Text(
+             Text(
               '설정',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
             buildSwitchTile(
+              context: context,
               icon: Icons.dark_mode,
               label: '다크 모드',
               value: isDarkMode,
@@ -49,6 +50,7 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             buildSwitchTile(
+              context: context,
               icon: Icons.notifications,
               label: '알림 설정',
               value: notificationsEnabled,
@@ -57,6 +59,7 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             buildListTile(
+              context: context,
               icon: Icons.format_list_bulleted,
               label: '리스트 정렬 방식',
               value: sortingMethod,
@@ -65,6 +68,7 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 20),
 
             buildSwitchTile(
+              context: context,
               icon: Icons.volume_up,
               label: '효과음',
               value: soundEffectsEnabled,
@@ -75,7 +79,7 @@ class SettingsPage extends StatelessWidget {
       ),
 
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(

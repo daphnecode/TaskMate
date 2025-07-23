@@ -5,21 +5,22 @@ Widget buildSwitchTile({
   required String label,
   required bool value,
   required void Function(bool)? onChanged,
+  required BuildContext context,
 }) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
     child: Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF6F6F6),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(icon),
+        leading: Icon(icon, color: Theme.of(context).iconTheme.color),
         title: Text(
           label,
-          style: const TextStyle(fontSize: 16, color: Colors.black), //
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),  //
         ),
-        trailing: IgnorePointer( // ✔️ 눌리지 않게 처리
+        trailing: IgnorePointer(
           ignoring: onChanged == null,
           child: Switch(
             value: value,
@@ -36,12 +37,13 @@ Widget buildListTile({
   required String label,
   required String value,
   required void Function()? onTap,
+  required BuildContext context,
 }) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
     child: Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF6F6F6),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(

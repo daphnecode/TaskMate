@@ -123,7 +123,8 @@ class _PlannerMainState extends State<PlannerMain> {
     // MaterialApp 없애고 Scaffold만 남김
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
         leading: Builder(
           builder: (context) =>
               IconButton(
@@ -171,7 +172,6 @@ class _PlannerMainState extends State<PlannerMain> {
             },
             child: const Text(
               '제출',
-              style: TextStyle(color: Colors.black),
             ),
           ),
         ],
@@ -266,7 +266,7 @@ class _PlannerMainState extends State<PlannerMain> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(

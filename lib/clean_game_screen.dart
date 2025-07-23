@@ -90,7 +90,7 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
 
       // 🔹 하단 네비게이션
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(

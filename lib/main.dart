@@ -14,9 +14,49 @@ import 'object.dart';
 import 'SettingsPage.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const Root());
+}
+class Root extends StatefulWidget {
+  const Root({super.key});
+  @override
+  State<Root> createState() => _RootState();
 }
 
+class _RootState extends State<Root> {
+  bool isDarkMode = false;
+  bool soundEffectsOn = false;
+
+  void toggleDarkMode(bool value) {
+    setState(() => isDarkMode = value);
+  }
+
+  void toggleSoundEffects(bool value) {
+    setState(() => soundEffectsOn = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'TaskMate',
+      theme: ThemeData.light().copyWith(
+        bottomAppBarTheme: const BottomAppBarTheme(color: Colors.white), // 라이트모드 하단바
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        iconTheme: const IconThemeData(color: Colors.white),
+        bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey[900]), // 다크모드 하단바
+      ),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: MyHomePage(
+        title: 'Virtual Pet',
+        isDarkMode: isDarkMode,
+        soundEffectsOn: soundEffectsOn,
+        onDarkModeChanged: toggleDarkMode,
+        onSoundEffectsChanged: toggleSoundEffects,
+      ),
+    );
+  }
+}
+/*
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -32,9 +72,21 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+*/
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  final bool isDarkMode;
+  final bool soundEffectsOn;
+  final Function(bool) onDarkModeChanged;
+  final Function(bool) onSoundEffectsChanged;
+
+  const MyHomePage({super.key,
+    required this.title,
+    required this.isDarkMode,
+    required this.soundEffectsOn,
+    required this.onDarkModeChanged,
+    required this.onSoundEffectsChanged,
+  });
 
   final String title;
 
@@ -186,10 +238,11 @@ class _MyHomePageState extends State<MyHomePage> {
       case 6:
         currentWidget = SettingsPage(
           onNext: goNext,
-          isDarkMode: isDarkMode,
+          isDarkMode: widget.isDarkMode,
           soundEffectsEnabled: soundEffectsOn,
           notificationsEnabled: false,
           sortingMethod: '기본값',
+          onDarkModeChanged: widget.onDarkModeChanged,
         );
         break;
 
