@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
+import 'package:taskmate/utils/bgm_manager.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'planner_main.dart';
@@ -122,6 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> initAsync() async {
     await initJsonIfNotExists();
     await loadItems();
+    await BgmManager.preload('bgm2.wav');
   }
 
   Future<void> initJsonIfNotExists() async {

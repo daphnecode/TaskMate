@@ -61,7 +61,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    - assets/sounds/
+    - assets/sounds/bgm2.wav
     - lib/DBtest/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

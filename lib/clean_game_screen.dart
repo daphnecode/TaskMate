@@ -26,7 +26,7 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
     // Root에서 현재 사운드 설정 읽기
     final rootState = context.findAncestorStateOfType<RootState>();
     if (rootState != null && rootState.soundEffectsOn) {
-      BgmManager.playBgm('bgm2.mp3');
+      BgmManager.playBgm('bgm2.wav');
     }
   }
 
@@ -130,7 +130,8 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
-                onPressed: () {},
+                onPressed: () {widget.onNext(6);
+                  },
               ),
             ],
           ),
