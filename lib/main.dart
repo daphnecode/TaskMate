@@ -19,10 +19,10 @@ void main() {
 class Root extends StatefulWidget {
   const Root({super.key});
   @override
-  State<Root> createState() => _RootState();
+  State<Root> createState() => RootState();
 }
 
-class _RootState extends State<Root> {
+class RootState extends State<Root> {
   bool isDarkMode = false;
   bool soundEffectsOn = false;
 
@@ -185,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext, pet: pet, user: user, pageType: 0,);
+        currentWidget = Petmain(onNext: goNext, pet: pet, user: user, pageType: 0, soundEffectsOn: widget.soundEffectsOn,);
         break;
       case 1:
         currentWidget = ItemCategory(onNext: goNext, pet: pet, user: user, pageType: 1,);
@@ -239,10 +239,11 @@ class _MyHomePageState extends State<MyHomePage> {
         currentWidget = SettingsPage(
           onNext: goNext,
           isDarkMode: widget.isDarkMode,
-          soundEffectsEnabled: soundEffectsOn,
+          soundEffectsEnabled: widget.soundEffectsOn,
           notificationsEnabled: false,
           sortingMethod: '기본값',
           onDarkModeChanged: widget.onDarkModeChanged,
+          onSoundEffectsChanged: widget.onSoundEffectsChanged,
         );
         break;
 

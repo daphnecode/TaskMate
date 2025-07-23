@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import 'package:taskmate/game/clean_game.dart';
 import 'package:taskmate/widgets/joystick_widget.dart';
+import 'package:taskmate/utils/bgm_manager.dart';
+import 'main.dart';
 
 class CleanGameScreen extends StatefulWidget {
   final void Function(int) onNext;
-  const CleanGameScreen({super.key, required this.onNext});
+  final bool soundEffectsOn;
+  const CleanGameScreen({super.key,
+    required this.onNext,
+    required this.soundEffectsOn,
+  });
 
   @override
   State<CleanGameScreen> createState() => _CleanGameScreenState();
@@ -13,6 +19,22 @@ class CleanGameScreen extends StatefulWidget {
 
 class _CleanGameScreenState extends State<CleanGameScreen> {
   final CleanGame _game = CleanGame();
+
+  @override
+  void initState() {
+    super.initState();
+    // Root에서 현재 사운드 설정 읽기
+    final rootState = context.findAncestorStateOfType<RootState>();
+    if (rootState != null && rootState.soundEffectsOn) {
+      BgmManager.playBgm('bgm2.mp3');
+    }
+  }
+
+  @override
+  void dispose() {
+    BgmManager.stopBgm();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

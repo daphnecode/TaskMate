@@ -114,7 +114,8 @@ class Petmain extends StatefulWidget {
   final Pets pet;
   final Users user;
   final int pageType;
-  const Petmain({required this.onNext, required this.pet, required this.user, required this.pageType, super.key});
+  final bool soundEffectsOn;
+  const Petmain({required this.onNext, required this.pet, required this.user, required this.pageType, required this.soundEffectsOn, super.key});
 
   @override
   State<Petmain> createState() => _PetmainState();
@@ -225,6 +226,7 @@ class _PetmainState extends State<Petmain> {
                                           Navigator.pop(context);
                                           widget.onNext(index);
                                         },
+                                        soundEffectsOn: widget.soundEffectsOn,
                                       )),
                                     );
                                     // Handle button press

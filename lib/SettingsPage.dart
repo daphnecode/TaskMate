@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taskmate/widgets/settings_widgets.dart';
+import 'package:taskmate/utils/bgm_manager.dart';
 
 class SettingsPage extends StatelessWidget {
   final bool isDarkMode; // 다크모드 켜져있는지 여부
@@ -72,7 +73,9 @@ class SettingsPage extends StatelessWidget {
               icon: Icons.volume_up,
               label: '효과음',
               value: soundEffectsEnabled,
-              onChanged: onSoundEffectsChanged,
+              onChanged: (value) {
+                onSoundEffectsChanged?.call(value); // 상태만 바꿈
+              },
             ),
           ],
         ),
