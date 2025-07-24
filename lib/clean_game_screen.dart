@@ -154,7 +154,7 @@ class ClearPopup extends StatelessWidget {
           width: 220,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black26)],
           ),
@@ -162,7 +162,7 @@ class ClearPopup extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text("CLEAR!",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, )),
               const SizedBox(height: 12),
               const Text("행복도 +10"),
               const SizedBox(height: 12),
