@@ -6,7 +6,6 @@ class StatisticsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 파이차트 데이터 정의
     final Map<String, double> dataMap = {
       "3/3~3/9": 5,
       "3/10~3/16": 3,
@@ -18,14 +17,13 @@ class StatisticsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('통계'),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 상단 카드들 (생략 가능)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: const [
@@ -43,16 +41,16 @@ class StatisticsPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // ✅ 파이차트 카드
             Expanded(
               child: Card(
+                color: Theme.of(context).cardColor, // 다크모드 호환
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("가장 바빴던 주", style: TextStyle(fontSize: 16)),
+                      Text("가장 바빴던 주", style: Theme.of(context).textTheme.bodyLarge),
                       const SizedBox(height: 8),
                       Expanded(
                         child: PieChart(
@@ -82,7 +80,6 @@ class StatisticsPage extends StatelessWidget {
   }
 }
 
-// 통계 카드 위젯 그대로 유지
 class StatCard extends StatelessWidget {
   final String title;
   final String value;
@@ -96,14 +93,14 @@ class StatCard extends StatelessWidget {
         margin: const EdgeInsets.all(4),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
+          color: Theme.of(context).cardColor, // <-- 테마 카드 색상
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           children: [
-            Text(title, style: const TextStyle(fontSize: 14)),
+            Text(title, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
           ],
         ),
       ),

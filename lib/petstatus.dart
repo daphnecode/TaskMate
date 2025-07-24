@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
 import 'object.dart';
 import 'tutorial.dart';
+import 'package:taskmate/utils/icon_utis.dart';
 
-Row hungerStatus(int nowHunger) {
+Row hungerStatus(BuildContext context, int nowHunger) {
   int check = (nowHunger / 20).truncate() + 1;
-  
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
     children: List.generate(5, (index) {
-      return Image.asset(
-        (index < check) ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',
+      return getThemedIcon(
+        context,
+        index < check
+            ? 'assets/icons/icon-chickenalt.png'
+            : 'assets/icons/icon-chickenaltW.png',
         width: 30,
         height: 30,
-        );
-      },
-      )
-    );
+      );
+    }),
+  );
 }
 
-Row happyStatus(int nowHappy) {
+Row happyStatus(BuildContext context, int nowHappy) {
   int check = (nowHappy / 20).truncate() + 1;
-  
   return Row(
     mainAxisAlignment: MainAxisAlignment.end,
     children: List.generate(5, (index) {
-      return Image.asset(
-        index < check ? 'assets/icons/icon-heart.png' : 'assets/icons/icon-heartW.png',
+      return getThemedIcon(
+        context,
+        index < check
+            ? 'assets/icons/icon-heart.png'
+            : 'assets/icons/icon-heartW.png',
         width: 30,
         height: 30,
-        );
-      },
-      )
-    );
+      );
+    }),
+  );
 }
 
 class PetStatArea extends StatefulWidget{
@@ -70,7 +73,7 @@ class _PetStatAreaState extends State<PetStatArea> {
                   "LV ${widget.pet.level}",),
               ),
               Expanded(
-                child: happyStatus(widget.pet.happy),
+                child: happyStatus(context, widget.pet.happy),
               ),
             ],
           ),
@@ -86,7 +89,7 @@ class _PetStatAreaState extends State<PetStatArea> {
                   ),
               ),
               Expanded(
-                child: hungerStatus(widget.pet.hunger),
+                child: hungerStatus(context, widget.pet.hunger),
               ),
             ],
           ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'petmain.dart';
 import 'object.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:taskmate/utils/icon_utis.dart';
 import 'dart:io';
 
 Future<void> useItemsSave(List<Item> items, int index) async {
@@ -92,7 +93,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
             ),
           ),
@@ -120,8 +121,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: ListView.builder(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView.builder(
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
                   final item = inventory[index];
@@ -173,7 +174,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                         ),
                       );
                     },
-                    leading: Image.asset(item.icon, width: 30, height: 30),
+                    leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
                   );
@@ -224,7 +225,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
             ),
           ),
@@ -260,8 +261,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
-              child: ListView.builder(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView.builder(
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
                   final item = inventory[index];
@@ -310,7 +311,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                         ),
                       );
                     },
-                    leading: Image.asset(item.icon, width: 30, height: 30),
+                    leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                   );
@@ -411,7 +412,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
             ),
           ),
@@ -439,7 +440,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
@@ -487,7 +488,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                         ),
                       );
                     },
-                    leading: Image.asset(item.icon, width: 30, height: 30),
+                    leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                     title: Text(item.name, style: TextStyle(fontSize: 18)),
                     trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
                   );
@@ -537,7 +538,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
             Expanded(
               flex: 6,
               child: Container(
-                color: Colors.white,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               ),
             ),
@@ -573,7 +574,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               flex: 3,
               child: Container(
                 padding: EdgeInsets.all(8.0),
-                color: Colors.grey[100],
+                color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
                   itemCount: inventory.length,
                   itemBuilder: (context, index) {
@@ -618,7 +619,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                         ),
                       );
                     },
-                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                     );
@@ -710,7 +711,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
             ),
           ),
@@ -738,7 +739,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
@@ -783,7 +784,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                         );
                         }
                       },
-                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
                     ),
@@ -834,7 +835,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
             ),
           ),
@@ -870,7 +871,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
@@ -915,7 +916,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                           );
                         }
                       },
-                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                     ),
@@ -1007,7 +1008,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
             ),
           ),
@@ -1035,7 +1036,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
@@ -1079,7 +1080,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                           );
                         }
                       },
-                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
                     ),
@@ -1130,7 +1131,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
             ),
           ),
@@ -1166,7 +1167,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
                 itemCount: inventory.length,
                 itemBuilder: (context, index) {
@@ -1211,7 +1212,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                           );
                         }
                       },
-                      leading: Image.asset(item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
                     ),
@@ -1279,7 +1280,7 @@ class _ItemCategoryState extends State<ItemCategory> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               // MainArea()로 변경
             ),
@@ -1308,7 +1309,7 @@ class _ItemCategoryState extends State<ItemCategory> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -1484,7 +1485,7 @@ class _ShopCategoryState extends State<ShopCategory> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               // MainArea()로 변경
             ),
@@ -1521,7 +1522,7 @@ class _ShopCategoryState extends State<ShopCategory> {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
