@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
+import 'dart:math';
 import 'run_game.dart';
 
 class Obstacle extends SpriteComponent with CollisionCallbacks {
@@ -11,7 +12,15 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     sprite = await game.loadSprite('dragon.png');
-    position = Vector2(game.size.x, game.size.y - size.y); // 오른쪽에서 시작
+    final int upDown;
+    if (Random().nextInt(9) % 2 == 1) {
+      upDown = 200;
+    } else {
+      upDown = 0;
+    }
+
+    position = Vector2(game.size.x, game.size.y - size.y - upDown); // 오른쪽에서 시작
+
     add(RectangleHitbox());
   }
 

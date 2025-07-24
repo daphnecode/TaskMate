@@ -134,7 +134,7 @@ class _PetmainState extends State<Petmain> {
           Expanded(
             flex: 6,
             child: Container(
-              color: Colors.white,
+              color: Colors.black,
               child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               // MainArea()로 변경
             ),
@@ -143,7 +143,7 @@ class _PetmainState extends State<Petmain> {
             flex: 4,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Colors.grey,
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -161,7 +161,7 @@ class _PetmainState extends State<Petmain> {
                                     backgroundColor: Colors.blue[100],
                                   ),
                                   child: Center(
-                                    child: Text("창고", style: TextStyle(fontSize: 16)),
+                                    child: Text("창고", style: TextStyle(fontSize: 16, color: Colors.black)),
                                   ),
                                 ),
                                 Positioned(

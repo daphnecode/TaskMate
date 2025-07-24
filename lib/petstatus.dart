@@ -9,7 +9,7 @@ Row hungerStatus(int nowHunger) {
     mainAxisAlignment: MainAxisAlignment.end,
     children: List.generate(5, (index) {
       return Image.asset(
-        (index < check) ? 'assets/icons/icon-chickenalt.png' : 'assets/icons/icon-chickenaltW.png',
+        (index < check) ? 'assets/icons/icon-chickenaltW.png' : 'assets/icons/icon-chickenalt.png',
         width: 30,
         height: 30,
         );
@@ -25,7 +25,7 @@ Row happyStatus(int nowHappy) {
     mainAxisAlignment: MainAxisAlignment.end,
     children: List.generate(5, (index) {
       return Image.asset(
-        index < check ? 'assets/icons/icon-heart.png' : 'assets/icons/icon-heartW.png',
+        index < check ? 'assets/icons/icon-heartW.png' : 'assets/icons/icon-heart.png',
         width: 30,
         height: 30,
         );
