@@ -147,9 +147,9 @@ class PetStatus extends StatelessWidget{
           ),
           Row(
             children: [
-              Expanded(child: Image.asset("assets/icons/icon-heart.png")),
+              Expanded(child: getThemedIcon(context, "assets/icons/icon-heart.png")),
               Expanded(child: Text("${pet.happy}/100")),
-              Expanded(child: Image.asset("assets/icons/icon-chickenalt.png")),
+              Expanded(child: getThemedIcon(context, "assets/icons/icon-chickenalt.png")),
               Expanded(child: Text("${pet.hunger}/100")),
             ],
           ),

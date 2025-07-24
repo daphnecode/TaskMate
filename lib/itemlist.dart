@@ -135,7 +135,12 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                getThemedIcon(
+                                  context,
+                                  item.icon,
+                                  width: 100,
+                                  height: 100,
+                                ),
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
@@ -275,7 +280,12 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                getThemedIcon(
+                                  context,
+                                  item.icon,
+                                  width: 100,
+                                  height: 100,
+                                ),
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
@@ -454,7 +464,12 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                getThemedIcon(
+                                  context,
+                                  item.icon,
+                                  width: 100,
+                                  height: 100,
+                                ),
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
@@ -588,7 +603,12 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                getThemedIcon(
+                                  context,
+                                  item.icon,
+                                  width: 100,
+                                  height: 100,
+                                ),
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
@@ -757,7 +777,12 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                             content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                  getThemedIcon(
+                                    context,
+                                    item.icon,
+                                    width: 100,
+                                    height: 100,
+                                  ),
                                   SizedBox(height: 10),
                                   Text('${item.itemText}', 
                                   style: TextStyle(fontSize: 16)),
@@ -890,7 +915,12 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
                                     SizedBox(height: 10),
                                     Text('가격은 ${item.price}pt입니다.', 
                                     style: TextStyle(fontSize: 16)),
@@ -1055,7 +1085,12 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
                                     SizedBox(height: 10),
                                     Text('${item.itemText}', 
                                     style: TextStyle(fontSize: 16)),
@@ -1185,7 +1220,12 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Image.asset(item.icon, fit: BoxFit.fill, width: 100, height: 100),
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
                                     SizedBox(height: 10),
                                     Text('가격은 ${item.price}pt입니다.', 
                                     style: TextStyle(fontSize: 16)),

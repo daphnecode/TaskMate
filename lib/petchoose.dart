@@ -101,7 +101,7 @@ class PetChoose extends StatelessWidget {
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(20.0),
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea1(),
             ),
           ),
@@ -109,14 +109,14 @@ class PetChoose extends StatelessWidget {
             flex: 4,
             child: Container(
               padding: EdgeInsets.all(8.0),
-              color: Colors.grey[100],
+              color: Theme.of(context).scaffoldBackgroundColor,
               child: Subarea1(),
               ),
             ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-          color: Colors.white,
+        color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
