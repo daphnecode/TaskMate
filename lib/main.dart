@@ -25,10 +25,20 @@ class Root extends StatefulWidget {
 
 class RootState extends State<Root> {
   bool isDarkMode = false;
+  bool isPushNotificationEnabled = false;
+  String sortingMethod = '기본값';
   bool soundEffectsOn = false;
 
   void toggleDarkMode(bool value) {
     setState(() => isDarkMode = value);
+  }
+
+  void togglePushNotification(bool value) {
+    setState(() => isPushNotificationEnabled = value);
+  }
+  
+  void toggleSortingMethod(String value) {
+    setState(() => sortingMethod = value);
   }
 
   void toggleSoundEffects(bool value) {
@@ -51,7 +61,11 @@ class RootState extends State<Root> {
         title: 'Virtual Pet',
         isDarkMode: isDarkMode,
         soundEffectsOn: soundEffectsOn,
+        isPushNotificationEnabled: isPushNotificationEnabled,
+        sortingMethod: sortingMethod,
         onDarkModeChanged: toggleDarkMode,
+        onPushChanged: togglePushNotification,
+        onSortingChanged: toggleSortingMethod,
         onSoundEffectsChanged: toggleSoundEffects,
       ),
     );
@@ -78,14 +92,22 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   final bool isDarkMode;
   final bool soundEffectsOn;
+  final bool isPushNotificationEnabled;
+  final String sortingMethod;
   final Function(bool) onDarkModeChanged;
+  final Function(bool) onPushChanged;
+  final Function(String) onSortingChanged;
   final Function(bool) onSoundEffectsChanged;
 
   const MyHomePage({super.key,
     required this.title,
     required this.isDarkMode,
+    required this.isPushNotificationEnabled,
+    required this.sortingMethod,
     required this.soundEffectsOn,
     required this.onDarkModeChanged,
+    required this.onPushChanged,
+    required this.onSortingChanged,
     required this.onSoundEffectsChanged,
   });
 
@@ -110,9 +132,6 @@ class _MyHomePageState extends State<MyHomePage> {
     level: 0,
     currentExp: 0,
   );
-
-  bool isDarkMode = false;
-  bool soundEffectsOn = false;
 
   @override
   void initState() {
@@ -242,8 +261,8 @@ class _MyHomePageState extends State<MyHomePage> {
           onNext: goNext,
           isDarkMode: widget.isDarkMode,
           soundEffectsEnabled: widget.soundEffectsOn,
-          notificationsEnabled: false,
-          sortingMethod: '기본값',
+          notificationsEnabled: widget.isPushNotificationEnabled,
+          sortingMethod: widget.sortingMethod,
           onDarkModeChanged: widget.onDarkModeChanged,
           onSoundEffectsChanged: widget.onSoundEffectsChanged,
         );
