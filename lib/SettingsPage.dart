@@ -22,8 +22,8 @@ class SettingsPage extends StatelessWidget {
     required this.sortingMethod,
     required this.onNext,
     required this.onDarkModeChanged,
-    this.onNotificationsChanged,
-    this.onSoundEffectsChanged,
+    required this.onNotificationsChanged,
+    required this.onSoundEffectsChanged,
     this.onChangeSortingMethod,
   });
 
@@ -64,7 +64,26 @@ class SettingsPage extends StatelessWidget {
               icon: Icons.format_list_bulleted,
               label: '리스트 정렬 방식',
               value: sortingMethod,
-              onTap: onChangeSortingMethod,
+              onTap: () {
+                showDialog(
+                  context: context, 
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Column(
+                        children: [
+                          Text("리스트 정렬 방식"),
+                          Text("포인트 순"),
+                          Text("가나다 순"),
+                          Text("등록 순"),
+                        ],
+                      ),
+                    );
+                  }
+                );
+              }
             ),
             const SizedBox(height: 20),
 

@@ -37,8 +37,25 @@ class RootState extends State<Root> {
     setState(() => isPushNotificationEnabled = value);
   }
   
-  void toggleSortingMethod(String value) {
-    setState(() => sortingMethod = value);
+  void toggleSortingMethod() {
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Column(
+            children: [
+              Text("리스트 정렬 방식"),
+              Text("포인트 순"),
+              Text("가나다 순"),
+              Text("등록 순"),
+            ],
+          ),
+        );
+      }
+    );
   }
 
   void toggleSoundEffects(bool value) {
@@ -96,7 +113,7 @@ class MyHomePage extends StatefulWidget {
   final String sortingMethod;
   final Function(bool) onDarkModeChanged;
   final Function(bool) onPushChanged;
-  final Function(String) onSortingChanged;
+  final Function() onSortingChanged;
   final Function(bool) onSoundEffectsChanged;
 
   const MyHomePage({super.key,
@@ -264,6 +281,8 @@ class _MyHomePageState extends State<MyHomePage> {
           notificationsEnabled: widget.isPushNotificationEnabled,
           sortingMethod: widget.sortingMethod,
           onDarkModeChanged: widget.onDarkModeChanged,
+          onNotificationsChanged: widget.onPushChanged,
+          onChangeSortingMethod: widget.onSortingChanged,
           onSoundEffectsChanged: widget.onSoundEffectsChanged,
         );
         break;
