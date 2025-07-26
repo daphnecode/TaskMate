@@ -26,6 +26,8 @@ class RepeatTaskBox extends StatelessWidget {
     int totalTasks = taskList.length;
     int completedTasks = taskList.where((task) => task.isChecked).length;
     double progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
+    
+    taskList.sort((a, b) => a.text.compareTo(b.text));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

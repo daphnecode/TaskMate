@@ -1244,6 +1244,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                         item.count++;
                                       });
                                       useItemsSave(inventory, 4);
+                                      Navigator.pop(context);
                                     }
                                   },
                                 ),

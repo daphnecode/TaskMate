@@ -1,8 +1,8 @@
 import 'package:taskmate/DBtest/task.dart';
 
 List<Task> repeatTaskList = [
-  Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
-  Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
+  Task(text: '추가해보세요', isChecked: false, point: 0),
+  Task(text: 'Run 3km 추가해보세요', isChecked: false, point: 0),
   Task(text: '할 일을 추가해보세요', isChecked: false, point: 0),
 ];
 
