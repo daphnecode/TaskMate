@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taskmate/widgets/settings_widgets.dart';
-import 'package:taskmate/utils/bgm_manager.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   final bool isDarkMode; // 다크모드 켜져있는지 여부
   final bool notificationsEnabled; // 알림설정 여부
   final bool soundEffectsEnabled; // 효과음 여부
@@ -12,7 +11,7 @@ class SettingsPage extends StatelessWidget {
   final void Function(bool)? onDarkModeChanged; // 다크 모드 토글 시 호출
   final void Function(bool)? onNotificationsChanged; // 알림설정 토글 시 호출
   final void Function(bool)? onSoundEffectsChanged; // 효과음 토글 시 호출
-  final void Function()? onChangeSortingMethod; // 정렬 방식 항목 클릭 시 실행
+  final void Function(String)? onChangeSortingMethod; // 정렬 방식 항목 클릭 시 실행
 
   const SettingsPage({
     super.key,
@@ -24,8 +23,38 @@ class SettingsPage extends StatelessWidget {
     required this.onDarkModeChanged,
     required this.onNotificationsChanged,
     required this.onSoundEffectsChanged,
-    this.onChangeSortingMethod,
+    required this.onChangeSortingMethod,
   });
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final List<String> _sortOptions = ['마감일 순', '이름 순', '우선순위 순'];
+
+  void onSortingChangedDialog(BuildContext context) async {
+    widget.onChangeSortingMethod;
+    String? selected = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text('정렬 방법 선택'),
+          children: _sortOptions.map((option) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, option); // 선택한 값을 반환
+              },
+              child: Text(option),
+            );
+          }).toList(),
+        );
+      },
+    );
+    if (selected != null && selected != widget.sortingMethod) {
+      widget.onChangeSortingMethod?.call(selected);
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +74,8 @@ class SettingsPage extends StatelessWidget {
               context: context,
               icon: Icons.dark_mode,
               label: '다크 모드',
-              value: isDarkMode,
-              onChanged: onDarkModeChanged,
+              value: widget.isDarkMode,
+              onChanged: widget.onDarkModeChanged,
             ),
             const SizedBox(height: 20),
 
@@ -54,8 +83,8 @@ class SettingsPage extends StatelessWidget {
               context: context,
               icon: Icons.notifications,
               label: '알림 설정',
-              value: notificationsEnabled,
-              onChanged: onNotificationsChanged,
+              value: widget.notificationsEnabled,
+              onChanged: widget.onNotificationsChanged,
             ),
             const SizedBox(height: 20),
 
@@ -63,27 +92,8 @@ class SettingsPage extends StatelessWidget {
               context: context,
               icon: Icons.format_list_bulleted,
               label: '리스트 정렬 방식',
-              value: sortingMethod,
-              onTap: () {
-                showDialog(
-                  context: context, 
-                  builder: (BuildContext context) {
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: Column(
-                        children: [
-                          Text("리스트 정렬 방식"),
-                          Text("포인트 순"),
-                          Text("가나다 순"),
-                          Text("등록 순"),
-                        ],
-                      ),
-                    );
-                  }
-                );
-              }
+              value: widget.sortingMethod,
+              onTap: () => onSortingChangedDialog(context),
             ),
             const SizedBox(height: 20),
 
@@ -91,9 +101,9 @@ class SettingsPage extends StatelessWidget {
               context: context,
               icon: Icons.volume_up,
               label: '효과음',
-              value: soundEffectsEnabled,
+              value: widget.soundEffectsEnabled,
               onChanged: (value) {
-                onSoundEffectsChanged?.call(value); // 상태만 바꿈
+                widget.onSoundEffectsChanged?.call(value); // 상태만 바꿈
               },
             ),
           ],
@@ -109,11 +119,11 @@ class SettingsPage extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.calendar_month),
-                onPressed: () => onNext(3),
+                onPressed: () => widget.onNext(3),
               ),
               IconButton(
                 icon: const Icon(Icons.home),
-                onPressed: () => onNext(0),
+                onPressed: () => widget.onNext(0),
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
@@ -125,5 +135,4 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
-
 }
