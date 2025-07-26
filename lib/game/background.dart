@@ -41,7 +41,7 @@ class ProgressBarOverlay extends StatelessWidget {
 
     return LinearProgressIndicator(
         value: progress,
-        minHeight: 8,
+        minHeight: 20,
         backgroundColor: Colors.white,
         valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
       );

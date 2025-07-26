@@ -28,11 +28,12 @@ class _RunGameScreenState extends State<RunGameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Column(
         children: [
           // 🔹 게임 영역
           Expanded(
-            flex: 5,
+            flex: 6,
             child: 
             Stack(
               children: [
