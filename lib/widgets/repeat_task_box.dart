@@ -10,6 +10,7 @@ class RepeatTaskBox extends StatelessWidget {
   final VoidCallback onEditPoints;
   final void Function(int index, int newPoint) onEditPoint;
   final void Function(int index) onStartEditing;
+  final String sortingMethod;
 
   const RepeatTaskBox({
     required this.taskList,
@@ -18,6 +19,7 @@ class RepeatTaskBox extends StatelessWidget {
     required this.onEditPoints,
     required this.onEditPoint,
     required this.onStartEditing,
+    required this.sortingMethod,
     Key? key,
   }) : super(key: key);
 
@@ -27,7 +29,10 @@ class RepeatTaskBox extends StatelessWidget {
     int completedTasks = taskList.where((task) => task.isChecked).length;
     double progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
     
-    taskList.sort((a, b) => a.text.compareTo(b.text));
+    List<Task> tmpList = sorting(taskList, sortingMethod);
+    for (int i = 0; i < taskList.length; i++) {
+      taskList[i] = tmpList[i].copyWith();
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

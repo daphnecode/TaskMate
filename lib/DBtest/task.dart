@@ -22,6 +22,21 @@ class Task {
   }
 }
 
+List<Task> sorting(List<Task> tasks, String sortingMethod) {
+  switch (sortingMethod) {
+    case "사전 순":
+      tasks.sort((a, b) => a.text.compareTo(b.text));   
+      break;
+    case "포인트 순":
+      tasks.sort((a, b) => b.point.compareTo(a.point));
+      break;
+    default:
+      tasks.sort((a, b) => a.text.compareTo(b.text));
+      break;
+  }
+  return tasks;
+}
+
 /*
 // 체크리스트 데이터 모델
 class Task {

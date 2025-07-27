@@ -26,7 +26,7 @@ class Root extends StatefulWidget {
 class RootState extends State<Root> {
   bool isDarkMode = false;
   bool isPushNotificationEnabled = false;
-  String sortingMethod = '기본값';
+  String sortingMethod = '사전 순';
   bool soundEffectsOn = false;
 
   void toggleDarkMode(bool value) {
@@ -215,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
         currentWidget = PetChoose(onNext: goNext);
         break;
       case 3:
-        currentWidget = PlannerMain(onNext: goNext);
+        currentWidget = PlannerMain(onNext: goNext, sortingMethod: widget.sortingMethod);
         break;
       case 4:
         currentWidget = PlannerEditPage(

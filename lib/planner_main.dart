@@ -13,20 +13,23 @@ import 'package:taskmate/widgets/today_task_box.dart';
 
 class PlannerMain extends StatefulWidget {
   final void Function(int) onNext;
-
-  const PlannerMain({required this.onNext,super.key});
+  final String sortingMethod;
+  const PlannerMain(
+      {
+        required this.onNext,
+        required this.sortingMethod,
+        super.key
+      }
+    );
 
   @override
-  State<PlannerMain> createState() => _PlannerMainState(onNext: onNext);
+  State<PlannerMain> createState() => _PlannerMainState();
 }
 
 class _PlannerMainState extends State<PlannerMain> {
-  final void Function(int) onNext;
   bool isEditMode = false;
   Map<String, List<Task>> dailyTaskMap = {};
   late DateTime selectedDate;
-
-  _PlannerMainState({required this.onNext});
 
 
   bool showFullRepeat = false;
@@ -87,7 +90,7 @@ class _PlannerMainState extends State<PlannerMain> {
   Widget build(BuildContext context) {
     if (isEditMode) {
       return PlannerEditPage(
-        onNext: onNext,
+        onNext: widget.onNext,
         repeatTaskList: repeatTaskList,
         todayTaskList: todayTaskList,
         onUpdateTasks: (updateRepeatLists, updateTodayList) {
@@ -238,6 +241,7 @@ class _PlannerMainState extends State<PlannerMain> {
                       .copyWith(isEditing: true);
                 });
               },
+              sortingMethod: widget.sortingMethod,
             ),
           ),
           Expanded(
@@ -261,6 +265,7 @@ class _PlannerMainState extends State<PlannerMain> {
                       .copyWith(isEditing: true);
                 });
               },
+              sortingMethod: widget.sortingMethod,
             ),
           ),
         ],
@@ -283,12 +288,13 @@ class _PlannerMainState extends State<PlannerMain> {
               IconButton(
                 icon: const Icon(Icons.home),
                 onPressed: () {
-                  onNext(0);
+                  widget.onNext(0);
                 },
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
-                onPressed: () {widget.onNext(6);
+                onPressed: () {
+                  widget.onNext(6);
                 },
               ),
             ],

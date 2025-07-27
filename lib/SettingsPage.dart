@@ -31,7 +31,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final List<String> _sortOptions = ['마감일 순', '이름 순', '우선순위 순'];
+  final List<String> _sortOptions = ['사전 순', '포인트 순', '등록 순'];
 
   void onSortingChangedDialog(BuildContext context) async {
     widget.onChangeSortingMethod;
