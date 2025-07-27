@@ -766,7 +766,11 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   final item = inventory[index];
                   final isHighlighted = item.name == widget.user.name;
                   return Container(
-                    color: isHighlighted ? Colors.yellow : Colors.transparent,
+                    color: isHighlighted
+                        ? (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey // 다크모드에서 하이라이트 색
+                        : Colors.yellow) // 라이트모드에서 하이라이트 색
+                        : Colors.transparent,
                     child: ListTile(
                       onTap: () {
                         if (!isHighlighted) {
@@ -904,7 +908,11 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   final check = (item.count != 0);
                   
                   return Container(
-                    color: (check) ? Colors.red : Colors.transparent,
+                    color: check
+                        ? (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey // 다크모드에서 색
+                        : Colors.red)  // 라이트모드에서 색
+                        : Colors.transparent,
                     child: ListTile(
                       onTap: () {
                         if (!check) {
@@ -1074,7 +1082,11 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   final isHighlighted = item.name == usedItem;
 
                   return Container(
-                    color: isHighlighted ? Colors.yellow : Colors.transparent,
+                    color: isHighlighted
+                        ? (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey // 다크모드에서 하이라이트
+                        : Colors.yellow) // 라이트모드에서 하이라이트
+                        : Colors.transparent,
                     child: ListTile(
                       onTap: () {
                         if(!isHighlighted) {
@@ -1209,7 +1221,11 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   final item = inventory[index];
                   final check = (item.count != 0);
                   return Container(
-                    color: (check) ? Colors.red : Colors.transparent,
+                    color: check
+                        ? (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey // 다크모드일 때
+                        : Colors.red)  // 라이트모드일 때
+                        : Colors.transparent,
                     child: ListTile(
                       onTap: () {
                         if (!check) {
