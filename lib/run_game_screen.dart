@@ -5,12 +5,13 @@ import 'package:taskmate/game/run_game.dart';
 import 'package:taskmate/game/background.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'main.dart';
-
+import 'object.dart';
 
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
   final bool soundEffectsOn;
-  const RunGameScreen({super.key, required this.onNext, required this.soundEffectsOn,});
+  final Pets pet;
+  const RunGameScreen({super.key, required this.onNext, required this.soundEffectsOn, required this.pet});
 
   @override
   State<RunGameScreen> createState() => _RunGameScreenState();
@@ -62,7 +63,9 @@ class _RunGameScreenState extends State<RunGameScreen> {
                       onClose: () {
                         _game.overlays.remove('ClearPopup');
                         setState(() {
-                          _isPlaying = false; // 다시 거리 버튼 보이도록
+                          _isPlaying = false;  // 다시 거리 버튼 보이도록
+                          widget.pet.happy += 10;
+                          widget.pet.hunger -= 10;
                         });
                         Navigator.pop(context);
                       },
