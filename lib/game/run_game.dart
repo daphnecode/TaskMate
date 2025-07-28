@@ -15,8 +15,8 @@ class RunGame extends FlameGame with HasCollisionDetection {
   double _currentSpeed = 150;
   final double _speedIncreaseRate = 20; // 초당 증가량
 
-  double elapsedTime = 0; // 현재 경과 시간 (초 단위)
-  double clearTime = 30;  // 클리어 기준 시간 (예: 30초)
+  double elapsedDistance = 0; // 현재 경과 시간 (초 단위)
+  double maxDistance = 0;  // 클리어 기준 시간 (예: 30초)
 
   @override
   Future<void> onLoad() async {
@@ -42,6 +42,8 @@ class RunGame extends FlameGame with HasCollisionDetection {
   void startGame(double distance) {
     targetDistance = distance;
     isGameRunning = true;
+    elapsedDistance = _dino.travelDistance;
+    maxDistance = distance;
     
     // 예: dino 달리기 애니메이션 시작, 장애물 주기적 생성 등
     _dino.run(); 
@@ -68,20 +70,14 @@ class RunGame extends FlameGame with HasCollisionDetection {
       stopGame();
       overlays.add('ClearPopup'); // 클리어 팝업
     }
-    elapsedTime += dt;
-
-    // 시간 초과 시 클리어 처리 등
-    if (elapsedTime >= clearTime) {
-      // 게임 클리어 로직
-      overlays.add('ClearPopup');
-      pauseEngine();
-    }
+    elapsedDistance += _dino.speed * dt;
+    
     _currentSpeed += _speedIncreaseRate * dt;
     obstacleTimer.update(dt);
   }
 
   void resetGame() {
-    elapsedTime = 0;
+    elapsedDistance = 0;
     resumeEngine();
     overlays.remove('ClearPopup');
   }

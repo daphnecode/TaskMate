@@ -85,8 +85,8 @@ class _RunGameScreenState extends State<RunGameScreen> {
                 Positioned(
                   child: 
                   ProgressBarOverlay(
-                    elapsedTime: _game.elapsedTime,
-                    totalTime: _game.clearTime,
+                    elapsedTime: _game.elapsedDistance,
+                    totalTime: _game.maxDistance,
                   ),
                 )
               ],
