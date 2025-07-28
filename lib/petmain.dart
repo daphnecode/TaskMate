@@ -266,6 +266,7 @@ class _PetmainState extends State<Petmain> {
                                           Navigator.pop(context);
                                           widget.onNext(index);
                                         },
+                                        soundEffectsOn: widget.soundEffectsOn,
                                       )),
                                     );
                                   },

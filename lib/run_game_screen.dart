@@ -3,10 +3,14 @@ import 'package:flame/game.dart';
 import 'dart:async';
 import 'package:taskmate/game/run_game.dart';
 import 'package:taskmate/game/background.dart';
+import 'package:taskmate/utils/bgm_manager.dart';
+import 'main.dart';
+
 
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
-  const RunGameScreen({super.key, required this.onNext});
+  final bool soundEffectsOn;
+  const RunGameScreen({super.key, required this.onNext, required this.soundEffectsOn,});
 
   @override
   State<RunGameScreen> createState() => _RunGameScreenState();
@@ -19,11 +23,25 @@ class _RunGameScreenState extends State<RunGameScreen> {
   @override
   void initState() {
     super.initState();
-    
+
+    // 효과음이 켜져 있으면 놀이 BGM 재생
+    final rootState = context.findAncestorStateOfType<RootState>();
+    if (rootState != null && rootState.soundEffectsOn) {
+      BgmManager.stopBgm();                // 이전 브금 정지
+      BgmManager.playBgm('bgm1.mp3');   // 놀이 브금 재생
+    }
     Timer.periodic(const Duration(milliseconds: 100), (_) {
       if (mounted) setState(() {}); // elapsedTime 업데이트 반영
     });
   }
+
+  @override
+  void dispose() {
+    // 화면 나갈 때 BGM 정지
+    BgmManager.stopBgm();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
