@@ -269,7 +269,10 @@ class _PetmainState extends State<Petmain> {
                                         soundEffectsOn: widget.soundEffectsOn,
                                         pet: widget.pet,
                                       )),
-                                    );
+                                    ).then((value) {
+                                      setState(() {
+                                      });
+                                    });
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue[100],
