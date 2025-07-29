@@ -5,6 +5,7 @@ import 'object.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:taskmate/utils/icon_utis.dart';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> useItemsSave(List<Item> items, int index) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -1726,7 +1727,12 @@ class _ShopCategoryState extends State<ShopCategory> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    FirebaseFirestore.instance.collection('tasks').add({
+                      'title': '공부하기',
+                      'done': false,
+                    });
+                  },
                 ),
               ],
             ),
