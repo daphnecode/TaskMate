@@ -143,7 +143,6 @@ class _MyHomePageState extends State<MyHomePage> {
     await initJsonIfNotExists();
     await loadItems();
     await BgmManager.preload('bgm2.wav');
-    // await BgmManager.preload('run_bgm.wav');
     await BgmManager.preload('bgm1.mp3');
   }
 
