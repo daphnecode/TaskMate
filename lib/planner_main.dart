@@ -47,6 +47,7 @@ class _PlannerMainState extends State<PlannerMain> {
         isChecked: !tasklist[index].isChecked,
       );
     });
+    _autoSave(); // Firestore에 바로 저장
   }
 
   void toggleEditingMode(List<Task> taskList) {
@@ -65,6 +66,7 @@ class _PlannerMainState extends State<PlannerMain> {
         isEditing: false,
       );
     });
+    _autoSave(); // Firestore에 바로 저장
   }
 
   //dailyTaskMap이 초기화되어 있지 않거나 해당 날짜 키가 없으면 빈 리스트로 초기화
@@ -78,13 +80,68 @@ class _PlannerMainState extends State<PlannerMain> {
     dailyTaskMap[key] = todayTaskList;
   }
 
+  // Firestore 저장 함수
+  void _autoSave() {
+    final dateKey = _dateKey(selectedDate);
+    updateTasksToFirestore(dateKey, todayTaskList, repeatTaskList);
+  }
+
+
 
   @override
   void initState() {
     super.initState();
     selectedDate = DateTime.now();
-    _syncTodayTaskWithMap(); // 오늘 날짜와 일일 리스트 연동
+    final dateKey = _dateKey(selectedDate);
+
+    // Firestore 데이터 불러오기
+    fetchTasks(dateKey).then((data) {
+      setState(() {
+        todayTaskList = data['todayTasks'];
+        repeatTaskList = data['repeatTasks'];
+        _isSubmitted = data['submitted'];
+      });
+    });
   }
+
+  //  Firestore 제출 함수
+  void _submit() async {
+    final dateKey = _dateKey(selectedDate);
+    try {
+      await submitTasksToFirestore(dateKey, todayTaskList, repeatTaskList);
+      setState(() {
+        _isSubmitted = true;
+      });
+
+      // 팝업으로 알림
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          content: const Text("제출 완료!"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("확인"),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("닫기"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +164,7 @@ class _PlannerMainState extends State<PlannerMain> {
 
             isEditMode = false;
           });
+          _autoSave(); // 편집 후 Firestore 바로 저장
         },
         onBackToMain: () {
           setState(() {
@@ -154,11 +212,21 @@ class _PlannerMainState extends State<PlannerMain> {
                     content: const Text('정말 제출하겠습니까?'),
                     actions: [
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.of(context).pop();
-                          setState(() {
-                            _isSubmitted = true;
-                          });
+                          final dateKey = _dateKey(selectedDate);
+                          try {
+                            await submitTasksToFirestore(dateKey, todayTaskList, repeatTaskList);
+                            setState(() => _isSubmitted = true);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("제출 완료!")),
+                            );
+                          } catch (e) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(content: Text(e.toString())),
+                            );
+                          }
                         },
                         child: const Text('예'),
                       ),
