@@ -98,7 +98,6 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
               itemCount: _localTaskList.length,
               itemBuilder: (context, index) {
                 final task = _localTaskList[index];
-                final taskListLength = _localTaskList.length;
 
                 return Row(
                   children: [

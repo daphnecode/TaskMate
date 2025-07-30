@@ -53,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
     if (selected != null && selected != widget.sortingMethod) {
       widget.onChangeSortingMethod?.call(selected);
-    };
+    }
   }
 
   @override

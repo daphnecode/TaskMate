@@ -12,7 +12,7 @@ import 'petchoose.dart';
 import 'package:taskmate/DBtest/task.dart';
 import 'package:taskmate/DBtest/task_data.dart';
 import 'object.dart';
-import 'SettingsPage.dart';
+import 'settingspage.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
