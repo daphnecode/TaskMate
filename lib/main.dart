@@ -30,7 +30,13 @@ class RootState extends State<Root> {
   bool isDarkMode = false;
   bool isPushNotificationEnabled = false;
   String sortingMethod = '사전 순';
-  bool soundEffectsOn = false;
+  bool soundEffectsOn = false;  
+  /*
+  ┌──────────────────────────────────┐
+    firestore에 User의 설정 정보 요청.
+    로컬에 저장.
+  └──────────────────────────────────┘
+  */
 
   void toggleDarkMode(bool value) {
     setState(() => isDarkMode = value);
@@ -177,6 +183,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> loadItems() async {
+    /*
+    ┌──────────────────────────────────────────────┐
+      firestore에 User와, User 하위의 Pet 정보 요청.
+      로컬에 저장.
+    └──────────────────────────────────────────────┘
+    */
     final testDirectory = await getApplicationDocumentsDirectory();
     String jsonStr1 = await File('${testDirectory.path}/user1.json').readAsString();    
     final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);

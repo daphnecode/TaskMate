@@ -170,6 +170,13 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                     widget.pet.happy += item.happy;
                                     changeStatusSave(widget.pet);
                                     useItemsSave(inventory, 1);
+                                    /*
+                                    ┌─────────────────────────────────────────────┐
+                                      firestore에 User 하위의 Pet 정보 갱신 요청.
+                                      firestore에 User의 statistics 정보 갱신 요청.
+                                      firestore에 User 하위의 Item 정보 갱신 요청.
+                                    └─────────────────────────────────────────────┘
+                                    */
                                   });
                                 }
                                 Navigator.pop(context);
@@ -315,6 +322,12 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   item.count++;
                                   useItemsSave(inventory, 1);
                                   userSave(widget.user);
+                                  /*
+                                  ┌─────────────────────────────────────────────┐
+                                    firestore에 User 하위의 Item 정보 갱신 요청.
+                                    firestore에 User의 point 정보 갱신 요청.
+                                  └─────────────────────────────────────────────┘
+                                  */
                                   }
                                 });
                                 Navigator.pop(context);
@@ -499,6 +512,13 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                   setState(() {
                                     item.count--;
                                     pet.happy += item.happy;
+                                    /*
+                                    ┌─────────────────────────────────────────────┐
+                                      firestore에 User 하위의 Pet 정보 갱신 요청.
+                                      firestore에 User의 statistics 정보 갱신 요청.
+                                      firestore에 User 하위의 Item 정보 갱신 요청.
+                                    └─────────────────────────────────────────────┘
+                                    */                                    
                                   });
                                   useItemsSave(inventory, 2);
                                 }
@@ -640,6 +660,12 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                 setState(() {
                                   item.count++;
                                   useItemsSave(inventory, 2);
+                                  /*
+                                  ┌─────────────────────────────────────────────┐
+                                    firestore에 User 하위의 Item 정보 갱신 요청.
+                                    firestore에 User의 point 정보 갱신 요청.
+                                  └─────────────────────────────────────────────┘
+                                  */
                                 });
                                 Navigator.pop(context);
                                 },
@@ -959,6 +985,12 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                   onPressed: () {
                                     setState(() {
                                       item.count++;
+                                      /*
+                                      ┌─────────────────────────────────────────────┐
+                                        firestore에 User 하위의 Item 정보 갱신 요청.
+                                        firestore에 User의 point 정보 갱신 요청.
+                                      └─────────────────────────────────────────────┘
+                                      */
                                     });
                                     useItemsSave(inventory, 3);
                                     Navigator.pop(context);
@@ -1136,6 +1168,12 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                   onPressed: () {
                                     setState(() {
                                       usedItem = item.name;
+                                      /*
+                                      ┌─────────────────────────────────────────────┐
+                                        firestore에 User의 statistics 정보 갱신 요청.
+                                        firestore에 User 하위의 Item 정보 갱신 요청.
+                                      └─────────────────────────────────────────────┘
+                                      */
                                     });
                                     Navigator.pop(context);
                                     },
