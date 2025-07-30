@@ -4,13 +4,17 @@ import 'package:taskmate/game/clean_game.dart';
 import 'package:taskmate/widgets/joystick_widget.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'main.dart';
+import 'object.dart';
 
 class CleanGameScreen extends StatefulWidget {
   final void Function(int) onNext;
   final bool soundEffectsOn;
+  final Pets pet;
+
   const CleanGameScreen({super.key,
     required this.onNext,
     required this.soundEffectsOn,
+    required this.pet,
   });
 
   @override
@@ -49,6 +53,9 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
               overlayBuilderMap: {
                 'ClearPopup': (context, _) => ClearPopup(
                   onClose: () {
+                    setState(() {
+                      widget.pet.happy += 10;
+                    });
                     _game.overlays.remove('ClearPopup');
                     Navigator.pop(context);
                   },

@@ -203,7 +203,8 @@ class _RunGameScreenState extends State<RunGameScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
-                onPressed: () {},
+                onPressed: () {
+                  widget.onNext(6);},
               ),
             ],
           ),

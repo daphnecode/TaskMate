@@ -227,6 +227,7 @@ class _PetmainState extends State<Petmain> {
                                           widget.onNext(index);
                                         },
                                         soundEffectsOn: widget.soundEffectsOn,
+                                        pet: widget.pet,
                                       )),
                                     );
                                     // Handle button press
