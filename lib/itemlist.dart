@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:taskmate/utils/icon_utis.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'main.dart';
 
 Future<void> useItemsSave(List<Item> items, int index) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -215,7 +216,10 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -357,7 +361,10 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -539,7 +546,10 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -675,7 +685,10 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   ),
                   IconButton(
                     icon: Icon(Icons.settings),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                      widget.onNext(6);
+                      },
                   ),
                 ],
               ),
@@ -850,7 +863,10 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -991,7 +1007,10 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -1164,7 +1183,10 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -1306,7 +1328,10 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -1512,7 +1537,10 @@ class _ItemCategoryState extends State<ItemCategory> {
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                    },
                 ),
               ],
             ),
@@ -1728,10 +1756,8 @@ class _ShopCategoryState extends State<ShopCategory> {
                 IconButton(
                   icon: Icon(Icons.settings),
                   onPressed: () {
-                    FirebaseFirestore.instance.collection('tasks').add({
-                      'title': '공부하기',
-                      'done': false,
-                    });
+                    Navigator.pop(context);
+                    widget.onNext(6);
                   },
                 ),
               ],
