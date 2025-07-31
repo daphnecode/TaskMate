@@ -1,10 +1,10 @@
 import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
-import 'package:flame/game.dart';
+import 'run_game.dart';
 import 'obstacle.dart';
 
 class Dino extends SpriteAnimationComponent with CollisionCallbacks{
-  final FlameGame game;
+  final RunGame game;
   Dino(this.game, {required this.groundY}) : super(size: Vector2(128, 128), priority: 10);
 
   double travelDistance = 0.0; // 진행 거리 (미터)
@@ -36,7 +36,8 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-
+    if (!game.isGameRunning) return;
+    
     if (other is Obstacle) {
       // 충돌 시 게임 오버 처리
       
