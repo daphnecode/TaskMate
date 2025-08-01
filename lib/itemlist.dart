@@ -407,6 +407,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
     happy: 0,
     level: 0,
     currentExp: 0,
+    styleID: "",
   );
 
   @override

@@ -33,25 +33,28 @@ class RootState extends State<Root> {
   String sortingMethod = '사전 순';
   bool soundEffectsOn = false;
 
-  @override
-  void initState() {
-    super.initState();
-    initAsync();
-  }
+  // 설정의 데이터를 firestore에서 받아오는 과정.
+  // Root의 setState가 호출될 경우에만 
+  // 데이터를 받아오는 오류가 있어서 주석처리함.
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   initAsync();
+  // }
 
-  Future<void> initAsync() async {
-    DocumentSnapshot tmpDoc = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .get();
+  // Future<void> initAsync() async {
+  //   DocumentSnapshot tmpDoc = await FirebaseFirestore.instance
+  //     .collection('Users')
+  //     .doc('HiHgtVpIvdyCZVtiFCOc')
+  //     .get();
     
-    if (tmpDoc.exists) {
-      isDarkMode = (tmpDoc['setting'] as Map<String, dynamic>)['darkMode'];
-      isPushNotificationEnabled = (tmpDoc['setting'] as Map<String, dynamic>)['push'];
-      sortingMethod = (tmpDoc['setting'] as Map<String, dynamic>)['listSort'];
-      soundEffectsOn = (tmpDoc['setting'] as Map<String, dynamic>)['sound'];
-    }
-  }
+  //   if (tmpDoc.exists) {
+  //     isDarkMode = (tmpDoc['setting'] as Map<String, dynamic>)['darkMode'];
+  //     isPushNotificationEnabled = (tmpDoc['setting'] as Map<String, dynamic>)['push'];
+  //     sortingMethod = (tmpDoc['setting'] as Map<String, dynamic>)['listSort'];
+  //     soundEffectsOn = (tmpDoc['setting'] as Map<String, dynamic>)['sound'];
+  //   }
+  // }
   
   void toggleDarkMode(bool value) {
     setState(() => isDarkMode = value);
@@ -155,6 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
     happy: 0,
     level: 0,
     currentExp: 0,
+    styleID: ""
   );
 
   @override
@@ -209,9 +213,34 @@ class _MyHomePageState extends State<MyHomePage> {
     final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
     final Users loadedItems1 = Users.fromJson(jsonData1);
 
-    String jsonStr2 = await File('${testDirectory.path}/pet1.json').readAsString();    
-    final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
-    final Pets loadedItems2 = Pets.fromJson(jsonData2);
+    // String jsonStr2 = await File('${testDirectory.path}/pet1.json').readAsString();    
+    // final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
+    // final Pets loadedItems2 = Pets.fromJson(jsonData2);
+
+    DocumentSnapshot petDoc = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .collection('pets')
+      .doc('dragon')
+      .get();
+    
+    final Pets loadedItems2;
+    
+    if (petDoc.exists) {
+      final data = petDoc.data() as Map<String, dynamic>;
+      loadedItems2 = Pets.fromMap(data);
+    } else {
+      loadedItems2 = Pets(
+        image: "",
+        name: "",
+        hunger:0,
+        happy: 0,
+        level: 0,
+        currentExp: 0,
+        styleID: ""
+      );
+    }
+
 
     setState(() {
       user = loadedItems1;
