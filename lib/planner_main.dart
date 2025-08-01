@@ -36,6 +36,8 @@ class _PlannerMainState extends State<PlannerMain> {
   bool showFullToday = false;
   bool _isSubmitted = false;
 
+  String userId = "HiHgtVpIvdyCZVtiFCOc";
+
   String _dateKey(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day
         .toString().padLeft(2, '0')}";
@@ -83,7 +85,8 @@ class _PlannerMainState extends State<PlannerMain> {
   // Firestore 저장 함수
   void _autoSave() {
     final dateKey = _dateKey(selectedDate);
-    updateTasksToFirestore(dateKey, todayTaskList, repeatTaskList);
+    updateTasksToFirestore(userId, dateKey, todayTaskList); // 일일 리스트 저장
+    updateRepeatTasks(userId, repeatTaskList); // 반복 리스트 저장
   }
 
 
@@ -94,21 +97,30 @@ class _PlannerMainState extends State<PlannerMain> {
     selectedDate = DateTime.now();
     final dateKey = _dateKey(selectedDate);
 
-    // Firestore 데이터 불러오기
-    fetchTasks(dateKey).then((data) {
+    // 오늘 문서 없으면 생성 + visited 기록
+    initializeTasksIfNotExist(userId, dateKey, todayTaskList);
+
+    // 반복 리스트 불러오기
+    fetchRepeatTasks(userId).then((repeatTasks) {
+      setState(() {
+        repeatTaskList = repeatTasks;
+      });
+    });
+
+    // 일일 리스트 불러오기
+    fetchTasks(userId, dateKey).then((data) {
       setState(() {
         todayTaskList = data['todayTasks'];
-        repeatTaskList = data['repeatTasks'];
         _isSubmitted = data['submitted'];
       });
     });
   }
 
-  //  Firestore 제출 함수
+    //  Firestore 제출 함수
   void _submit() async {
     final dateKey = _dateKey(selectedDate);
     try {
-      await submitTasksToFirestore(dateKey, todayTaskList, repeatTaskList);
+      await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList);
       setState(() {
         _isSubmitted = true;
       });
@@ -216,7 +228,7 @@ class _PlannerMainState extends State<PlannerMain> {
                           Navigator.of(context).pop();
                           final dateKey = _dateKey(selectedDate);
                           try {
-                            await submitTasksToFirestore(dateKey, todayTaskList, repeatTaskList);
+                            await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList);
                             setState(() => _isSubmitted = true);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("제출 완료!")),
