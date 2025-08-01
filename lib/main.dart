@@ -14,6 +14,7 @@ import 'package:taskmate/DBtest/task_data.dart';
 import 'object.dart';
 import 'settingspage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,14 +31,28 @@ class RootState extends State<Root> {
   bool isDarkMode = false;
   bool isPushNotificationEnabled = false;
   String sortingMethod = '사전 순';
-  bool soundEffectsOn = false;  
-  /*
-  ┌──────────────────────────────────┐
-    firestore에 User의 설정 정보 요청.
-    로컬에 저장.
-  └──────────────────────────────────┘
-  */
+  bool soundEffectsOn = false;
 
+  @override
+  void initState() {
+    super.initState();
+    initAsync();
+  }
+
+  Future<void> initAsync() async {
+    DocumentSnapshot tmpDoc = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .get();
+    
+    if (tmpDoc.exists) {
+      isDarkMode = (tmpDoc['setting'] as Map<String, dynamic>)['darkMode'];
+      isPushNotificationEnabled = (tmpDoc['setting'] as Map<String, dynamic>)['push'];
+      sortingMethod = (tmpDoc['setting'] as Map<String, dynamic>)['listSort'];
+      soundEffectsOn = (tmpDoc['setting'] as Map<String, dynamic>)['sound'];
+    }
+  }
+  
   void toggleDarkMode(bool value) {
     setState(() => isDarkMode = value);
   }
