@@ -5,6 +5,7 @@ import 'object.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:taskmate/utils/icon_utis.dart';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<void> useItemsSave(List<Item> items, int index) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -65,6 +66,7 @@ class ItemlistPage1 extends StatefulWidget {
 
 class _ItemlistPage1State extends State<ItemlistPage1> {
   List<Item> inventory = [];
+  List<Item> gotItem = [];
 
   @override
   void initState() {
@@ -77,8 +79,19 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
     String jsonStr = await File('${testDirectory.path}/items1.json').readAsString();    
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
+    
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .collection('items')
+      .get();
+    
+    List<Item> ItemDoc = snapshot.docs.map((doc) {
+      return Item.fromMap(doc.data() as Map<String, dynamic>);
+    }).toList();
 
     setState(() {
+      gotItem = ItemDoc;
       inventory = loadedItems;
     });
   }
@@ -123,9 +136,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                itemCount: inventory.length,
+                itemCount: gotItem.length,
                 itemBuilder: (context, index) {
-                  final item = inventory[index];
+                  final item = gotItem[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -400,15 +413,6 @@ class ItemlistPage2 extends StatefulWidget {
 
 class _ItemlistPage2State extends State<ItemlistPage2> {
   List<Item> inventory = [];
-  Pets pet = Pets(
-    image: "assets/images/dragon.png",
-    name: "",
-    hunger:0,
-    happy: 0,
-    level: 0,
-    currentExp: 0,
-    styleID: "",
-  );
 
   @override
   void initState() {
@@ -422,13 +426,8 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
 
-    String jsonStr1 = await File('${testDirectory.path}/pet1.json').readAsString();    
-    final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
-    final Pets loadedItems1 = Pets.fromJson(jsonData1);
-
     setState(() {
       inventory = loadedItems;
-      pet = loadedItems1;
     });
   }
 
@@ -512,7 +511,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                 if(item.count > 0) {
                                   setState(() {
                                     item.count--;
-                                    pet.happy += item.happy;
+                                    widget.pet.happy += item.happy;
                                     /*
                                     ┌─────────────────────────────────────────────┐
                                       firestore에 User 하위의 Pet 정보 갱신 요청.

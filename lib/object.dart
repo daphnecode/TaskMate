@@ -43,6 +43,18 @@ class Item {
     'price': price,
     'itemText': itemText,
   };
+  factory Item.fromMap(Map<String, dynamic> map) {
+    return Item(
+      icon: map['icon'],
+      category: map['category'],
+      name: map['name'],
+      hunger: map['hunger'],
+      happy: map['happy'],
+      count: map['itemQuantity'],
+      price: map['price'],
+      itemText: map['itemText'],
+    );
+  }
   
 }
 
