@@ -86,12 +86,12 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
       .collection('items')
       .get();
     
-    List<Item> ItemDoc = snapshot.docs.map((doc) {
+    List<Item> itemDoc = snapshot.docs.map((doc) {
       return Item.fromMap(doc.data() as Map<String, dynamic>);
     }).toList();
 
     setState(() {
-      gotItem = ItemDoc;
+      gotItem = itemDoc;
       inventory = loadedItems;
     });
   }
@@ -413,6 +413,7 @@ class ItemlistPage2 extends StatefulWidget {
 
 class _ItemlistPage2State extends State<ItemlistPage2> {
   List<Item> inventory = [];
+  List<Item> gotItem = [];
 
   @override
   void initState() {
@@ -426,8 +427,19 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
 
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .collection('items')
+      .get();
+    
+    List<Item> itemDoc = snapshot.docs.map((doc) {
+      return Item.fromMap(doc.data() as Map<String, dynamic>);
+    }).toList();
+
     setState(() {
       inventory = loadedItems;
+      gotItem = itemDoc;
     });
   }
 
@@ -471,9 +483,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: inventory.length,
+                itemCount: gotItem.length,
                 itemBuilder: (context, index) {
-                  final item = inventory[index];
+                  final item = gotItem[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -737,6 +749,7 @@ class ItemlistPage3 extends StatefulWidget {
 
 class _ItemlistPage3State extends State<ItemlistPage3> {
   List<Item> inventory = [];
+  List<Item> gotItem = [];
 
   @override
   void initState() {
@@ -750,8 +763,19 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
 
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .collection('items')
+      .get();
+    
+    List<Item> itemDoc = snapshot.docs.map((doc) {
+      return Item.fromMap(doc.data() as Map<String, dynamic>);
+    }).toList();
+
     setState(() {
       inventory = loadedItems;
+      gotItem = itemDoc;
     });
   }
 
@@ -799,9 +823,9 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: inventory.length,
+                itemCount: gotItem.length,
                 itemBuilder: (context, index) {
-                  final item = inventory[index];
+                  final item = gotItem[index];
                   final isHighlighted = item.name == widget.user.name;
                   return Container(
                     color: isHighlighted
@@ -1066,6 +1090,7 @@ class ItemlistPage4 extends StatefulWidget {
 
 class _ItemlistPage4State extends State<ItemlistPage4> {
   List<Item> inventory = [];
+  List<Item> gotItem = [];
   String usedItem = "기본";
 
   @override
@@ -1081,8 +1106,19 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
     final List<dynamic> jsonData = json.decode(jsonStr);
     final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();  
 
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .collection('items')
+      .get();
+    
+    List<Item> itemDoc = snapshot.docs.map((doc) {
+      return Item.fromMap(doc.data() as Map<String, dynamic>);
+    }).toList();
+
     setState(() {
       inventory = loadedItems;
+      gotItem = itemDoc;
     });
   }
 
@@ -1126,9 +1162,9 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: inventory.length,
+                itemCount: gotItem.length,
                 itemBuilder: (context, index) {
-                  final item = inventory[index];
+                  final item = gotItem[index];
                   final isHighlighted = item.name == usedItem;
 
                   return Container(
