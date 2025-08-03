@@ -5,16 +5,49 @@ final FirebaseFirestore firestore = FirebaseFirestore.instance;
 /// 반복 리스트 전용 (repeatTasks)
 /// ==========================
 Future<List<Task>> fetchRepeatTasks(String userId) async {
-  final doc = await firestore
+  final repeatRef = firestore
       .collection('Users')
       .doc(userId)
       .collection('repeatTasks')
-      .doc('default')
-      .get();
+      .doc('default');
+
+  final metaRef = firestore
+      .collection('Users')
+      .doc(userId)
+      .collection('repeatTasks')
+      .doc('meta'); // 날짜 기록용
+
+  final doc = await repeatRef.get();
   if (!doc.exists) return [];
-  return (doc.data()?['tasks'] as List)
+
+  // 마지막 업데이트 날짜 확인
+  final metaDoc = await metaRef.get();
+  DateTime lastUpdated = metaDoc.exists
+      ? DateTime.tryParse(metaDoc['lastUpdated'] ?? '') ?? DateTime.now()
+      : DateTime.now();
+
+  DateTime today = DateTime.now();
+
+  List<Task> tasks = (doc.data()?['tasks'] as List)
       .map((t) => Task.fromJson(Map<String, dynamic>.from(t)))
       .toList();
+
+  // 날짜가 바뀌었으면 체크 해제
+  if (lastUpdated.year != today.year ||
+      lastUpdated.month != today.month ||
+      lastUpdated.day != today.day) {
+    tasks = tasks.map((t) => t.copyWith(isChecked: false)).toList();
+
+    // Firestore에 반영
+    await repeatRef.set({
+      'tasks': tasks.map((t) => t.toJson()).toList(),
+    }, SetOptions(merge: true));
+
+    // meta 날짜 갱신
+    await metaRef.set({'lastUpdated': today.toIso8601String()});
+  }
+
+  return tasks;
 }
 
 Future<void> updateRepeatTasks(String userId, List<Task> tasks) async {
@@ -23,9 +56,19 @@ Future<void> updateRepeatTasks(String userId, List<Task> tasks) async {
       .doc(userId)
       .collection('repeatTasks')
       .doc('default');
+
+  final metaRef = firestore
+      .collection('Users')
+      .doc(userId)
+      .collection('repeatTasks')
+      .doc('meta');
+
   await docRef.set({
     'tasks': tasks.map((t) => t.toJson()).toList(),
   }, SetOptions(merge: true));
+
+  // 저장할 때도 마지막 업데이트 날짜 갱신
+  await metaRef.set({'lastUpdated': DateTime.now().toIso8601String()});
 }
 
 /// ==========================

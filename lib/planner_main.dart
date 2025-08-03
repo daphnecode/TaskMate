@@ -262,7 +262,11 @@ class _PlannerMainState extends State<PlannerMain> {
       body: showFullRepeat
           ? RepeatTaskFullScreen(
         taskList: repeatTaskList,
-        onToggleCheck: (index) => toggleCheck(repeatTaskList, index),
+        onToggleCheck: (index) {
+          if (!_isSubmitted) {
+            toggleCheck(repeatTaskList, index);
+          }
+        },
         onCollapse: () {
           setState(() {
             showFullRepeat = false;
@@ -281,8 +285,11 @@ class _PlannerMainState extends State<PlannerMain> {
           : showFullToday
           ? TodayTaskFullScreen(
         taskList: todayTaskList,
-        onToggleCheck: (index) =>
-            toggleCheck(todayTaskList, index),
+        onToggleCheck: (index) {
+          if (!_isSubmitted) {
+            toggleCheck(todayTaskList, index);
+          }
+        },
         onCollapse: () {
           setState(() {
             showFullToday = false;
@@ -304,8 +311,11 @@ class _PlannerMainState extends State<PlannerMain> {
             flex: 2,
             child: RepeatTaskBox(
               taskList: repeatTaskList,
-              onToggleCheck: (index) =>
-                  toggleCheck(repeatTaskList, index),
+              onToggleCheck: (index) {
+                if (!_isSubmitted) {
+                  toggleCheck(repeatTaskList, index);
+                }
+              },
               onExpand: () {
                 setState(() {
                   showFullRepeat = true;
@@ -328,8 +338,11 @@ class _PlannerMainState extends State<PlannerMain> {
             flex: 2,
             child: TodayTaskBox(
               taskList: todayTaskList,
-              onToggleCheck: (index) =>
-                  toggleCheck(todayTaskList, index),
+              onToggleCheck: (index) {
+                if (!_isSubmitted) {
+                  toggleCheck(todayTaskList, index);
+                }
+              },
               onExpand: () {
                 setState(() {
                   showFullToday = true;
