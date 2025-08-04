@@ -48,6 +48,11 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     widget.onUpdateDailyTaskMap(_dailyTaskMap);
   }
 
+  DateTime getKstNow() {
+    return DateTime.now().toUtc().add(const Duration(hours: 9)); // 한국 시간 변환
+  }
+
+
 
   // 날짜 키 문자열 (예: 2025-06-27)
   String _dateKey(DateTime date) {
@@ -57,7 +62,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.selectedDate;
+    _selectedDate = getKstNow();
     _dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
     _loadTasksForDate(_selectedDate); // 앱 첫 로드시 Firestore 데이터 불러오기
   }

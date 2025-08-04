@@ -92,12 +92,16 @@ class _PlannerMainState extends State<PlannerMain> {
     updateRepeatTasks(userId, repeatTaskList); // 반복 리스트 저장
   }
 
+  DateTime getKstNow() {
+    return DateTime.now().toUtc().add(const Duration(hours: 9)); // 한국 시간
+  }
+
 
 
   @override
   void initState() {
     super.initState();
-    selectedDate = DateTime.now();
+    selectedDate = getKstNow();
     final dateKey = _dateKey(selectedDate);
 
     // 🔹 dailyTasks → planner
@@ -167,6 +171,8 @@ class _PlannerMainState extends State<PlannerMain> {
 
   @override
   Widget build(BuildContext context) {
+    selectedDate = getKstNow(); // 항상 최신 날짜로 갱신
+    final dateKey = _dateKey(selectedDate);
     if (isEditMode) {
       return PlannerEditPage(
         onNext: widget.onNext,

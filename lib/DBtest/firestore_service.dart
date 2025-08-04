@@ -28,7 +28,8 @@ Future<List<Task>> fetchRepeatTasks(String userId) async {
       ? DateTime.tryParse(metaDoc['lastUpdated'] ?? '') ?? DateTime.now()
       : DateTime.now();
 
-  DateTime today = DateTime.now();
+  // 🔹 오늘 날짜를 KST로 계산
+  DateTime today = DateTime.now().toUtc().add(const Duration(hours: 9));
 
   List<Task> tasks = (doc.data()?['tasks'] as List)
       .map((t) => Task.fromJson(Map<String, dynamic>.from(t)))
@@ -65,13 +66,16 @@ Future<void> updateRepeatTasks(String userId, List<Task> tasks) async {
       .collection('repeatTasks')
       .doc('meta');
 
+  // 🔹 저장할 때도 KST로 meta 날짜 갱신
+  DateTime today = DateTime.now().toUtc().add(const Duration(hours: 9));
+
   await docRef.set({
     'tasks': tasks.map((t) => t.toJson()).toList(),
   }, SetOptions(merge: true));
 
-  // 저장할 때도 마지막 업데이트 날짜 갱신
-  await metaRef.set({'lastUpdated': DateTime.now().toIso8601String()});
+  await metaRef.set({'lastUpdated': today.toIso8601String()});
 }
+
 
 /// ==========================
 /// 일일 리스트 (planner)
@@ -119,9 +123,11 @@ Future<void> initializeTasksIfNotExist(
     });
   }
 
-  // 접속 로그 기록
+  // 🔹 접속 로그 기록 (KST 기준 날짜)
+  DateTime kstNow = DateTime.now().toUtc().add(const Duration(hours: 9));
   await logRef.set({
     'visited': true,
+    'visitedAt': kstNow.toIso8601String(), // KST 방문 시간 기록 추가
   }, SetOptions(merge: true));
 }
 
@@ -172,15 +178,18 @@ Future<void> submitTasksToFirestore(
     'submitted': true,
   }, SetOptions(merge: true));
 
-  // 로그 기록
+  // 로그 기록 (제출 시간은 서버 타임스탬프 + KST 기록)
+  DateTime kstNow = DateTime.now().toUtc().add(const Duration(hours: 9));
   await logRef.set({
     'submitted': true,
-    'submittedAt': FieldValue.serverTimestamp(),
+    'submittedAt': FieldValue.serverTimestamp(), // 서버 시간
+    'submittedAtKST': kstNow.toIso8601String(), // KST 시간 추가
     'completedCount': completedCount,
     'totalTasks': totalTasks,
     'visited': true,
   }, SetOptions(merge: true));
 }
+
 
 /// ==========================
 /// 일일 리스트 날짜별 저장 (dailyTasks)
