@@ -3,6 +3,9 @@ import 'DBtest/task.dart';
 import 'package:taskmate/DBtest/task_data.dart';
 import 'planner_edit.dart';
 import 'statistics.dart';
+import 'DBtest/firestore_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 
 //위젯
@@ -97,9 +100,16 @@ class _PlannerMainState extends State<PlannerMain> {
     selectedDate = DateTime.now();
     final dateKey = _dateKey(selectedDate);
 
-    // 오늘 문서 없으면 생성 + visited 기록
-    initializeTasksIfNotExist(userId, dateKey, todayTaskList);
+    // 🔹 dailyTasks → planner
+    syncDailyToPlanner(userId, dateKey);
 
+    // 🔹 방문 로그 기록 (visited)
+    firestore
+        .collection('Users')
+        .doc(userId)
+        .collection('log')
+        .doc(dateKey)
+        .set({'visited': true}, SetOptions(merge: true));
     // 반복 리스트 불러오기
     fetchRepeatTasks(userId).then((repeatTasks) {
       setState(() {

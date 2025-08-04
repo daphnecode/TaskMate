@@ -20,10 +20,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
   int visitedDays = 0;
   Map<String, double> weeklyData = {};
 
+  // 날짜를 '자정 00:00:00'으로 맞추는 함수
+  DateTime onlyDate(DateTime d) => DateTime(d.year, d.month, d.day);
+
   @override
   void initState() {
     super.initState();
     _loadStatistics();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadStatistics(); // 페이지 다시 올 때마다 최신 데이터 로드
   }
 
   Future<void> _loadStatistics() async {
@@ -39,9 +48,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
     }
 
     // 오늘 날짜 / 이번 주 시작 날짜 계산
-    final today = DateTime.now();
-    final weekStart = today.subtract(Duration(days: today.weekday - 1));
-    final weekEnd = weekStart.add(const Duration(days: 6));
+    final today = onlyDate(DateTime.now());
+    final weekStart = onlyDate(today.subtract(Duration(days: today.weekday - 1)));
+    final weekEnd = onlyDate(weekStart.add(const Duration(days: 6)));
 
     int completedSum = 0;
     int visitedCount = 0;
@@ -53,7 +62,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
     for (var doc in logsSnap.docs) {
       final data = doc.data();
-      final date = DateFormat('yyyy-MM-dd').parse(doc.id);
+      final date = onlyDate(DateFormat('yyyy-MM-dd').parse(doc.id));
 
       final completed = (data['completedCount'] ?? 0) as int;
       final total = (data['totalTasks'] ?? 0) as int;
@@ -80,7 +89,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
     int streak = 0;
     DateTime current = today;
     for (var d in submittedDates) {
-      if (d.isAtSameMomentAs(DateTime(current.year, current.month, current.day))) {
+      if (d.isAtSameMomentAs(current)) {
         streak++;
         current = current.subtract(const Duration(days: 1));
       } else if (d.isBefore(current)) {
@@ -92,15 +101,13 @@ class _StatisticsPageState extends State<StatisticsPage> {
     Map<String, double> weekData = {};
     for (var doc in logsSnap.docs) {
       final data = doc.data();
-      final date = DateFormat('yyyy-MM-dd').parse(doc.id);
-      final weekStart = date.subtract(Duration(days: date.weekday - 1));
-      final weekEnd = weekStart.add(const Duration(days: 6));
+      final date = onlyDate(DateFormat('yyyy-MM-dd').parse(doc.id));
+      final weekStart = onlyDate(date.subtract(Duration(days: date.weekday - 1)));
+      final weekEnd = onlyDate(weekStart.add(const Duration(days: 6)));
       final weekKey =
           "${DateFormat('M/d').format(weekStart)}~${DateFormat('M/d').format(weekEnd)}";
       weekData[weekKey] = (weekData[weekKey] ?? 0) + (data['completedCount'] ?? 0);
     }
-
-
 
     setState(() {
       totalCompleted = completedSum;
