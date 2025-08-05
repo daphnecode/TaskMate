@@ -90,6 +90,7 @@ class Pets {
       styleID: map['styleID'],
     );
   }
+  
   Map<String, dynamic> toJson() => {
     'image': image,
     'name': name,
@@ -111,6 +112,7 @@ class Pets {
       styleID: newPet.styleID,
     );
   }
+
   factory Pets.fromJson(Map<String, dynamic> json) {
     return Pets(
       image: json['image'],

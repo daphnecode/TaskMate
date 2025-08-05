@@ -16,6 +16,30 @@ Future<void> useItemsSave(List<Item> items, int index) async {
   await file.writeAsString(jsonString);
 }
 
+Future<void> itemSaveDB(String userID, String itemID, int count) async {
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userID)
+      .collection('items')
+      .doc(itemID)
+      .update(
+        {
+          'itemQuantity' : count,
+        }
+      );
+}
+
+Future<void> petSaveDB(String userID, String petID, Pets pet) async {
+  final jsonString = jsonEncode(pet.toJson());
+  Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userID)
+      .collection('pets')
+      .doc(petID)
+      .set(jsonMap);
+}
+
 Future<void> userSave(Users user) async {
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/user1.json');
