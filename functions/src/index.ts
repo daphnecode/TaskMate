@@ -1,32 +1,66 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import {onDocumentCreated} from "firebase-functions/v2/firestore";
+import * as admin from "firebase-admin";
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+admin.initializeApp();
+const db = admin.firestore();
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+export const onTaskSubmitted = onDocumentWritten(
+  "Users/{userId}/log/{logId}",
+  async (event) => {
+    const userId = event.params.userId;
+    const newLog = event.data?.after.data();
+    if (!newLog) return;
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+    const statsRef = db
+      .collection("Users")
+      .doc(userId)
+      .collection("stats")
+      .doc("summary");
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    const statsDoc = await statsRef.get();
+    let totalCompleted = 0;
+    let streakDays = 0;
+    let lastUpdated: FirebaseFirestore.Timestamp | null = null;
+
+    if (statsDoc.exists) {
+      const data = statsDoc.data();
+      totalCompleted = data?.totalCompleted || 0;
+      streakDays = data?.streakDays || 0;
+      lastUpdated = data?.lastUpdated || null;
+    }
+
+    // 수정: 필드명 맞춤
+    const completedCount = newLog.completedCount || 0;
+
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0];
+    let newStreak = streakDays;
+
+    if (lastUpdated) {
+      const lastDate = new Date(lastUpdated.toDate());
+      const lastStr = lastDate.toISOString().split("T")[0];
+
+      if (lastStr !== todayStr) {
+        const diff =
+          (today.getTime() - lastDate.getTime()) /
+          (1000 * 60 * 60 * 24);
+        newStreak = diff === 1 ? streakDays + 1 : 1;
+      }
+    } else {
+      newStreak = 1;
+    }
+
+    await statsRef.set(
+      {
+        totalCompleted: totalCompleted + completedCount,
+        streakDays: newStreak,
+        lastUpdated: admin.firestore.Timestamp.now(),
+      },
+      {merge: true}
+    );
+
+    console.log(
+      `Stats updated for user ${userId}: +${completedCount} tasks, streak ${newStreak}`
+    );
+  }
+);
