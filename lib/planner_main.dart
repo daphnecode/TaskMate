@@ -104,8 +104,16 @@ class _PlannerMainState extends State<PlannerMain> {
     selectedDate = getKstNow();
     final dateKey = _dateKey(selectedDate);
 
-    // 🔹 dailyTasks → planner
-    syncDailyToPlanner(userId, dateKey);
+    // 🔹 dailyTasks → planner (오늘 날짜 동기화)
+    syncDailyToPlanner(userId, dateKey).then((_) {
+      // 🔹 dailyTasks 동기화 후 일일 리스트 불러오기
+      fetchTasks(userId, dateKey).then((data) {
+        setState(() {
+          todayTaskList = data['todayTasks'];
+          _isSubmitted = data['submitted'];
+        });
+      });
+    });
 
     // 🔹 방문 로그 기록 (visited)
     firestore
@@ -114,23 +122,16 @@ class _PlannerMainState extends State<PlannerMain> {
         .collection('log')
         .doc(dateKey)
         .set({'visited': true}, SetOptions(merge: true));
+
     // 반복 리스트 불러오기
     fetchRepeatTasks(userId).then((repeatTasks) {
       setState(() {
         repeatTaskList = repeatTasks;
       });
     });
-
-    // 일일 리스트 불러오기
-    fetchTasks(userId, dateKey).then((data) {
-      setState(() {
-        todayTaskList = data['todayTasks'];
-        _isSubmitted = data['submitted'];
-      });
-    });
   }
 
-    //  Firestore 제출 함수
+  //  Firestore 제출 함수
   void _submit() async {
     final dateKey = _dateKey(selectedDate);
     try {

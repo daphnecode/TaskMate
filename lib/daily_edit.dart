@@ -45,6 +45,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
       _dailyTaskMap[key] = updatedList;
     });
     await saveDailyTasks(userId, key, updatedList); // Firestore 저장
+    await updateTasksToFirestore(userId, key, _dailyTaskMap[key] ?? []); // planner컬렉션에 반영
     widget.onUpdateDailyTaskMap(_dailyTaskMap);
   }
 
@@ -79,7 +80,13 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
             icon: Icon(Icons.save),
             onPressed: () async {
               final key = _dateKey(_selectedDate);
-              await saveDailyTasks(userId, key, _dailyTaskMap[key] ?? []); // 저장 버튼 누를 때도 Firestore 반영
+              final tasks = _dailyTaskMap[key] ?? [];
+
+              // dailyTasks에 저장
+              await saveDailyTasks(userId, key, tasks);
+              // planner에도 저장
+              await updateTasksToFirestore(userId, key, tasks);
+
               widget.onUpdateDailyTaskMap(_dailyTaskMap);
               Navigator.pop(context, _dailyTaskMap);
             },

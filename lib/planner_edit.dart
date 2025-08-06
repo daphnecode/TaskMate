@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'DBtest/task.dart';
 import 'daily_edit.dart';
+import 'DBtest/firestore_service.dart';
+
 
 //위젯
 import 'package:taskmate/widgets/repeat_edit_box.dart';
@@ -34,6 +36,7 @@ class PlannerEditPage extends StatefulWidget {
 }
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
+  final String userId = "HiHgtVpIvdyCZVtiFCOc";
 
   String _dateKey(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -69,22 +72,31 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     });
   }
 
+  /// 🔹 planner + dailyTasks 동시 저장
+  Future<void> saveCurrentTasks() async {
+    final key = _dateKey(selectedDate);
+    await updateTasksToFirestore(userId, key, todayTaskList);
+    await saveDailyTasks(userId, key, todayTaskList);
+  }
 
-  void saveAndNavigate(int target) {
-    final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
+  /// 저장 후 페이지 이동
+  void saveAndNavigate(int target) async {
     final key = _dateKey(widget.selectedDate);
+    final newMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
     newMap[key] = todayTaskList;
 
     widget.onDailyMapChanged(newMap);
     widget.onUpdateTasks(repeatTaskList, todayTaskList);
 
-    if(target == 0) {
-      widget.onNext(0); //홈 화면으로 이동
-    }
-    else if(target ==1) {
-      widget.onBackToMain(); //플래너 메인화면으로 이동
+    await saveCurrentTasks(); // 공통 저장
+
+    if (target == 0) {
+      widget.onNext(0); // 홈
+    } else if (target == 1) {
+      widget.onBackToMain(); // 플래너 메인
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -92,36 +104,35 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       appBar: AppBar(actions: [
         IconButton(
           icon: Icon(Icons.calendar_today),
-      onPressed: () async {
-        final newMap = Map<String, List<Task>>.from(dailyTaskMap);
-        final key = _dateKey(selectedDate);
-        newMap[key] = todayTaskList;
+          onPressed: () async {
+            // 🔹 현재 데이터 저장 
+            await saveCurrentTasks();
 
-        // 화면 이동 + 결과 기다림
-        final result = await Navigator.push<Map<String, List<Task>>>(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DailyTaskEditPage(
-              dailyTaskMap: newMap,
-              selectedDate: selectedDate,
-              onUpdateDailyTaskMap: (updatedMap) {
-                //Navigator.pop(context, updatedMap); // ✅ 수정된 map을 반환
-              },
-            ),
-          ),
-        );
+            final key = _dateKey(selectedDate);
+            final newMap = Map<String, List<Task>>.from(dailyTaskMap);
+            newMap[key] = todayTaskList;
 
-        // 돌아왔을 때 result가 null 아니면 상태 반영
-        if (result != null) {
-          setState(() {
-            dailyTaskMap = result;
-            todayTaskList = result[_dateKey(selectedDate)] ?? [];
-          });
+            // DailyTaskEditPage로 이동
+            final result = await Navigator.push<Map<String, List<Task>>>(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DailyTaskEditPage(
+                  dailyTaskMap: newMap,
+                  selectedDate: selectedDate,
+                  onUpdateDailyTaskMap: (updatedMap) {},
+                ),
+              ),
+            );
 
-          // 부모 위젯에도 전달
-          widget.onDailyMapChanged(result);
-        }
-      }
+            // 돌아오면 결과 반영
+            if (result != null) {
+              setState(() {
+                dailyTaskMap = result;
+                todayTaskList = result[_dateKey(selectedDate)] ?? [];
+              });
+              widget.onDailyMapChanged(result);
+            }
+          },
         )
       ]),
       body: showFullRepeat
