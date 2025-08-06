@@ -13,25 +13,20 @@ Future<List<Task>> fetchRepeatTasks(String userId) async {
       .collection('repeatTasks')
       .doc('default');
 
-  final metaRef = firestore
-      .collection('Users')
-      .doc(userId)
-      .collection('repeatTasks')
-      .doc('meta'); // 날짜 기록용
-
   final doc = await repeatRef.get();
   if (!doc.exists) return [];
 
+  final data = doc.data() ?? {};
+  final metaData = data['meta'] ?? {};
+
   // 마지막 업데이트 날짜 확인
-  final metaDoc = await metaRef.get();
-  DateTime lastUpdated = metaDoc.exists
-      ? DateTime.tryParse(metaDoc['lastUpdated'] ?? '') ?? DateTime.now()
-      : DateTime.now();
+  DateTime lastUpdated =
+      DateTime.tryParse(metaData['lastUpdated'] ?? '') ?? DateTime.now();
 
   // 🔹 오늘 날짜를 KST로 계산
   DateTime today = DateTime.now().toUtc().add(const Duration(hours: 9));
 
-  List<Task> tasks = (doc.data()?['tasks'] as List)
+  List<Task> tasks = (data['tasks'] as List)
       .map((t) => Task.fromJson(Map<String, dynamic>.from(t)))
       .toList();
 
@@ -41,13 +36,11 @@ Future<List<Task>> fetchRepeatTasks(String userId) async {
       lastUpdated.day != today.day) {
     tasks = tasks.map((t) => t.copyWith(isChecked: false)).toList();
 
-    // Firestore에 반영
+    // Firestore에 반영 (meta 포함)
     await repeatRef.set({
       'tasks': tasks.map((t) => t.toJson()).toList(),
+      'meta': {'lastUpdated': today.toIso8601String()},
     }, SetOptions(merge: true));
-
-    // meta 날짜 갱신
-    await metaRef.set({'lastUpdated': today.toIso8601String()});
   }
 
   return tasks;
@@ -60,22 +53,14 @@ Future<void> updateRepeatTasks(String userId, List<Task> tasks) async {
       .collection('repeatTasks')
       .doc('default');
 
-  final metaRef = firestore
-      .collection('Users')
-      .doc(userId)
-      .collection('repeatTasks')
-      .doc('meta');
-
   // 🔹 저장할 때도 KST로 meta 날짜 갱신
   DateTime today = DateTime.now().toUtc().add(const Duration(hours: 9));
 
   await docRef.set({
     'tasks': tasks.map((t) => t.toJson()).toList(),
+    'meta': {'lastUpdated': today.toIso8601String()},
   }, SetOptions(merge: true));
-
-  await metaRef.set({'lastUpdated': today.toIso8601String()});
 }
-
 
 /// ==========================
 /// 일일 리스트 (planner)
@@ -190,7 +175,6 @@ Future<void> submitTasksToFirestore(
   }, SetOptions(merge: true));
 }
 
-
 /// ==========================
 /// 일일 리스트 날짜별 저장 (dailyTasks)
 /// ==========================
@@ -256,4 +240,3 @@ Future<void> syncDailyToPlanner(String userId, String dateKey) async {
     'submitted': false,
   }, SetOptions(merge: true));
 }
-
