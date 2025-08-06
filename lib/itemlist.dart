@@ -100,27 +100,34 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 
   Future<void> loadItems() async {
     List<Item> itemDoc = [];
-    
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/items1.json').readAsString();    
-    final List<dynamic> jsonData = json.decode(jsonStr);
-    final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
+    List<Item> shopDoc = [];
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
+    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
       .collection('items')
       .where('category', isEqualTo: 1)
       .get();
     
-    if (snapshot.docs.isNotEmpty) {
-      itemDoc = snapshot.docs.map((doc) {
+    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
+      .collection('aLLitems')
+      .where('category', isEqualTo: 1)
+      .get();
+    
+    if (snapshot1.docs.isNotEmpty) {
+      itemDoc = snapshot1.docs.map((doc) {
+        return Item.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }
+
+    if (snapshot2.docs.isNotEmpty) {
+      shopDoc = snapshot2.docs.map((doc) {
         return Item.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
     }
 
     setState(() {
-      inventory = loadedItems;
+      inventory = shopDoc;
       gotItem = itemDoc;
     });
   }
@@ -452,27 +459,34 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 
   Future<void> loadItems() async {
     List<Item> itemDoc = [];
-    
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/items2.json').readAsString();    
-    final List<dynamic> jsonData = json.decode(jsonStr);
-    final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
+    List<Item> shopDoc = [];
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
+    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
       .collection('items')
       .where('category', isEqualTo: 2)
       .get();
     
-    if (snapshot.docs.isNotEmpty) {
-      itemDoc = snapshot.docs.map((doc) {
+    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
+      .collection('aLLitems')
+      .where('category', isEqualTo: 2)
+      .get();
+    
+    if (snapshot1.docs.isNotEmpty) {
+      itemDoc = snapshot1.docs.map((doc) {
+        return Item.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }
+
+    if (snapshot2.docs.isNotEmpty) {
+      shopDoc = snapshot2.docs.map((doc) {
         return Item.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
     }
 
     setState(() {
-      inventory = loadedItems;
+      inventory = shopDoc;
       gotItem = itemDoc;
     });
   }
@@ -793,27 +807,34 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 
   Future<void> loadItems() async {
     List<Item> itemDoc = [];
-    
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/items3.json').readAsString();    
-    final List<dynamic> jsonData = json.decode(jsonStr);
-    final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
+    List<Item> shopDoc = [];
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
+    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
       .collection('items')
       .where('category', isEqualTo: 3)
       .get();
     
-    if (snapshot.docs.isNotEmpty) {
-      itemDoc = snapshot.docs.map((doc) {
+    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
+      .collection('aLLitems')
+      .where('category', isEqualTo: 3)
+      .get();
+    
+    if (snapshot1.docs.isNotEmpty) {
+      itemDoc = snapshot1.docs.map((doc) {
+        return Item.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }
+
+    if (snapshot2.docs.isNotEmpty) {
+      shopDoc = snapshot2.docs.map((doc) {
         return Item.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
     }
 
     setState(() {
-      inventory = loadedItems;
+      inventory = shopDoc;
       gotItem = itemDoc;
     });
   }
@@ -1141,27 +1162,34 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 
   Future<void> loadItems() async {
     List<Item> itemDoc = [];
-    
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr = await File('${testDirectory.path}/items4.json').readAsString();    
-    final List<dynamic> jsonData = json.decode(jsonStr);
-    final List<Item> loadedItems = jsonData.map((e) => Item.fromJson(e)).toList();
+    List<Item> shopDoc = [];
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
+    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
       .collection('items')
       .where('category', isEqualTo: 4)
       .get();
     
-    if (snapshot.docs.isNotEmpty) {
-      itemDoc = snapshot.docs.map((doc) {
+    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
+      .collection('aLLitems')
+      .where('category', isEqualTo: 4)
+      .get();
+    
+    if (snapshot1.docs.isNotEmpty) {
+      itemDoc = snapshot1.docs.map((doc) {
+        return Item.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }
+
+    if (snapshot2.docs.isNotEmpty) {
+      shopDoc = snapshot2.docs.map((doc) {
         return Item.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
     }
 
     setState(() {
-      inventory = loadedItems;
+      inventory = shopDoc;
       gotItem = itemDoc;
     });
   }

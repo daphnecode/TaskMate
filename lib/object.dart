@@ -50,7 +50,7 @@ class Item {
       name: map['name'],
       hunger: map['hunger'],
       happy: map['happy'],
-      count: map['itemQuantity'],
+      count: map['count'],
       price: map['price'],
       itemText: map['itemText'],
     );
