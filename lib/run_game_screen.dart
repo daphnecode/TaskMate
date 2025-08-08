@@ -27,7 +27,7 @@ class _RunGameScreenState extends State<RunGameScreen> {
 
     // 효과음이 켜져 있으면 놀이 BGM 재생
     final rootState = context.findAncestorStateOfType<RootState>();
-    if (rootState != null && rootState.soundEffectsOn) {
+    if (rootState != null && rootState.user.setting['sound']) {
       BgmManager.stopBgm();                // 이전 브금 정지
       BgmManager.playBgm('bgm1.mp3');   // 놀이 브금 재생
     }

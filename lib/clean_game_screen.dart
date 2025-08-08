@@ -29,7 +29,7 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
     super.initState();
     // Root에서 현재 사운드 설정 읽기
     final rootState = context.findAncestorStateOfType<RootState>();
-    if (rootState != null && rootState.soundEffectsOn) {
+    if (rootState != null && rootState.user.setting['sound']) {
       BgmManager.playBgm('bgm2.wav');
     }
   }

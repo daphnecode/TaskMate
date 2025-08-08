@@ -167,11 +167,11 @@ class Users {
       currentPoint: 0,
       gotPoint: 0,
       setting: {
-        'darkMode': false,
+        'darkMode': map['setting']['darkMode'],
         'listSort': "사전 순",
-        'placeID': "초원",
-        'push': false,
-        'sound': false
+        'placeID': "assets/images/prairie.png",
+        'push': map['setting']['push'],
+        'sound': map['setting']['sound']
       },
     );
   }
