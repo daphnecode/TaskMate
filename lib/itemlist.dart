@@ -8,17 +8,28 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
-Future<void> itemSaveDB(String userID, String itemID, int count) async {
-  await FirebaseFirestore.instance
+Future<void> itemSaveDB(String userID, String itemID, Item target) async {
+  final refDoc = FirebaseFirestore.instance
       .collection('Users')
       .doc(userID)
       .collection('items')
-      .doc(itemID)
-      .update(
-        {
-          'itemQuantity' : count,
-        }
-      );
+      .doc(itemID);
+  
+  DocumentSnapshot tmpDoc = await refDoc.get();
+  
+  if (tmpDoc.exists) {
+    await refDoc.update(
+      {
+        'count': target.count
+      }
+    );
+  } else {
+    final jsonString = jsonEncode(target.toJson());
+    Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+    await refDoc.set(
+      jsonMap
+    );
+  }
 }
 
 Future<void> petSaveDB(String userID, String petID, Pets pet) async {
@@ -184,6 +195,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                     */
                                   });
                                 }
+                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                 Navigator.pop(context);
                                 },
                             ),
@@ -334,6 +346,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   */
                                   }
                                 });
+                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                 Navigator.pop(context);
                                 },
                             ),
@@ -498,9 +511,10 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                       firestore에 User의 statistics 정보 갱신 요청.
                                       firestore에 User 하위의 Item 정보 갱신 요청.
                                     └─────────────────────────────────────────────┘
-                                    */                                    
+                                    */
                                   });
                                 }
+                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                 Navigator.pop(context);
                                 },
                             ),
@@ -645,6 +659,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                   └─────────────────────────────────────────────┘
                                   */
                                 });
+                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                 Navigator.pop(context);
                                 },
                             ),
@@ -810,6 +825,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                     widget.user.name = item.name;
                                   });
                                   userSave(widget.user);                                  
+                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                   Navigator.pop(context);
                                 },
                               ),
@@ -959,6 +975,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                       └─────────────────────────────────────────────┘
                                       */
                                     });
+                                    itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                     Navigator.pop(context);
                                     },
                                 ),
@@ -1130,6 +1147,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       └─────────────────────────────────────────────┘
                                       */
                                     });
+                                    itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                     Navigator.pop(context);
                                     },
                                 ),
@@ -1273,6 +1291,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       setState(() {
                                         item.count++;
                                       });
+                                      itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                       Navigator.pop(context);
                                     }
                                   },
