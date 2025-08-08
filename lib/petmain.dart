@@ -49,7 +49,7 @@ class _MainareaState extends State<Mainarea> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.user.image == "" || widget.pet.image == "") {
+    if (widget.user.setting['placeID'] == "" || widget.pet.image == "") {
       return Center(child: CircularProgressIndicator());
     }
     
@@ -86,7 +86,7 @@ class _MainareaState extends State<Mainarea> {
                   return Stack(
                     children: [
                       Image.asset(
-                        widget.user.image, 
+                        widget.user.setting['placeID'], 
                         fit: BoxFit.cover, 
                         height: double.infinity, width: double.infinity
                         ),
@@ -124,7 +124,7 @@ class Petmain extends StatefulWidget {
 class _PetmainState extends State<Petmain> { 
   @override
   Widget build(BuildContext context) {
-    if (widget.user.image == "" || widget.pet.image == "") {
+    if (widget.user.setting['placeID'] == "" || widget.pet.image == "") {
       return Center(child: CircularProgressIndicator());
     }
     return Scaffold(

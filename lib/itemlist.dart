@@ -53,31 +53,31 @@ Future<void> userSave(Users user) async {
 }
 
 String nameChange(String name) {
-    String result;
-    switch (name) {
-      case "초원":
-        result = "assets/images/prairie.png";
-        return result;
-      case "바닷가":
-        result = "assets/images/beach.png";
-        return result;
-      case "숲 속":
-        result = "assets/images/forest.png";
-        return result;
-      case "구름 위":
-        result = "assets/images/cloud.png";
-        return result;
-      case "화산":
-        result = "assets/images/volcano.png";
-        return result;
-      case "야경":
-        result = "assets/images/nightcity.png";
-        return result;
-      default:
-        result = "assets/images/prairie.png";
-        return result;
-    }
+  String result;
+  switch (name) {
+    case "assets/images/prairie.png":
+      result = "prairie";
+      return result;
+    case "assets/images/beach.png":
+      result = "beach";
+      return result;
+    case "assets/images/forest.png":
+      result = "forest";
+      return result;
+    case "assets/images/cloud.png":
+      result = "cloud";
+      return result;
+    case "assets/images/volcano.png":
+      result = "volcano";
+      return result;
+    case "assets/images/nightcity.png":
+      result = "nightcity";
+      return result;
+    default:
+      result = "assets/images/prairie.png";
+      return result;
   }
+}
 
 class ItemlistPage1 extends StatefulWidget {
   final void Function(int) onNext;
@@ -280,7 +280,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("${widget.user.point}pt", 
+                      child: Text("${widget.user.currentPoint}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -334,14 +334,14 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                               child: Text('구매'),
                               onPressed: () {
                                 setState(() {
-                                  if (item.price < widget.user.point) {
-                                  widget.user.point -= item.price;
+                                  if (item.price < widget.user.currentPoint) {
+                                  widget.user.currentPoint -= item.price;
                                   item.count++;
                                   userSave(widget.user);
                                   /*
                                   ┌─────────────────────────────────────────────┐
                                     firestore에 User 하위의 Item 정보 갱신 요청.
-                                    firestore에 User의 point 정보 갱신 요청.
+                                    firestore에 User의 currentPoint 정보 갱신 요청.
                                   └─────────────────────────────────────────────┘
                                   */
                                   }
@@ -598,7 +598,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                     Expanded(
                       child: Container(
                         alignment: Alignment.centerRight,
-                        child: Text("${widget.user.point}pt", 
+                        child: Text("${widget.user.currentPoint}pt", 
                           style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -655,7 +655,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                   /*
                                   ┌─────────────────────────────────────────────┐
                                     firestore에 User 하위의 Item 정보 갱신 요청.
-                                    firestore에 User의 point 정보 갱신 요청.
+                                    firestore에 User의 currentPoint 정보 갱신 요청.
                                   └─────────────────────────────────────────────┘
                                   */
                                 });
@@ -739,7 +739,7 @@ class ItemlistPage3 extends StatefulWidget {
 class _ItemlistPage3State extends State<ItemlistPage3> {
   @override
   Widget build(BuildContext context) {
-    if (widget.user.image == "") {
+    if (widget.user.setting['placeID'] == "") {
       return Center(child: CircularProgressIndicator());
     }
 
@@ -784,7 +784,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                 itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
                   final item = widget.inventory[index];
-                  final isHighlighted = item.name == widget.user.name;
+                  final isHighlighted = item.name == nameChange(widget.user.setting['placeID']);
                   return Container(
                     color: isHighlighted
                         ? (Theme.of(context).brightness == Brightness.dark
@@ -821,8 +821,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                 child: Text('사용'),
                                 onPressed: () {
                                   setState(() {
-                                    widget.user.image = nameChange(item.name);
-                                    widget.user.name = item.name;
+                                    widget.user.setting['placeID'] = "assets/images/${widget.user.setting['placeID']}.png";
                                   });
                                   userSave(widget.user);                                  
                                   itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
@@ -911,7 +910,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("${widget.user.point}pt", 
+                      child: Text("${widget.user.currentPoint}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -971,7 +970,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                       /*
                                       ┌─────────────────────────────────────────────┐
                                         firestore에 User 하위의 Item 정보 갱신 요청.
-                                        firestore에 User의 point 정보 갱신 요청.
+                                        firestore에 User의 currentPoint 정보 갱신 요청.
                                       └─────────────────────────────────────────────┘
                                       */
                                     });
@@ -1233,7 +1232,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("${widget.user.point}pt", 
+                      child: Text("${widget.user.currentPoint}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -1693,7 +1692,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("${widget.user.point}pt", 
+                      child: Text("${widget.user.currentPoint}pt", 
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),

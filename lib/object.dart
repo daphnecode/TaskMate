@@ -33,6 +33,7 @@ class Item {
       itemText: json['itemText'],
     );
   }
+  
   Map<String, dynamic> toJson() => {
     'icon': icon,
     'category': category,
@@ -43,6 +44,7 @@ class Item {
     'price': price,
     'itemText': itemText,
   };
+
   factory Item.fromMap(Map<String, dynamic> map) {
     return Item(
       icon: map['icon'],
@@ -127,30 +129,57 @@ class Pets {
 }
 
 class Users {
-  int point;
-  String image;
-  String name;
+  int currentPoint;
+  int gotPoint;
+  Map<String, dynamic> setting;
+  
 
   Users(
     {
-      required this.point,
-      required this.image,
-      required this.name,
+      required this.currentPoint,
+      required this.gotPoint,
+      required this.setting,
     }
   );
 
   factory Users.fromJson(Map<String, dynamic> json) {
     return Users(
-      point: json['point'],
-      image: json['image'],
-      name: json['name'],
+      currentPoint: 100,
+      gotPoint: 100,
+      setting: {
+        'darkMode': false,
+        'listSort': "사전 순",
+        'placeID': "초원",
+        'push': false,
+        'sound': false
+      },
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'point': point,
-    'image': image,
-    'name': name,
+    'currentPoint': currentPoint,
+    'gotPoint': gotPoint,
+    'setting': setting,
+  };
+
+  factory Users.fromMap(Map<String, dynamic> map) {
+    return Users(
+      currentPoint: 0,
+      gotPoint: 0,
+      setting: {
+        'darkMode': false,
+        'listSort': "사전 순",
+        'placeID': "초원",
+        'push': false,
+        'sound': false
+      },
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+    'currentPoint': currentPoint,
+    'gotPoint': gotPoint,
+    'setting': setting,
   };
 }
 /*
