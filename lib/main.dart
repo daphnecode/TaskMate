@@ -3,7 +3,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'dart:io';
-import 'dart:convert';
 import 'planner_main.dart';
 import 'planner_edit.dart';
 import 'itemlist.dart';
@@ -28,52 +27,61 @@ class Root extends StatefulWidget {
 }
 
 class RootState extends State<Root> {
-  bool isDarkMode = false;
-  bool isPushNotificationEnabled = false;
-  String sortingMethod = '사전 순';
-  bool soundEffectsOn = false;
+  Users user = Users(
+    currentPoint: 0,
+    gotPoint: 0,
+    setting: {},
+  );
 
-  // 설정의 데이터를 firestore에서 받아오는 과정.
-  // Root의 setState가 호출될 경우에만 
-  // 데이터를 받아오는 오류가 있어서 주석처리함.
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   initAsync();
-  // }
+  bool isLoading = true;
 
-  // Future<void> initAsync() async {
-  //   DocumentSnapshot tmpDoc = await FirebaseFirestore.instance
-  //     .collection('Users')
-  //     .doc('HiHgtVpIvdyCZVtiFCOc')
-  //     .get();
+  @override
+  void initState() {
+    super.initState();
+    loadItems();
+  }
+
+  Future<void> loadItems() async {
+    DocumentSnapshot doc1 = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .get();
     
-  //   if (tmpDoc.exists) {
-  //     isDarkMode = (tmpDoc['setting'] as Map<String, dynamic>)['darkMode'];
-  //     isPushNotificationEnabled = (tmpDoc['setting'] as Map<String, dynamic>)['push'];
-  //     sortingMethod = (tmpDoc['setting'] as Map<String, dynamic>)['listSort'];
-  //     soundEffectsOn = (tmpDoc['setting'] as Map<String, dynamic>)['sound'];
-  //   }
-  // }
+    
+    setState(() {
+      if (doc1.exists) {
+        user = Users.fromMap(doc1.data() as Map<String, dynamic>);
+      }
+    });
+
+    isLoading = false;
+  }
   
   void toggleDarkMode(bool value) {
-    setState(() => isDarkMode = value);
+    setState(() => user.setting['darkMode'] = value);
   }
 
   void togglePushNotification(bool value) {
-    setState(() => isPushNotificationEnabled = value);
+    setState(() => user.setting['push'] = value);
   }
   
   void toggleSortingMethod(String value) {
-    setState(() => sortingMethod = value);
+    setState(() => user.setting['listSort'] = value);
   }
 
   void toggleSoundEffects(bool value) {
-    setState(() => soundEffectsOn = value);
+    setState(() => user.setting['sound'] = value);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
     return MaterialApp(
       title: 'TaskMate',
       theme: ThemeData.light().copyWith(
@@ -83,13 +91,10 @@ class RootState extends State<Root> {
         iconTheme: const IconThemeData(color: Colors.white),
         bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey[900]), // 다크모드 하단바
       ),
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      themeMode: user.setting['darkMode'] ? ThemeMode.dark : ThemeMode.light,
       home: MyHomePage(
         title: 'Virtual Pet',
-        isDarkMode: isDarkMode,
-        soundEffectsOn: soundEffectsOn,
-        isPushNotificationEnabled: isPushNotificationEnabled,
-        sortingMethod: sortingMethod,
+        user: user,
         onDarkModeChanged: toggleDarkMode,
         onPushChanged: togglePushNotification,
         onSortingChanged: toggleSortingMethod,
@@ -117,25 +122,20 @@ class MyApp extends StatelessWidget {
 */
 
 class MyHomePage extends StatefulWidget {
-  final bool isDarkMode;
-  final bool soundEffectsOn;
-  final bool isPushNotificationEnabled;
-  final String sortingMethod;
+  final Users user;
   final Function(bool) onDarkModeChanged;
   final Function(bool) onPushChanged;
   final Function(String) onSortingChanged;
   final Function(bool) onSoundEffectsChanged;
 
-  const MyHomePage({super.key,
+  const MyHomePage({
     required this.title,
-    required this.isDarkMode,
-    required this.isPushNotificationEnabled,
-    required this.sortingMethod,
-    required this.soundEffectsOn,
+    required this.user,
     required this.onDarkModeChanged,
     required this.onPushChanged,
     required this.onSortingChanged,
     required this.onSoundEffectsChanged,
+    super.key,
   });
 
   final String title;
@@ -146,11 +146,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  Users user = Users(
-    point: 0,
-    image: "",
-    name: ""
-  );
   Pets pet = Pets(
     image: "",
     name: "",
@@ -208,15 +203,6 @@ class _MyHomePageState extends State<MyHomePage> {
       로컬에 저장.
     └──────────────────────────────────────────────┘
     */
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr1 = await File('${testDirectory.path}/user1.json').readAsString();    
-    final Map<String, dynamic> jsonData1 = json.decode(jsonStr1);
-    final Users loadedItems1 = Users.fromJson(jsonData1);
-
-    // String jsonStr2 = await File('${testDirectory.path}/pet1.json').readAsString();    
-    // final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
-    // final Pets loadedItems2 = Pets.fromJson(jsonData2);
-
     DocumentSnapshot petDoc = await FirebaseFirestore.instance
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
@@ -243,7 +229,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     setState(() {
-      user = loadedItems1;
       pet = loadedItems2;
     });
   }
@@ -266,16 +251,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext, pet: pet, user: user, pageType: 0, soundEffectsOn: widget.soundEffectsOn,);
+        currentWidget = Petmain(onNext: goNext, pet: pet, user: widget.user, pageType: 0, soundEffectsOn: widget.user.setting['sound'],);
         break;
       case 1:
-        currentWidget = ItemCategory(onNext: goNext, pet: pet, user: user, pageType: 1,);
+        currentWidget = ItemCategory(onNext: goNext, pet: pet, user: widget.user, pageType: 1,);
         break;
       case 2:
         currentWidget = PetChoose(onNext: goNext);
         break;
       case 3:
-        currentWidget = PlannerMain(onNext: goNext, sortingMethod: widget.sortingMethod);
+        currentWidget = PlannerMain(onNext: goNext, sortingMethod: widget.user.setting['listSort']);
         break;
       case 4:
         currentWidget = PlannerEditPage(
@@ -313,16 +298,16 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 5:
-        currentWidget = ShopCategory(onNext: goNext, pet: pet, user: user,  pageType: 1,);
+        currentWidget = ShopCategory(onNext: goNext, pet: pet, user: widget.user,  pageType: 1,);
         break;
 
       case 6:
         currentWidget = SettingsPage(
           onNext: goNext,
-          isDarkMode: widget.isDarkMode,
-          soundEffectsEnabled: widget.soundEffectsOn,
-          notificationsEnabled: widget.isPushNotificationEnabled,
-          sortingMethod: widget.sortingMethod,
+          isDarkMode: widget.user.setting['darkMode'],
+          soundEffectsEnabled: widget.user.setting['sound'],
+          notificationsEnabled: widget.user.setting['push'],
+          sortingMethod: widget.user.setting['listSort'],
           onDarkModeChanged: widget.onDarkModeChanged,
           onNotificationsChanged: widget.onPushChanged,
           onChangeSortingMethod: widget.onSortingChanged,

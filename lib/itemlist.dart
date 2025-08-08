@@ -821,7 +821,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                 child: Text('사용'),
                                 onPressed: () {
                                   setState(() {
-                                    widget.user.setting['placeID'] = "assets/images/${widget.user.setting['placeID']}.png";
+                                    widget.user.setting['placeID'] = "assets/images/${item.name}.png";
                                   });
                                   userSave(widget.user);                                  
                                   itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
