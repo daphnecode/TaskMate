@@ -7,14 +7,6 @@ import 'package:taskmate/utils/icon_utis.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<void> useItemsSave(List<Item> items, int index) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final file = File('${directory.path}/items$index.json');
-
-  final jsonString = jsonEncode(items.map((e) => e.toJson()).toList());
-
-  await file.writeAsString(jsonString);
-}
 
 Future<void> itemSaveDB(String userID, String itemID, int count) async {
   await FirebaseFirestore.instance
@@ -82,56 +74,21 @@ class ItemlistPage1 extends StatefulWidget {
   final Users user;
   final int pageType;
   final bool isUseItem;
-  const ItemlistPage1({required this.onNext, required this.pet, required this.user, required this.pageType, required this.isUseItem, super.key});
+  final List<Item> inventory;
+  const ItemlistPage1({
+    required this.onNext, 
+    required this.pet, 
+    required this.user, 
+    required this.pageType, 
+    required this.isUseItem, 
+    required this.inventory,
+    super.key});
 
   @override
   State<ItemlistPage1> createState() => _ItemlistPage1State();
 }
 
 class _ItemlistPage1State extends State<ItemlistPage1> {
-  List<Item> inventory = [];
-  List<Item> gotItem = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadItems();
-  }
-
-  Future<void> loadItems() async {
-    List<Item> itemDoc = [];
-    List<Item> shopDoc = [];
-
-    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .collection('items')
-      .where('category', isEqualTo: 1)
-      .get();
-    
-    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
-      .collection('aLLitems')
-      .where('category', isEqualTo: 1)
-      .get();
-    
-    if (snapshot1.docs.isNotEmpty) {
-      itemDoc = snapshot1.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    if (snapshot2.docs.isNotEmpty) {
-      shopDoc = snapshot2.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    setState(() {
-      inventory = shopDoc;
-      gotItem = itemDoc;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if (widget.isUseItem) {
@@ -172,9 +129,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                itemCount: gotItem.length,
+                itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
-                  final item = gotItem[index];
+                  final item = widget.inventory[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -218,7 +175,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                     widget.pet.hunger += item.hunger;
                                     widget.pet.happy += item.happy;
                                     changeStatusSave(widget.pet);
-                                    useItemsSave(inventory, 1);
                                     /*
                                     ┌─────────────────────────────────────────────┐
                                       firestore에 User 하위의 Pet 정보 갱신 요청.
@@ -327,9 +283,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                itemCount: inventory.length,
+                itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
-                  final item = inventory[index];
+                  final item = widget.inventory[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -369,7 +325,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   if (item.price < widget.user.point) {
                                   widget.user.point -= item.price;
                                   item.count++;
-                                  useItemsSave(inventory, 1);
                                   userSave(widget.user);
                                   /*
                                   ┌─────────────────────────────────────────────┐
@@ -441,56 +396,21 @@ class ItemlistPage2 extends StatefulWidget {
   final Users user;
   final int pageType;
   final bool isUseItem;
-  const ItemlistPage2({required this.onNext, required this.pet, required this.user, required this.pageType, required this.isUseItem, super.key});
+  final List<Item> inventory;
+  const ItemlistPage2({
+    required this.onNext, 
+    required this.pet, 
+    required this.user, 
+    required this.pageType, 
+    required this.isUseItem, 
+    required this.inventory,
+    super.key});
 
   @override
   State<ItemlistPage2> createState() => _ItemlistPage2State();
 }
 
 class _ItemlistPage2State extends State<ItemlistPage2> {
-  List<Item> inventory = [];
-  List<Item> gotItem = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadItems();
-  }
-
-  Future<void> loadItems() async {
-    List<Item> itemDoc = [];
-    List<Item> shopDoc = [];
-
-    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .collection('items')
-      .where('category', isEqualTo: 2)
-      .get();
-    
-    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
-      .collection('aLLitems')
-      .where('category', isEqualTo: 2)
-      .get();
-    
-    if (snapshot1.docs.isNotEmpty) {
-      itemDoc = snapshot1.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    if (snapshot2.docs.isNotEmpty) {
-      shopDoc = snapshot2.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    setState(() {
-      inventory = shopDoc;
-      gotItem = itemDoc;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if (widget.isUseItem) {
@@ -531,9 +451,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: gotItem.length,
+                itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
-                  final item = gotItem[index];
+                  final item = widget.inventory[index];
                   return ListTile(
                     onTap: () {
                       showDialog(
@@ -580,7 +500,6 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                     └─────────────────────────────────────────────┘
                                     */                                    
                                   });
-                                  useItemsSave(inventory, 2);
                                 }
                                 Navigator.pop(context);
                                 },
@@ -680,9 +599,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                 padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                  itemCount: inventory.length,
+                  itemCount: widget.inventory.length,
                   itemBuilder: (context, index) {
-                    final item = inventory[index];
+                    final item = widget.inventory[index];
                     return ListTile(
                       onTap: () {
                       showDialog(
@@ -719,7 +638,6 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                               onPressed: () {
                                 setState(() {
                                   item.count++;
-                                  useItemsSave(inventory, 2);
                                   /*
                                   ┌─────────────────────────────────────────────┐
                                     firestore에 User 하위의 Item 정보 갱신 요청.
@@ -789,56 +707,21 @@ class ItemlistPage3 extends StatefulWidget {
   final Users user;
   final int pageType;
   final bool isUseItem;
-  const ItemlistPage3({required this.onNext, required this.pet, required this.user, required this.pageType, required this.isUseItem, super.key});
+  final List<Item> inventory;
+  const ItemlistPage3({
+    required this.onNext, 
+    required this.pet, 
+    required this.user, 
+    required this.pageType, 
+    required this.isUseItem, 
+    required this.inventory,
+    super.key});
 
   @override
   State<ItemlistPage3> createState() => _ItemlistPage3State();
 }
 
 class _ItemlistPage3State extends State<ItemlistPage3> {
-  List<Item> inventory = [];
-  List<Item> gotItem = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadItems();
-  }
-
-  Future<void> loadItems() async {
-    List<Item> itemDoc = [];
-    List<Item> shopDoc = [];
-
-    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .collection('items')
-      .where('category', isEqualTo: 3)
-      .get();
-    
-    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
-      .collection('aLLitems')
-      .where('category', isEqualTo: 3)
-      .get();
-    
-    if (snapshot1.docs.isNotEmpty) {
-      itemDoc = snapshot1.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    if (snapshot2.docs.isNotEmpty) {
-      shopDoc = snapshot2.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    setState(() {
-      inventory = shopDoc;
-      gotItem = itemDoc;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if (widget.user.image == "") {
@@ -883,9 +766,9 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: gotItem.length,
+                itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
-                  final item = gotItem[index];
+                  final item = widget.inventory[index];
                   final isHighlighted = item.name == widget.user.name;
                   return Container(
                     color: isHighlighted
@@ -1027,9 +910,9 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: inventory.length,
+                itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
-                  final item = inventory[index];
+                  final item = widget.inventory[index];
                   final check = (item.count != 0);
                   
                   return Container(
@@ -1076,7 +959,6 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                       └─────────────────────────────────────────────┘
                                       */
                                     });
-                                    useItemsSave(inventory, 3);
                                     Navigator.pop(context);
                                     },
                                 ),
@@ -1142,57 +1024,22 @@ class ItemlistPage4 extends StatefulWidget {
   final Users user;
   final int pageType;
   final bool isUseItem;
-  const ItemlistPage4({required this.onNext, required this.pet, required this.user, required this.pageType, required this.isUseItem, super.key});
+  final List<Item> inventory;
+  const ItemlistPage4({
+    required this.onNext, 
+    required this.pet, 
+    required this.user, 
+    required this.pageType, 
+    required this.isUseItem, 
+    required this.inventory,
+    super.key});
 
   @override
   State<ItemlistPage4> createState() => _ItemlistPage4State();
 }
 
 class _ItemlistPage4State extends State<ItemlistPage4> {
-  List<Item> inventory = [];
-  List<Item> gotItem = [];
   String usedItem = "기본";
-
-  @override
-  void initState() {
-    super.initState();
-    loadItems();
-  }
-
-
-  Future<void> loadItems() async {
-    List<Item> itemDoc = [];
-    List<Item> shopDoc = [];
-
-    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .collection('items')
-      .where('category', isEqualTo: 4)
-      .get();
-    
-    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
-      .collection('aLLitems')
-      .where('category', isEqualTo: 4)
-      .get();
-    
-    if (snapshot1.docs.isNotEmpty) {
-      itemDoc = snapshot1.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    if (snapshot2.docs.isNotEmpty) {
-      shopDoc = snapshot2.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    setState(() {
-      inventory = shopDoc;
-      gotItem = itemDoc;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1234,9 +1081,9 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: gotItem.length,
+                itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
-                  final item = gotItem[index];
+                  final item = widget.inventory[index];
                   final isHighlighted = item.name == usedItem;
 
                   return Container(
@@ -1383,9 +1230,9 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: ListView.builder(
-                itemCount: inventory.length,
+                itemCount: widget.inventory.length,
                 itemBuilder: (context, index) {
-                  final item = inventory[index];
+                  final item = widget.inventory[index];
                   final check = (item.count != 0);
                   return Container(
                     color: check
@@ -1426,7 +1273,6 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       setState(() {
                                         item.count++;
                                       });
-                                      useItemsSave(inventory, 4);
                                       Navigator.pop(context);
                                     }
                                   },
@@ -1498,6 +1344,39 @@ class ItemCategory extends StatefulWidget {
 }
 
 class _ItemCategoryState extends State<ItemCategory> {
+  List<Item> inventory = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadItems();
+  }
+
+
+  Future<void> loadItems() async {
+    List<Item> itemDoc = [];
+
+    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .collection('items')
+      .get();
+    
+    if (snapshot1.docs.isNotEmpty) {
+      itemDoc = snapshot1.docs.map((doc) {
+        return Item.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }
+
+    setState(() {
+      inventory = itemDoc;
+    });
+  }
+
+  List<Item> getItemsByCategory(int category) {
+    return inventory.where((item) => item.category == category).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1549,7 +1428,14 @@ class _ItemCategoryState extends State<ItemCategory> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2, isUseItem: true,),
+                                    builder: (context) => ItemlistPage1(
+                                      onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 2, 
+                                      isUseItem: true,
+                                      inventory: getItemsByCategory(1),
+                                      ),
                                 )
                                 ).then((value) {
                                   setState(() {
@@ -1575,7 +1461,14 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2, isUseItem: true,),
+                                    builder: (context) => ItemlistPage2(
+                                      onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 2, 
+                                      isUseItem: true,
+                                      inventory: getItemsByCategory(2),
+                                      ),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1606,7 +1499,13 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2, isUseItem:  true,),
+                                    builder: (context) => ItemlistPage3(onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 2, 
+                                      isUseItem: true,
+                                      inventory: getItemsByCategory(3),
+                                      ),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1631,7 +1530,13 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 2, isUseItem: true,),
+                                    builder: (context) => ItemlistPage4(onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 2, 
+                                      isUseItem: true,
+                                      inventory: getItemsByCategory(4),
+                                      ),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1706,6 +1611,36 @@ class ShopCategory extends StatefulWidget {
 }
 
 class _ShopCategoryState extends State<ShopCategory> {
+  List<Item> inventory = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadItems();
+  }
+
+  Future<void> loadItems() async {
+    List<Item> shopDoc = [];
+    
+    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
+      .collection('aLLitems')
+      .get();
+
+    if (snapshot2.docs.isNotEmpty) {
+      shopDoc = snapshot2.docs.map((doc) {
+        return Item.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    }
+
+    setState(() {
+      inventory = shopDoc;
+    });
+  }
+
+  List<Item> getItemsByCategory(int category) {
+    return inventory.where((item) => item.category == category).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1765,7 +1700,14 @@ class _ShopCategoryState extends State<ShopCategory> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
+                                    builder: (context) => ItemlistPage1(
+                                      onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 3, 
+                                      isUseItem: false,
+                                      inventory: getItemsByCategory(1),
+                                      ),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1791,7 +1733,14 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
+                                    builder: (context) => ItemlistPage2(
+                                      onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 3, 
+                                      isUseItem: false,
+                                      inventory: getItemsByCategory(2),
+                                      ),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1822,7 +1771,14 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
+                                    builder: (context) => ItemlistPage3(
+                                      onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 3, 
+                                      isUseItem: false,
+                                      inventory: getItemsByCategory(3),
+                                      ),
                                 ),
                                 ).then((value) {
                                   setState(() {
@@ -1848,7 +1804,14 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: 3, isUseItem: false,),
+                                    builder: (context) => ItemlistPage4(
+                                      onNext: widget.onNext, 
+                                      pet: widget.pet, 
+                                      user: widget.user, 
+                                      pageType: 3, 
+                                      isUseItem: false,
+                                      inventory: getItemsByCategory(4),
+                                      ),
                                 ),
                                 ).then((value) {
                                   setState(() {
