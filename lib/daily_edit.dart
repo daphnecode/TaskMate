@@ -70,8 +70,6 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Task> taskList = _dailyTaskMap[_dateKey(_selectedDate)] ?? [];
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('일일 리스트 편집'),

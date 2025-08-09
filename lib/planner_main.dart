@@ -74,17 +74,6 @@ class _PlannerMainState extends State<PlannerMain> {
     _autoSave(); // Firestore에 바로 저장
   }
 
-  //dailyTaskMap이 초기화되어 있지 않거나 해당 날짜 키가 없으면 빈 리스트로 초기화
-  void _syncTodayTaskWithMap() {
-    final key = _dateKey(selectedDate);
-    todayTaskList = dailyTaskMap[key] ?? [];
-  }
-
-  void _updateDailyTaskMap() {
-    final key = _dateKey(selectedDate);
-    dailyTaskMap[key] = todayTaskList;
-  }
-
   // Firestore 저장 함수
   void _autoSave() {
     final dateKey = _dateKey(selectedDate);
@@ -131,49 +120,9 @@ class _PlannerMainState extends State<PlannerMain> {
     });
   }
 
-  //  Firestore 제출 함수
-  void _submit() async {
-    final dateKey = _dateKey(selectedDate);
-    try {
-      await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList);
-      setState(() {
-        _isSubmitted = true;
-      });
-
-      // 팝업으로 알림
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          content: const Text("제출 완료!"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("확인"),
-            ),
-          ],
-        ),
-      );
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("닫기"),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     selectedDate = getKstNow(); // 항상 최신 날짜로 갱신
-    final dateKey = _dateKey(selectedDate);
     if (isEditMode) {
       return PlannerEditPage(
         onNext: widget.onNext,
