@@ -148,7 +148,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: Center(child: Text('${item.name}')),
+                          title: Center(child: Text(item.name)),
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -166,7 +166,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text('${item.itemText}', 
+                                Text(item.itemText, 
                                 style: TextStyle(fontSize: 16)),
                               ],
                             ),
@@ -303,7 +303,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: Center(child: Text('${item.name}')),
+                          title: Center(child: Text(item.name)),
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -472,7 +472,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: Center(child: Text('${item.name}')),
+                          title: Center(child: Text(item.name)),
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -489,7 +489,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text('${item.itemText}', 
+                                Text(item.itemText, 
                                 style: TextStyle(fontSize: 16)),
                               ],
                             ),
@@ -621,7 +621,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: Center(child: Text('${item.name}')),
+                          title: Center(child: Text(item.name)),
                           content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -797,7 +797,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                           showDialog(
                           context: context,
                           builder: (_) => AlertDialog(
-                            title: Center(child: Text('${item.name}')),
+                            title: Center(child: Text(item.name)),
                             content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -808,7 +808,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                     height: 100,
                                   ),
                                   SizedBox(height: 10),
-                                  Text('${item.itemText}', 
+                                  Text(item.itemText, 
                                   style: TextStyle(fontSize: 16)),
                                 ],
                               ),
@@ -942,7 +942,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: Center(child: Text('${item.name}')),
+                              title: Center(child: Text(item.name)),
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -1114,7 +1114,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: Center(child: Text('${item.name}')),
+                              title: Center(child: Text(item.name)),
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -1125,7 +1125,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text('${item.itemText}', 
+                                    Text(item.itemText, 
                                     style: TextStyle(fontSize: 16)),
                                   ],
                                 ),
@@ -1263,7 +1263,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                           showDialog(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: Center(child: Text('${item.name}')),
+                              title: Center(child: Text(item.name)),
                               content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
