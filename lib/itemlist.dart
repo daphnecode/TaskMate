@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'petmain.dart';
 import 'object.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:taskmate/utils/icon_utis.dart';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
@@ -41,15 +39,6 @@ Future<void> petSaveDB(String userID, String petID, Pets pet) async {
       .collection('pets')
       .doc(petID)
       .set(jsonMap);
-}
-
-Future<void> userSave(Users user) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final file = File('${directory.path}/user1.json');
-
-  final jsonString = jsonEncode(user.toJson());
-
-  await file.writeAsString(jsonString);
 }
 
 String nameChange(String name) {
@@ -337,7 +326,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   if (item.price < widget.user.currentPoint) {
                                   widget.user.currentPoint -= item.price;
                                   item.count++;
-                                  userSave(widget.user);
                                   /*
                                   ┌─────────────────────────────────────────────┐
                                     firestore에 User 하위의 Item 정보 갱신 요청.
@@ -822,8 +810,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                 onPressed: () {
                                   setState(() {
                                     widget.user.setting['placeID'] = "assets/images/${item.name}.png";
-                                  });
-                                  userSave(widget.user);                                  
+                                  });                              
                                   itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                   Navigator.pop(context);
                                 },

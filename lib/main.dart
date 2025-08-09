@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:path_provider/path_provider.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
-import 'dart:io';
 import 'planner_main.dart';
 import 'planner_edit.dart';
 import 'itemlist.dart';
@@ -103,23 +100,6 @@ class RootState extends State<Root> {
     );
   }
 }
-/*
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Virtual Pet'),
-    );
-  }
-}
-*/
 
 class MyHomePage extends StatefulWidget {
   final Users user;
@@ -150,8 +130,8 @@ class _MyHomePageState extends State<MyHomePage> {
    currentPoint: 0,
     gotPoint: 0,
     setting: {},
-
   );
+
   Pets pet = Pets(
     image: "",
     name: "",
@@ -169,37 +149,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> initAsync() async {
-    await initJsonIfNotExists();
     await loadItems();
     await BgmManager.preload('bgm2.wav');
     await BgmManager.preload('bgm1.mp3');
-  }
-
-  Future<void> initJsonIfNotExists() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file1 = File('${dir.path}/pet1.json');
-    final file2 = File('${dir.path}/items1.json');
-    final file3 = File('${dir.path}/items2.json');
-    final file4 = File('${dir.path}/items3.json');
-    final file5 = File('${dir.path}/items4.json');
-    final file6 = File('${dir.path}/user1.json');
-    final file7 = File('${dir.path}/pet2.json');
-    String assetJson;
-
-    assetJson = await rootBundle.loadString('lib/DBtest/pet1.json');
-    await file1.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items1.json');
-    await file2.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items2.json');
-    await file3.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items3.json');
-    await file4.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/items4.json');
-    await file5.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/user1.json');
-    await file6.writeAsString(assetJson);
-    assetJson = await rootBundle.loadString('lib/DBtest/pet2.json');
-    await file7.writeAsString(assetJson);
   }
 
   Future<void> loadItems() async {
