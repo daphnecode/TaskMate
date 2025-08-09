@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'dart:convert';
 import 'object.dart';
 import 'petchoose.dart';
 import 'petstatus.dart';
@@ -11,15 +8,6 @@ import 'clean_game_screen.dart';
 
 //장애물달리기게임
 import 'run_game_screen.dart';
-
-Future<void> changeStatusSave(Pets pet) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final file = File('${directory.path}/pet1.json');
-
-  final jsonString = jsonEncode(pet.toJson());
-
-  await file.writeAsString(jsonString);
-}
 
 class Mainarea extends StatefulWidget {
   final void Function(int) onNext;

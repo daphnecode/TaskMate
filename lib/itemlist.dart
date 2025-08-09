@@ -174,7 +174,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                     item.count--;
                                     widget.pet.hunger += item.hunger;
                                     widget.pet.happy += item.happy;
-                                    changeStatusSave(widget.pet);
                                     /*
                                     ┌─────────────────────────────────────────────┐
                                       firestore에 User 하위의 Pet 정보 갱신 요청.
