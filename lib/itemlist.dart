@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'petmain.dart';
 import 'object.dart';
 import 'package:taskmate/utils/icon_utis.dart';
@@ -22,23 +21,19 @@ Future<void> itemSaveDB(String userID, String itemID, Item target) async {
       }
     );
   } else {
-    final jsonString = jsonEncode(target.toJson());
-    Map<String, dynamic> jsonMap = jsonDecode(jsonString);
     await refDoc.set(
-      jsonMap
+      target.toMap()
     );
   }
 }
 
 Future<void> petSaveDB(String userID, String petID, Pets pet) async {
-  final jsonString = jsonEncode(pet.toJson());
-  Map<String, dynamic> jsonMap = jsonDecode(jsonString);
   await FirebaseFirestore.instance
       .collection('Users')
       .doc(userID)
       .collection('pets')
       .doc(petID)
-      .set(jsonMap);
+      .set(pet.toMap());
 }
 
 String nameChange(String name) {

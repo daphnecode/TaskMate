@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'object.dart';
 
 class Mainarea1 extends StatelessWidget {
@@ -30,11 +28,29 @@ class Subarea1 extends StatefulWidget {
 
 class _Subarea1State extends State<Subarea1> {
   Future<Pets> loadPet(String currentPet) async {
-    final testDirectory = await getApplicationDocumentsDirectory();
-    String jsonStr2 = await File('${testDirectory.path}/$currentPet.json').readAsString();    
-    final Map<String, dynamic> jsonData2 = json.decode(jsonStr2);
-    final Pets loadedItems2 = Pets.fromJson(jsonData2);
-
+    DocumentSnapshot petDoc = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .collection('pets')
+      .doc(currentPet)
+      .get();
+    
+    final Pets loadedItems2;
+    
+    if (petDoc.exists) {
+      final data = petDoc.data() as Map<String, dynamic>;
+      loadedItems2 = Pets.fromMap(data);
+    } else {
+      loadedItems2 = Pets(
+        image: "",
+        name: "",
+        hunger:0,
+        happy: 0,
+        level: 0,
+        currentExp: 0,
+        styleID: ""
+      );
+    }
     return loadedItems2;
   }
   
@@ -47,7 +63,7 @@ class _Subarea1State extends State<Subarea1> {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
-                Navigator.pop(context, loadPet("pet1"));
+                Navigator.pop(context, loadPet("dragon"));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red[100],
@@ -61,7 +77,7 @@ class _Subarea1State extends State<Subarea1> {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
-                Navigator.pop(context, loadPet("pet2"));
+                Navigator.pop(context, loadPet("unicon"));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green[100],
@@ -74,7 +90,7 @@ class _Subarea1State extends State<Subarea1> {
             child: ElevatedButton(
               onPressed: () {
                 // Handle button press
-                Navigator.pop(context, loadPet("pet2"));
+                Navigator.pop(context, loadPet("unicon"));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[100],

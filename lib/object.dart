@@ -21,20 +21,7 @@ class Item {
     }
   );
 
-  factory Item.fromJson(Map<String, dynamic> json) {
-    return Item(
-      icon: json['icon'],
-      category: json['category'],
-      name: json['name'],
-      hunger: json['hunger'],
-      happy: json['happy'],
-      count: json['count'],
-      price: json['price'],
-      itemText: json['itemText'],
-    );
-  }
-  
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
     'icon': icon,
     'category': category,
     'name': name,
@@ -93,7 +80,7 @@ class Pets {
     );
   }
   
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
     'image': image,
     'name': name,
     'hunger': hunger,
@@ -114,18 +101,6 @@ class Pets {
       styleID: newPet.styleID,
     );
   }
-
-  factory Pets.fromJson(Map<String, dynamic> json) {
-    return Pets(
-      image: json['image'],
-      name: json['name'],
-      hunger: json['hunger'],
-      happy: json['happy'],
-      level: json['level'],
-      currentExp: json['currentExp'],
-      styleID: "",
-    );
-  }
 }
 
 class Users {
@@ -141,26 +116,6 @@ class Users {
       required this.setting,
     }
   );
-
-  factory Users.fromJson(Map<String, dynamic> json) {
-    return Users(
-      currentPoint: 100,
-      gotPoint: 100,
-      setting: {
-        'darkMode': false,
-        'listSort': "사전 순",
-        'placeID': "초원",
-        'push': false,
-        'sound': false
-      },
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    'currentPoint': currentPoint,
-    'gotPoint': gotPoint,
-    'setting': setting,
-  };
 
   factory Users.fromMap(Map<String, dynamic> map) {
     return Users(
