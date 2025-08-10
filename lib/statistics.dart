@@ -24,6 +24,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
   DateTime onlyDate(DateTime d) => DateTime(d.year, d.month, d.day);
   String ymd(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
 
+  //  KST 고정 헬퍼 추가 (기기 설정에 따라 UTC로 인식되는 것 방지)
+  DateTime kstNow() => DateTime.now().toUtc().add(const Duration(hours: 9));
+  DateTime onlyDateKST(DateTime d) => DateTime(d.year, d.month, d.day);
+  String ymdKST(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
+
   @override
   void initState() {
     super.initState();
@@ -50,7 +55,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       }
 
       // 2) 최근 8주 로그만 로드해서 뷰 지표 계산
-      final today = onlyDate(DateTime.now());
+      final today = onlyDateKST(kstNow()); // KST
       final start = onlyDate(today.subtract(const Duration(days: 56)));
       final startStr = ymd(start);
       final endStr = ymd(today);
@@ -61,19 +66,20 @@ class _StatisticsPageState extends State<StatisticsPage> {
           .orderBy(FieldPath.documentId)
           .startAt([startStr])
           .endAt([endStr])
-          .get();
+          .get(const GetOptions(source: Source.server));
 
       int visitedCount = 0;
       int weekCompleted = 0, weekTotal = 0;
       Map<String, double> weekData = {};
 
       // 이번 주 범위
-      final weekStart = onlyDate(today.subtract(Duration(days: today.weekday - 1)));
-      final weekEnd = onlyDate(weekStart.add(const Duration(days: 6)));
+      final weekStart = onlyDateKST(today.subtract(Duration(days: today.weekday - 1))); // Mon
+      final weekEnd = onlyDateKST(weekStart.add(const Duration(days: 6)));              // Sun
 
       for (final doc in logsSnap.docs) {
         final data = doc.data();
-        final date = onlyDate(DateFormat('yyyy-MM-dd').parse(doc.id));
+        final date = onlyDateKST(DateFormat('yyyy-MM-dd').parse(doc.id)); // KST로 취급
+
 
         final completed = (data['completedCount'] ?? 0) as int;
         final total = (data['totalTasks'] ?? 0) as int;
@@ -175,6 +181,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           chartValuesOptions: const ChartValuesOptions(
                             showChartValues: true,
                             showChartValuesInPercentage: false,
+                            decimalPlaces: 0, // 소수점 0자리
                           ),
                         ),
                       ),
