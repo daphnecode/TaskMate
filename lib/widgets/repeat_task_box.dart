@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:taskmate/DBtest/task.dart';
 import 'checklist_item.dart';
 
-//반복 리스트
+// 반복 리스트
 class RepeatTaskBox extends StatelessWidget {
   final List<Task> taskList;
   final void Function(int) onToggleCheck;
@@ -25,92 +25,111 @@ class RepeatTaskBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int totalTasks = taskList.length;
-    int completedTasks = taskList.where((task) => task.isChecked).length;
-    double progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
-    
-    List<Task> tmpList = sorting(taskList, sortingMethod);
+    final theme = Theme.of(context);
+
+    final totalTasks = taskList.length;
+    final completedTasks = taskList.where((t) => t.isChecked).length;
+    final progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
+
+    // 정렬 결과를 원본 리스트에 반영
+    final tmpList = sorting(taskList, sortingMethod);
     for (int i = 0; i < taskList.length; i++) {
       taskList[i] = tmpList[i].copyWith();
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: onExpand,
-                child: Text(
-                  '반복해야 할 일',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold),
+    return Card(
+      elevation: 1,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: theme.cardColor,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 헤더
+            Row(
+              children: [
+                TextButton(
+                  onPressed: onExpand,
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    foregroundColor: theme.colorScheme.onSurface,
+                  ),
+                  child: Text(
+                    '반복해야 할 일',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 26,
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Checklist items', style: TextStyle(fontSize: 16)),
-              IconButton(
-                onPressed: onEditPoints,
-                icon: Icon(Icons.sync),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          SizedBox(
-            height: 140,
-            child: ListView.builder(
-              itemCount: taskList.length > 3 ? 3 : taskList.length,
-              itemBuilder: (context, index) {
-                final task = taskList[index];
-                return ChecklistItem(
-                  index: index,
-                  task: task.text,
-                  isChecked: task.isChecked,
-                  point: task.point,
-                  isEditing: task.isEditing,
-                  onChanged: (_) => onToggleCheck(index),
-                  onStartEditing: (i) => onStartEditing(index),
-                  onEditPoint: (newPoint) => onEditPoint(index, newPoint),
-                );
-              },
+                const Spacer(),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  onPressed: onEditPoints,
+                  icon: const Icon(Icons.sync), // ✅ sync로 복구
+                ),
+              ],
             ),
-          ),
-          SizedBox(height: 10),
-          Text('Progress', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 8,
-                  backgroundColor: Colors.grey.shade300,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                ),
+
+            const SizedBox(height: 6),
+            Text('Checklist items', style: theme.textTheme.bodySmall),
+
+            const SizedBox(height: 8),
+            // 미리보기 리스트(3개)
+            SizedBox(
+              height: 140,
+              child: ListView.builder(
+                itemCount: taskList.length > 3 ? 3 : taskList.length,
+                itemBuilder: (context, index) {
+                  final task = taskList[index];
+                  return ChecklistItem(
+                    index: index,
+                    task: task.text,
+                    isChecked: task.isChecked,
+                    point: task.point,
+                    isEditing: task.isEditing,
+                    onChanged: (_) => onToggleCheck(index),
+                    onStartEditing: (_) => onStartEditing(index),
+                    onEditPoint: (newPoint) => onEditPoint(index, newPoint),
+                  );
+                },
               ),
-              SizedBox(width: 4),
-              Text('${(progress * 100).round()}%', style: TextStyle(fontSize: 16)),
-            ],
-          ),
-        ],
+            ),
+
+            const SizedBox(height: 12),
+            // 진행도
+            Text(
+              'Progress',
+              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 10,
+                      backgroundColor: theme.colorScheme.surfaceVariant,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.blue,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text('${(progress * 100).round()}%', style: theme.textTheme.bodyMedium),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
 
 // 반복 리스트 확장
 class RepeatTaskFullScreen extends StatelessWidget {
@@ -133,36 +152,52 @@ class RepeatTaskFullScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int totalTasks = taskList.length;
-    int completedTasks = taskList.where((task) => task.isChecked).length;
-    double progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
+    final theme = Theme.of(context);
+
+    final totalTasks = taskList.length;
+    final completedTasks = taskList.where((t) => t.isChecked).length;
+    final progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextButton(
           onPressed: onCollapse,
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            foregroundColor: theme.colorScheme.onSurface,
+          ),
           child: Row(
             children: [
-              Text('반복해야 할 일', style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              )),
-              Icon(Icons.expand_less),
+              Text(
+                '반복해야 할 일',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(Icons.expand_less),
             ],
           ),
         ),
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Checklist items', style: TextStyle(fontSize: 16)),
-              IconButton(onPressed: onEditPoints, icon: const Icon(Icons.sync)),
+              Text('Checklist items', style: theme.textTheme.bodySmall),
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                onPressed: onEditPoints,
+                icon: const Icon(Icons.sync),
+              ),
             ],
           ),
         ),
+
+        // 전체 리스트
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -184,30 +219,37 @@ class RepeatTaskFullScreen extends StatelessWidget {
             ),
           ),
         ),
+
+        // 진행도
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Progress', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
+              Text('Progress', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
               Row(
                 children: [
                   Expanded(
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 8,
-                      backgroundColor: Colors.grey.shade300,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 10,
+                        backgroundColor: theme.colorScheme.surfaceVariant,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.blue,
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Text('${(progress * 100).round()}%'),
+                  const SizedBox(width: 8),
+                  Text('${(progress * 100).round()}%', style: theme.textTheme.bodyMedium),
                 ],
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
