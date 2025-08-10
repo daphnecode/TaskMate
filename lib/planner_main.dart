@@ -333,7 +333,8 @@ class _PlannerMainState extends State<PlannerMain> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
+        color: Theme.of(context).cardColor,
+        elevation: 0,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
