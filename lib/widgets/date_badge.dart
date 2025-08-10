@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // 날짜 위젯
 class DateBadge extends StatelessWidget {
-  const DateBadge({Key? key}) : super(key: key);
+  const DateBadge({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -85,6 +85,8 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
               // planner에도 저장
               await updateTasksToFirestore(userId, key, tasks);
 
+              if (!mounted) return;
+
               widget.onUpdateDailyTaskMap(_dailyTaskMap);
               Navigator.pop(context, _dailyTaskMap);
             },

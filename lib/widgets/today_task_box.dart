@@ -13,6 +13,7 @@ class TodayTaskBox extends StatelessWidget {
   final String sortingMethod;
 
   const TodayTaskBox({
+    super.key,
     required this.taskList,
     required this.onToggleCheck,
     required this.onExpand,
@@ -20,8 +21,7 @@ class TodayTaskBox extends StatelessWidget {
     required this.onEditPoint,
     required this.onStartEditing,
     required this.sortingMethod,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -121,14 +121,14 @@ class TodayTaskFullScreen extends StatelessWidget {
   final void Function(int index) onStartEditing;
 
   const TodayTaskFullScreen({
+    super.key,
     required this.taskList,
     required this.onToggleCheck,
     required this.onCollapse,
     required this.onEditPoints,
     required this.onEditPoint,
     required this.onStartEditing,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

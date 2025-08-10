@@ -9,12 +9,12 @@ class TodayEditBox extends StatefulWidget {
   final VoidCallback onExpand;
 
   const TodayEditBox({
-    Key? key,
+    super.key,
     required this.taskList,
     required this.onTaskListUpdated,
     required this.onExpand,
     this.selectedDate,
-  }) : super(key: key);
+  });
 
   @override
   State<TodayEditBox> createState() => _TodayEditBoxState();
@@ -145,12 +145,12 @@ class TodayEditFullScreen extends StatefulWidget {
   final DateTime? selectedDate;
 
   const TodayEditFullScreen({
-    Key? key,
+    super.key,
     required this.taskList,
     required this.onTaskListUpdated,
     required this.onCollapse,
     this.selectedDate,
-  }) : super(key: key);
+  });
 
   @override
   State<TodayEditFullScreen> createState() => _TodayEditFullScreenState();

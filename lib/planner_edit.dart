@@ -112,6 +112,8 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             final newMap = Map<String, List<Task>>.from(dailyTaskMap);
             newMap[key] = todayTaskList;
 
+            if (!mounted) return;
+
             // DailyTaskEditPage로 이동
             final result = await Navigator.push<Map<String, List<Task>>>(
               context,

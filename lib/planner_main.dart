@@ -193,6 +193,9 @@ class _PlannerMainState extends State<PlannerMain> {
                         onPressed: () async {
                           Navigator.of(context).pop();
                           final dateKey = _dateKey(selectedDate);
+                          
+                          if (!mounted) return;
+
                           try {
                             await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList);
                             setState(() => _isSubmitted = true);

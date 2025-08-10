@@ -13,6 +13,7 @@ class RepeatTaskBox extends StatelessWidget {
   final String sortingMethod;
 
   const RepeatTaskBox({
+    super.key,
     required this.taskList,
     required this.onToggleCheck,
     required this.onExpand,
@@ -20,8 +21,7 @@ class RepeatTaskBox extends StatelessWidget {
     required this.onEditPoint,
     required this.onStartEditing,
     required this.sortingMethod,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,14 +122,14 @@ class RepeatTaskFullScreen extends StatelessWidget {
   final void Function(int index) onStartEditing;
 
   const RepeatTaskFullScreen({
+    super.key,
     required this.taskList,
     required this.onToggleCheck,
     required this.onCollapse,
     required this.onEditPoints,
     required this.onEditPoint,
     required this.onStartEditing,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

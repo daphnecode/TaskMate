@@ -13,7 +13,7 @@ class ChecklistItem extends StatelessWidget {
   final ValueChanged<int> onEditPoint;
 
   const ChecklistItem({
-    Key? key,
+    super.key,
     required this.index,
     required this.task,
     required this.isChecked,
@@ -22,7 +22,7 @@ class ChecklistItem extends StatelessWidget {
     required this.onChanged,
     required this.onStartEditing,
     required this.onEditPoint,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +79,12 @@ class TaskListWidget extends StatelessWidget {
   final void Function(int index, int newPoint) onEditPoint;
 
   const TaskListWidget({
-    Key? key,
+    super.key,
     required this.tasks,
     required this.onToggleCheck,
     required this.onStartEditing,
     required this.onEditPoint,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

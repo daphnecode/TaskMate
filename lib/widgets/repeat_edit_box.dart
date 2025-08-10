@@ -8,11 +8,11 @@ class RepeatEditBox extends StatefulWidget {
   final VoidCallback onExpand;
 
   const RepeatEditBox({
-    Key? key,
+    super.key,
     required this.taskList,
     required this.onTaskListUpdated,
     required this.onExpand,
-  }) : super(key: key);
+  });
 
   @override
   State<RepeatEditBox> createState() => _RepeatEditBoxState();
@@ -131,11 +131,11 @@ class ReapeatEditFullScreen extends StatefulWidget {
   final VoidCallback onCollapse;
 
   const ReapeatEditFullScreen({
+    super.key,
     required this.tasklist,
     required this.onTaskAListUpdated,
     required this.onCollapse,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   State<ReapeatEditFullScreen> createState() => _ReapeatEditFullScreenState();
