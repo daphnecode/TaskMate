@@ -139,7 +139,7 @@ class PetStatus extends StatelessWidget{
                       SizedBox(width: 4),
                     ],
                   ),
-                    Text("${pet.currentExp}/157"),
+                    Text("${pet.currentExp}/${petLevelTable[pet.level-1].expToNext}"),
                   ],
                 ),
               ),
