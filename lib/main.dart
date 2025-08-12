@@ -126,11 +126,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  Users user = Users(
-    currentPoint: 0,
-    gotPoint: 0,
-    setting: {},
-  );
 
   Pets pet = Pets(
     image: "",

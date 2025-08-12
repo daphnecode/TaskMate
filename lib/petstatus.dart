@@ -106,7 +106,7 @@ class PetStatus extends StatelessWidget{
   
   @override
   Widget build(BuildContext context) {
-    double progress = pet.currentExp / 157;
+    double progress = pet.currentExp / petLevelTable[pet.level-1].expToNext;
     return Padding(
       padding: EdgeInsets.all(20.0),
       child: Column(
