@@ -236,8 +236,8 @@ class Users {
 
   factory Users.fromMap(Map<String, dynamic> map) {
     return Users(
-      currentPoint: 0,
-      gotPoint: 0,
+      currentPoint: map['currentPoint'],
+      gotPoint: map['gotPoint'],
       setting: {
         'darkMode': map['setting']['darkMode'],
         'listSort': "사전 순",
