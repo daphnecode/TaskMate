@@ -106,6 +106,16 @@ class _SettingsPageState extends State<SettingsPage> {
                 widget.onSoundEffectsChanged?.call(value); // 상태만 바꿈
               },
             ),
+            const SizedBox(height: 20),
+            buildListTile(
+              context: context,
+              icon: Icons.volunteer_activism, // 원하는 아이콘으로 변경 가능
+              label: '도움을 주신 분들',
+              value: '',
+              onTap: () {
+                // 추후 연결 
+              },
+            ),
           ],
         ),
       ),
