@@ -27,6 +27,7 @@ class RootState extends State<Root> {
   Users user = Users(
     currentPoint: 0,
     gotPoint: 0,
+    nowPet: "",
     setting: {},
   );
 
@@ -160,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
       .collection('pets')
-      .doc('dragon')
+      .doc(widget.user.nowPet)
       .get();
     
     final Pets loadedItems2;

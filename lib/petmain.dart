@@ -61,6 +61,7 @@ class _MainareaState extends State<Mainarea> {
                     widget.pet.happy = newPet.happy;
                     widget.pet.level = newPet.level;
                     widget.pet.currentExp = newPet.currentExp;
+                    widget.pet.styleID = newPet.styleID;
                   });
                 });
             },

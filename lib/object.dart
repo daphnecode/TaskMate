@@ -89,18 +89,6 @@ class Pets {
     'currentExp': currentExp,
     'styleID': styleID,
   };
-
-  factory Pets.copyPet(Pets newPet) {
-    return Pets(
-      image: newPet.image,
-      name: newPet.name,
-      hunger: newPet.hunger,
-      happy: newPet.happy,
-      level: newPet.level,
-      currentExp: newPet.currentExp,
-      styleID: newPet.styleID,
-    );
-  }
 }
 
 // Pet 레벨 정보 클래스
@@ -223,6 +211,7 @@ const List<PetLevel> petLevelTable = [
 class Users {
   int currentPoint;
   int gotPoint;
+  String nowPet;
   Map<String, dynamic> setting;
   
 
@@ -230,6 +219,7 @@ class Users {
     {
       required this.currentPoint,
       required this.gotPoint,
+      required this.nowPet,
       required this.setting,
     }
   );
@@ -238,6 +228,7 @@ class Users {
     return Users(
       currentPoint: map['currentPoint'],
       gotPoint: map['gotPoint'],
+      nowPet: map['nowPet'],
       setting: {
         'darkMode': map['setting']['darkMode'],
         'listSort': "사전 순",
@@ -251,6 +242,7 @@ class Users {
   Map<String, dynamic> toMap() => {
     'currentPoint': currentPoint,
     'gotPoint': gotPoint,
+    'nowPet': nowPet,
     'setting': setting,
   };
 }

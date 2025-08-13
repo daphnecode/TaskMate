@@ -28,9 +28,11 @@ class Subarea1 extends StatefulWidget {
 
 class _Subarea1State extends State<Subarea1> {
   Future<Pets> loadPet(String currentPet) async {
-    DocumentSnapshot petDoc = await FirebaseFirestore.instance
+    final tmp = FirebaseFirestore.instance
       .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
+      .doc('HiHgtVpIvdyCZVtiFCOc');
+    
+    DocumentSnapshot petDoc = await tmp
       .collection('pets')
       .doc(currentPet)
       .get();
@@ -51,6 +53,11 @@ class _Subarea1State extends State<Subarea1> {
         styleID: ""
       );
     }
+
+    await tmp.update({
+      'nowPet': currentPet
+    });
+
     return loadedItems2;
   }
   
