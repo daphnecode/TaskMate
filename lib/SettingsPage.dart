@@ -113,7 +113,7 @@ class _SettingsPageState extends State<SettingsPage> {
               label: '도움을 주신 분들',
               value: '',
               onTap: () {
-                // 추후 연결 
+                // 추후 연결
               },
             ),
           ],
