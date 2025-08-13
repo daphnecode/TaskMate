@@ -85,6 +85,40 @@ class _PlannerMainState extends State<PlannerMain> {
     return DateTime.now().toUtc().add(const Duration(hours: 9)); // 한국 시간
   }
 
+  int _calcEarnedPointsForToday() {
+    int sum = 0;
+    for (final t in todayTaskList) { if (t.isChecked) sum += (t.point ?? 0); }
+    for (final t in repeatTaskList) { if (t.isChecked) sum += (t.point ?? 0); }
+    return sum;
+  }
+
+  Future<void> _addPointsClient({
+    required String uid,
+    required String dateKey,
+    required int earnedPoints,
+  }) async {
+    if (earnedPoints <= 0) return;
+    final db = FirebaseFirestore.instance;
+    final userRef = db.collection('Users').doc(uid);
+    final logRef  = userRef.collection('log').doc(dateKey);
+
+    await db.runTransaction((tx) async {
+      final logSnap = await tx.get(logRef);
+      final already = logSnap.exists && (logSnap.data()?['rewarded'] == true);
+      if (already) return;
+
+      final userSnap = await tx.get(userRef);
+      final cur = (userSnap.data()?['currentPoint'] ?? 0) as int;
+      tx.update(userRef, {'currentPoint': cur + earnedPoints});
+      tx.set(logRef, {
+        'rewarded': true,
+        'earnedPoints': earnedPoints,
+        'rewardedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    });
+  }
+
+
 
 
   @override
@@ -198,6 +232,8 @@ class _PlannerMainState extends State<PlannerMain> {
 
                           try {
                             await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList);
+                            final earned = _calcEarnedPointsForToday();
+                            await _addPointsClient(uid: userId, dateKey: dateKey, earnedPoints: earned);
                             setState(() => _isSubmitted = true);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("제출 완료!")),
