@@ -116,3 +116,5 @@ export const onTaskSubmitted = onDocumentWritten(
     );
   }
 );
+
+export * from "./submitReward";

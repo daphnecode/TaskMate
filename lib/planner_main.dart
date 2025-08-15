@@ -5,6 +5,8 @@ import 'planner_edit.dart';
 import 'statistics.dart';
 import 'DBtest/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+
 
 
 
@@ -91,35 +93,6 @@ class _PlannerMainState extends State<PlannerMain> {
     for (final t in repeatTaskList) { if (t.isChecked) sum += (t.point ?? 0); }
     return sum;
   }
-
-  Future<void> _addPointsClient({
-    required String uid,
-    required String dateKey,
-    required int earnedPoints,
-  }) async {
-    if (earnedPoints <= 0) return;
-    final db = FirebaseFirestore.instance;
-    final userRef = db.collection('Users').doc(uid);
-    final logRef  = userRef.collection('log').doc(dateKey);
-
-    await db.runTransaction((tx) async {
-      final logSnap = await tx.get(logRef);
-      final already = logSnap.exists && (logSnap.data()?['rewarded'] == true);
-      if (already) return;
-
-      final userSnap = await tx.get(userRef);
-      final cur = (userSnap.data()?['currentPoint'] ?? 0) as int;
-      tx.update(userRef, {'currentPoint': cur + earnedPoints});
-      tx.set(logRef, {
-        'rewarded': true,
-        'earnedPoints': earnedPoints,
-        'rewardedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    });
-  }
-
-
-
 
   @override
   void initState() {
@@ -227,13 +200,21 @@ class _PlannerMainState extends State<PlannerMain> {
                         onPressed: () async {
                           Navigator.of(context).pop();
                           final dateKey = _dateKey(selectedDate);
-                          
+
                           if (!mounted) return;
 
                           try {
-                            await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList);
-                            final earned = _calcEarnedPointsForToday();
-                            await _addPointsClient(uid: userId, dateKey: dateKey, earnedPoints: earned);
+                            await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList); //플래너 내용 저장
+                            final earned = _calcEarnedPointsForToday(); // 오늘 얻은 포인트 계산
+                            final functions = FirebaseFunctions.instance;
+                            final callable = functions.httpsCallable('submitReward');
+                            if (earned > 0) {
+                              await callable.call(<String, dynamic>{
+                                'uid': userId,
+                                'earned': earned,
+                                'dateKey': dateKey,
+                              });
+                            }
                             setState(() => _isSubmitted = true);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("제출 완료!")),
