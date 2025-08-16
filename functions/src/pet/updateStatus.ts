@@ -1,44 +1,55 @@
-import { pubsub as pubsubV2 } from "firebase-functions/v2";
+// src/index.ts
 import * as admin from "firebase-admin";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-
+admin.initializeApp();
 const db = admin.firestore();
-//TS가 schedule 속성을 못 찾아서, 함수에 any로 타입 캐스팅
-const pubsub: any = pubsubV2;
 
-/**
- * 매일 새벽 3시(서울 시간)에 펫 상태 감소
- * - 배고픔 +10 (최대 100)
- * - 체력 -5 (최소 0)
- */
-export const updateStatus = pubsub.schedule("0 3 * * *", {
-  timeZone: "Asia/Seoul",      // 서울 시간
-  region: "asia-northeast3",   // 서울 리전
-})
-.onRun(async () => {
-  console.log("펫 상태 감소 작업 시작 (v2 API)");
+// 매일 새벽 0시 (UTC 기준) 실행
+export const updatedStatus = onSchedule({schedule: "0 18 * * *", timeZone: "Asia/Seoul"}, 
+  async (event) => {
+    console.log("매일 펫 상태 감소 작업 시작");
 
-  const petsRef = db.collection("pets");
-  const snapshot = await petsRef.get();
+    try {
+      // 1. 모든 Users 불러오기
+      const usersSnap = await db.collection("Users").get();
 
-  const batch = db.batch();
-  snapshot.forEach((doc) => {
-    const pet = doc.data();
-    const hunger = Math.min((pet.hunger || 0) - 10, 100);
-    const health = Math.max((pet.health || 100) - 5, 0);
+      for (const userDoc of usersSnap.docs) {
+        const userId = userDoc.id;
+        const nowPetId = userDoc.get("nowPet");
 
-    batch.update(doc.ref, {
-      hunger,
-      health,
-      lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-    });
-  });
+        if (!nowPetId) {
+          console.log(`유저 ${userId}는 nowPet이 없음`);
+          continue;
+        }
 
-  await batch.commit();
-  console.log(`총 ${snapshot.size}마리 펫 상태 업데이트 완료`);
+        // 2. Users/{uid}/pets/{nowPetId} 문서 가져오기
+        const petRef = db.collection("Users").doc(userId).collection("pets").doc(nowPetId);
+        const petSnap = await petRef.get();
 
-  return null;
-});
+        if (!petSnap.exists) {
+          console.log(`유저 ${userId}의 nowPet(${nowPetId}) 문서 없음`);
+          continue;
+        }
+
+        const petData = petSnap.data() || {};
+        const petHunger = petData["hunger"] || {};
+        const petHappy = petData["happy"] || {};
+
+        // 3. 상태 감소 로직 (예: hunger -5, happy -2)
+        
+        const hunger = Math.max(0, (petHunger || 50) - 10);
+        const happy = Math.max(0, (petHappy || 50) - 10);
+
+        // 4. 상태 업데이트
+        await petRef.set({ hunger: hunger, happy: happy }, { merge: true });
+
+        console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updatedStatus);
+      }
+
+      console.log("모든 유저의 펫 상태 감소 완료 ✅");
+    } catch (error) {
+      console.error("스케줄 함수 오류:", error);
+    }
+  }
+);
