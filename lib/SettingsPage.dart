@@ -114,6 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
               value: '',
               onTap: () {
                 // 추후 연결
+                Navigator.push(context,MaterialPageRoute(builder: (context) => CreditsPage(),));
               },
             ),
           ],
@@ -141,6 +142,41 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class CreditsPage extends StatelessWidget {
+  const CreditsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("도움을 주신 분")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: const [
+            Text(
+              "이 앱은 아래 오픈소스 및 자료를 사용하여 제작되었습니다.",
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "• 아이콘: WebHostingHub Glyphs\n"
+              "  출처: https://www.webhostinghub.com/glyphs\n"
+              "  라이선스: SIL Open Font License 1.1",
+              style: TextStyle(fontSize: 14),
+            ),
+            SizedBox(height: 20),
+            Text(
+              "아이콘의 저작권은 WebHostingHub에 있으며, 본 앱은 "
+              "SIL Open Font License 1.1에 따라 해당 아이콘을 사용합니다.",
+              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+            ),
+          ],
         ),
       ),
     );
