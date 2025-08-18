@@ -1,12 +1,10 @@
 // src/index.ts
 import * as admin from "firebase-admin";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-
-admin.initializeApp();
-const db = admin.firestore();
+import { db } from "../firebase";
 
 // 매일 새벽 0시 (UTC 기준) 실행
-export const updatedStatus = onSchedule({schedule: "0 18 * * *", timeZone: "Asia/Seoul"}, 
+export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia/Seoul"}, 
   async (event) => {
     console.log("매일 펫 상태 감소 작업 시작");
 
@@ -32,19 +30,19 @@ export const updatedStatus = onSchedule({schedule: "0 18 * * *", timeZone: "Asia
           continue;
         }
 
-        const petData = petSnap.data() || {};
-        const petHunger = petData["hunger"] || {};
-        const petHappy = petData["happy"] || {};
+        const petData = petSnap.data() ?? {};
+        const petHunger = petData["hunger"] ?? 0;
+        const petHappy = petData["happy"] ?? 0;
 
-        // 3. 상태 감소 로직 (예: hunger -5, happy -2)
+        // 3. 상태 감소 로직 (예: hunger -24, happy -30)
         
-        const hunger = Math.max(0, (petHunger || 50) - 10);
-        const happy = Math.max(0, (petHappy || 50) - 10);
+        const newHunger = Math.max(0, petHunger - 2);
+        const newHappy = Math.max(0, petHappy - 2);
 
         // 4. 상태 업데이트
-        await petRef.set({ hunger: hunger, happy: happy }, { merge: true });
+        await petRef.set({ hunger: newHunger, happy: newHappy }, { merge: true });
 
-        console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updatedStatus);
+        console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updateStatus);
       }
 
       console.log("모든 유저의 펫 상태 감소 완료 ✅");

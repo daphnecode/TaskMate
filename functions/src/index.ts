@@ -1,9 +1,8 @@
 // functions/src/index.ts
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
+import { db } from "./firebase";
 
-admin.initializeApp();
-const db = admin.firestore();
 
 // KST 기준 YYYY-MM-DD 문자열
 function kstDateStr(date = new Date()): string {
@@ -118,3 +117,4 @@ export const onTaskSubmitted = onDocumentWritten(
 );
 
 export * from "./submitReward";
+export * from "./pet/updateStatus";

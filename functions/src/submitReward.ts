@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import { db } from "./firebase";
 
-const db = admin.firestore();
 
 export const submitReward = onCall(async (req) => {
   const uid = (req.auth?.uid as string) || (req.data.uid as string);
