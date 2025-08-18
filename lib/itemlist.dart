@@ -33,7 +33,12 @@ Future<void> petSaveDB(String userID, String petID, Pets pet) async {
       .doc(userID)
       .collection('pets')
       .doc(petID)
-      .set(pet.toMap());
+      .update(
+        {
+          'hunger': pet.hunger,
+          'happy': pet.happy,
+        },
+      );
 }
 
 String nameChange(String name) {
@@ -179,6 +184,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   });
                                 }
                                 itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                petSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.nowPet, widget.pet);
                                 Navigator.pop(context);
                                 },
                             ),
