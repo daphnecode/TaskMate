@@ -19,10 +19,13 @@ import 'package:taskmate/widgets/today_task_box.dart';
 class PlannerMain extends StatefulWidget {
   final void Function(int) onNext;
   final String sortingMethod;
+  final void Function(int delta)? onPointsAdded;
+
   const PlannerMain(
       {
         required this.onNext,
         required this.sortingMethod,
+        this.onPointsAdded,
         super.key
       }
     );
@@ -40,6 +43,7 @@ class _PlannerMainState extends State<PlannerMain> {
   bool showFullRepeat = false;
   bool showFullToday = false;
   bool _isSubmitted = false;
+  bool _submitting = false;
 
   String userId = "HiHgtVpIvdyCZVtiFCOc";
 
@@ -190,6 +194,7 @@ class _PlannerMainState extends State<PlannerMain> {
         actions: [
           TextButton(
             onPressed: () {
+              if (_submitting) return;
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -203,17 +208,21 @@ class _PlannerMainState extends State<PlannerMain> {
 
                           if (!mounted) return;
 
+                          setState(() => _submitting = true);
+
                           try {
                             await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList); //플래너 내용 저장
                             final earned = _calcEarnedPointsForToday(); // 오늘 얻은 포인트 계산
                             final functions = FirebaseFunctions.instance;
                             final callable = functions.httpsCallable('submitReward');
                             if (earned > 0) {
-                              await callable.call(<String, dynamic>{
-                                'uid': userId,
-                                'earned': earned,
-                                'dateKey': dateKey,
-                              });
+                              widget.onPointsAdded?.call(earned); // 로컬 즉시 반영
+                              try {
+                                await callable.call({'uid': userId, 'earned': earned, 'dateKey': dateKey});
+                              } catch (e) {
+                                widget.onPointsAdded?.call(-earned); // 실패 시 되돌리기
+                                rethrow;
+                              }
                             }
                             setState(() => _isSubmitted = true);
                             ScaffoldMessenger.of(context).showSnackBar(

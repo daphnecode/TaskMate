@@ -33,6 +33,14 @@ class RootState extends State<Root> {
 
   bool isLoading = true;
 
+  void _onPointsAdded(int delta) {
+    setState(() {
+      user.currentPoint += delta;
+      user.gotPoint += delta; // 원하면 함께 올려두기
+    });
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -97,6 +105,7 @@ class RootState extends State<Root> {
         onPushChanged: togglePushNotification,
         onSortingChanged: toggleSortingMethod,
         onSoundEffectsChanged: toggleSoundEffects,
+        onPointsAdded:_onPointsAdded,
       ),
     );
   }
@@ -108,6 +117,7 @@ class MyHomePage extends StatefulWidget {
   final Function(bool) onPushChanged;
   final Function(String) onSortingChanged;
   final Function(bool) onSoundEffectsChanged;
+  final Function(int) onPointsAdded;
 
   const MyHomePage({
     required this.title,
@@ -116,6 +126,7 @@ class MyHomePage extends StatefulWidget {
     required this.onPushChanged,
     required this.onSortingChanged,
     required this.onSoundEffectsChanged,
+    required this.onPointsAdded,
     super.key,
   });
 
@@ -214,7 +225,11 @@ class _MyHomePageState extends State<MyHomePage> {
         currentWidget = PetChoose(onNext: goNext);
         break;
       case 3:
-        currentWidget = PlannerMain(onNext: goNext, sortingMethod: widget.user.setting['listSort']);
+        currentWidget = PlannerMain(
+            onNext: goNext,
+            sortingMethod: widget.user.setting['listSort'],
+            onPointsAdded: widget.onPointsAdded,
+        );
         break;
       case 4:
         currentWidget = PlannerEditPage(
