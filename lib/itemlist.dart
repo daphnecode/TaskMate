@@ -1,45 +1,10 @@
 import 'package:flutter/material.dart';
+import 'DBtest/firestore_service.dart';
 import 'petmain.dart';
 import 'object.dart';
 import 'package:taskmate/utils/icon_utis.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-Future<void> itemSaveDB(String userID, String itemID, Item target) async {
-  final refDoc = FirebaseFirestore.instance
-      .collection('Users')
-      .doc(userID)
-      .collection('items')
-      .doc(itemID);
-  
-  DocumentSnapshot tmpDoc = await refDoc.get();
-  
-  if (tmpDoc.exists) {
-    await refDoc.update(
-      {
-        'count': target.count
-      }
-    );
-  } else {
-    await refDoc.set(
-      target.toMap()
-    );
-  }
-}
-
-Future<void> petSaveDB(String userID, String petID, Pets pet) async {
-  await FirebaseFirestore.instance
-      .collection('Users')
-      .doc(userID)
-      .collection('pets')
-      .doc(petID)
-      .update(
-        {
-          'hunger': pet.hunger,
-          'happy': pet.happy,
-        },
-      );
-}
 
 String nameChange(String name) {
   String result;

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:taskmate/object.dart';
 import 'task.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -239,4 +240,41 @@ Future<void> syncDailyToPlanner(String userId, String dateKey) async {
     'todayTasks': tasks.map((t) => t.toJson()).toList(),
     'submitted': false,
   }, SetOptions(merge: true));
+}
+
+// Pet 관련 함수들.
+Future<void> itemSaveDB(String userID, String itemID, Item target) async {
+  final refDoc = FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userID)
+      .collection('items')
+      .doc(itemID);
+  
+  DocumentSnapshot tmpDoc = await refDoc.get();
+  
+  if (tmpDoc.exists) {
+    await refDoc.update(
+      {
+        'count': target.count
+      }
+    );
+  } else {
+    await refDoc.set(
+      target.toMap()
+    );
+  }
+}
+
+Future<void> petSaveDB(String userID, String petID, Pets pet) async {
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userID)
+      .collection('pets')
+      .doc(petID)
+      .update(
+        {
+          'hunger': pet.hunger,
+          'happy': pet.happy,
+        },
+      );
 }

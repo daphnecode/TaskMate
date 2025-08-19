@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/button.dart';
 import 'object.dart';
 import 'petchoose.dart';
 import 'petstatus.dart';
@@ -9,6 +10,7 @@ import 'clean_game_screen.dart';
 //장애물달리기게임
 import 'run_game_screen.dart';
 
+//화면 상단 구성
 class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
   final Pets pet;
@@ -128,6 +130,7 @@ class _PetmainState extends State<Petmain> {
               // MainArea()로 변경
             ),
           ),
+          //화면 하단 구성
           Expanded(
             flex: 4,
             child: Container(
@@ -140,61 +143,11 @@ class _PetmainState extends State<Petmain> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Stack(
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                  widget.onNext(1); // Navigate to ItemlistPage
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue[100],
-                                  ),
-                                  child: Center(
-                                    child: Text("창고", style: TextStyle(fontSize: 16, color: Colors.black)),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 0, top: 0,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.blueAccent,
-                                    radius: 35,
-                                    child: Image.asset(
-                                      "assets/icons/icon-list-alt.png", 
-                                      fit: BoxFit.fill, width: 50, height: 50
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: mainButton(onNext: widget.onNext, buttonName: "창고", icon: "assets/icons/icon-list-alt.png"),
                           ),
                           SizedBox(width: 10.0,),
                           Expanded(
-                            child: Stack(
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                  widget.onNext(5); // Navigate to ItemlistPage
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue[100],
-                                  ),
-                                  child: Center(
-                                    child: Text("상점", style: TextStyle(fontSize: 16, color: Colors.black)),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 0, top: 0,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.blueAccent,
-                                    radius: 35,
-                                    child: Image.asset(
-                                      "assets/icons/icon-store.png", 
-                                      fit: BoxFit.fill, width: 50, height: 50
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
+                            child: mainButton(onNext: widget.onNext, buttonName: "상점", icon: "assets/icons/icon-store.png"),
                           ),
                         ],
                       ),
@@ -294,6 +247,7 @@ class _PetmainState extends State<Petmain> {
             ),
         ],
       ),
+      // 하단 앱바
       bottomNavigationBar: BottomAppBar(
           color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(

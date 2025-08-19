@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:taskmate/utils/bgm_manager.dart';
+import 'utils/bgm_manager.dart';
 import 'planner_main.dart';
 import 'planner_edit.dart';
 import 'itemlist.dart';
 import 'petmain.dart';
 import 'petchoose.dart';
-import 'package:taskmate/DBtest/task.dart';
-import 'package:taskmate/DBtest/task_data.dart';
+import 'DBtest/task.dart';
+import 'DBtest/task_data.dart';
 import 'object.dart';
 import 'settingspage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,10 +44,10 @@ class RootState extends State<Root> {
   @override
   void initState() {
     super.initState();
-    loadItems();
+    loadUser();
   }
 
-  Future<void> loadItems() async {
+  Future<void> loadUser() async {
     DocumentSnapshot doc1 = await FirebaseFirestore.instance
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
@@ -156,18 +156,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> initAsync() async {
-    await loadItems();
+    await loadPets();
     await BgmManager.preload('bgm2.wav');
     await BgmManager.preload('bgm1.mp3');
   }
 
-  Future<void> loadItems() async {
-    /*
-    ┌──────────────────────────────────────────────┐
-      firestore에 User와, User 하위의 Pet 정보 요청.
-      로컬에 저장.
-    └──────────────────────────────────────────────┘
-    */
+  Future<void> loadPets() async {
     DocumentSnapshot petDoc = await FirebaseFirestore.instance
       .collection('Users')
       .doc('HiHgtVpIvdyCZVtiFCOc')
