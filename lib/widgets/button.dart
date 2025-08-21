@@ -4,10 +4,12 @@ class mainButton extends StatelessWidget {
   final void Function(int) onNext;
   final String buttonName;
   final String icon;
+  final int pageNumber;
   const mainButton({
     required this.onNext, 
     required this.buttonName, 
-    required this.icon, 
+    required this.icon,
+    required this.pageNumber,
     super.key});
   
   @override
@@ -16,7 +18,7 @@ class mainButton extends StatelessWidget {
       children: [
         ElevatedButton(
           onPressed: () {
-          onNext(1); // Navigate to ItemlistPage
+          onNext(pageNumber); // Navigate to ItemlistPage
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[100],

@@ -146,11 +146,11 @@ class _PetmainState extends State<Petmain> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: mainButton(onNext: widget.onNext, buttonName: "창고", icon: "assets/icons/icon-list-alt.png"),
+                            child: mainButton(onNext: widget.onNext, buttonName: "창고", icon: "assets/icons/icon-list-alt.png", pageNumber: 1,),
                           ),
                           SizedBox(width: 10.0,),
                           Expanded(
-                            child: mainButton(onNext: widget.onNext, buttonName: "상점", icon: "assets/icons/icon-store.png"),
+                            child: mainButton(onNext: widget.onNext, buttonName: "상점", icon: "assets/icons/icon-store.png", pageNumber: 5,),
                           ),
                         ],
                       ),
