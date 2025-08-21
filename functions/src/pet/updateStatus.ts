@@ -35,6 +35,10 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         const petHappy = petData["happy"] ?? 0;
 
         // 3. 상태 감소 로직 (예: hunger -24, happy -30)
+        /* 
+        포만도 0 이하일 때, 행복도 감소
+        행복도 0 이하일 때, 경험치 감소 추가 필요.
+        */
         
         const newHunger = Math.max(0, petHunger - 2);
         const newHappy = Math.max(0, petHappy - 2);

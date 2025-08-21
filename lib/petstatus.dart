@@ -154,6 +154,9 @@ class PetStatus extends StatelessWidget{
             ],
           ),
           SizedBox(height: 40,),
+          /*
+          사용자의 통계 정보로 갱신하기.
+          */
           Row(
             children: [
               Expanded(child: Text("총 달린 거리", style: TextStyle(fontSize: 16),)),

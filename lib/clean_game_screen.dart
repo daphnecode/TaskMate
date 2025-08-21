@@ -56,6 +56,12 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
                     setState(() {
                       widget.pet.happy += 10;
                     });
+                    /*
+                    게임이 클리어 시, 
+                      펫의 행복도 증가.
+                      로그 남기기.
+                      통계 변화.
+                    */
                     _game.overlays.remove('ClearPopup');
                     Navigator.pop(context);
                   },

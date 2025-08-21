@@ -27,6 +27,11 @@ class Root extends StatefulWidget {
 }
 
 class RootState extends State<Root> {
+  /*
+  최초 사용자 정보 생성.
+  사용자 ID 저장.
+  사용지 로그인, 인증.
+  */
   Users user = Users(
     currentPoint: 0,
     gotPoint: 0,

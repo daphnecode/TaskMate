@@ -36,7 +36,10 @@ class _MainareaState extends State<Mainarea> {
     }
   }
     
+  /*
+  웹과 앱에서 실행할 때, 이미지 크기나 위치 조정.
 
+  */
   @override
   Widget build(BuildContext context) {
     if (widget.user.setting['placeID'] == "" || widget.pet.image == "") {
@@ -265,8 +268,7 @@ class _PetmainState extends State<Petmain> {
 
                 IconButton(
                   icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
-                  },
+                  onPressed: () {}, // 현재 페이지이므로 빈 처리
                 ),
                 IconButton(
                   icon: Icon(Icons.settings),
