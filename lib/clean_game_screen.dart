@@ -5,16 +5,21 @@ import 'package:taskmate/widgets/joystick_widget.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'main.dart';
 import 'object.dart';
+import 'package:taskmate/DBtest/firestore_service.dart';
 
 class CleanGameScreen extends StatefulWidget {
   final void Function(int) onNext;
   final bool soundEffectsOn;
   final Pets pet;
+  final String uid;
+  final String petId;
 
   const CleanGameScreen({super.key,
     required this.onNext,
     required this.soundEffectsOn,
     required this.pet,
+    required this.uid,
+    required this.petId,
   });
 
   @override
@@ -23,6 +28,9 @@ class CleanGameScreen extends StatefulWidget {
 
 class _CleanGameScreenState extends State<CleanGameScreen> {
   final CleanGame _game = CleanGame();
+
+  //중복 보상 방지
+  bool _rewardApplied = false;
 
   @override
   void initState() {
@@ -52,18 +60,24 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
               game: _game,
               overlayBuilderMap: {
                 'ClearPopup': (context, _) => ClearPopup(
-                  onClose: () {
+                  onClose: () async {
+                    if (_rewardApplied) return;
+                    _rewardApplied = true;
+
+                    // 로컬 즉시 반영
                     setState(() {
-                      widget.pet.happy += 10;
+                      widget.pet.happy = (widget.pet.happy + 10).clamp(0, 9999);
                     });
-                    /*
-                    게임이 클리어 시, 
-                      펫의 행복도 증가.
-                      로그 남기기.
-                      통계 변화.
-                    */
+
+                    //  DB 반영
+                    try {
+                      await petSaveDB(widget.uid, widget.petId, widget.pet);
+                    } catch (e) {
+
+                    }
+                    // 부모에게 "변경됨" 신호 보내서 돌아간 화면이 setState 하도록
                     _game.overlays.remove('ClearPopup');
-                    Navigator.pop(context);
+                    Navigator.pop(context, true);
                   },
                 ),
               },

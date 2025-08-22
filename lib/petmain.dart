@@ -163,8 +163,8 @@ class _PetmainState extends State<Petmain> {
                             child: Stack(
                               children: [
                                 ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(
+                                  onPressed: () async {
+                                    final changed =await Navigator.push<bool> (
                                       context,
                                       MaterialPageRoute(builder: (_) => CleanGameScreen(
                                         onNext: (int index) {
@@ -173,8 +173,14 @@ class _PetmainState extends State<Petmain> {
                                         },
                                         soundEffectsOn: widget.soundEffectsOn,
                                         pet: widget.pet,
+                                        uid: 'HiHgtVpIvdyCZVtiFCOc',
+                                        petId: widget.user.nowPet,
                                       )),
                                     );
+                                    if (changed == true) {
+                                      setState(() {
+                                      });
+                                    }
                                     // Handle button press
                                   },
                                   style: ElevatedButton.styleFrom(
