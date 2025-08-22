@@ -33,6 +33,7 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         const petData = petSnap.data() ?? {};
         const petHunger = petData["hunger"] ?? 0;
         const petHappy = petData["happy"] ?? 0;
+        const petExp = petData["currentExp"] ?? 0;
 
         // 3. 상태 감소 로직 (예: hunger -24, happy -30)
         /* 
@@ -44,7 +45,13 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         const newHappy = Math.max(0, petHappy - 2);
 
         // 4. 상태 업데이트
-        await petRef.set({ hunger: newHunger, happy: newHappy }, { merge: true });
+        if (petHappy > 2) {
+          const newExp = Math.max(0, petExp + petHappy - 2);
+          await petRef.set({ hunger: newHunger, happy: newHappy, currentExp: newExp }, { merge: true });
+        }
+        else {
+          await petRef.set({ hunger: newHunger, happy: newHappy }, { merge: true });
+        }
 
         console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updateStatus);
       }

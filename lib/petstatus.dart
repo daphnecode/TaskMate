@@ -103,7 +103,9 @@ class PetStatus extends StatelessWidget{
   final Pets pet;
   const PetStatus({required this.pet, super.key});
 
-  
+  /*
+  경험치가 증가하거나 감소했을 때, 레벨 업 혹은 레벨 다운.
+  */
   @override
   Widget build(BuildContext context) {
     double progress = pet.currentExp / petLevelTable[pet.level-1].expToNext;
