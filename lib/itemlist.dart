@@ -300,6 +300,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   }
                                 });
                                 itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                userSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
                                 Navigator.pop(context);
                                 },
                             ),

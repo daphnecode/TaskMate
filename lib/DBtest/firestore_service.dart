@@ -278,3 +278,14 @@ Future<void> petSaveDB(String userID, String petID, Pets pet) async {
         },
       );
 }
+
+Future<void> userSaveDB(String userID, int point) async {
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userID)
+      .update(
+        {
+          'currentPoint': point
+        },
+      );
+}
