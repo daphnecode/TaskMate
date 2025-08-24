@@ -70,33 +70,34 @@ class _MainareaState extends State<Mainarea> {
                   });
                 });
             },
-            child: Container(
-              color: Colors.white,
+            child: AspectRatio(
+              aspectRatio: 1 / 1, // 예: 모바일 화면 비율
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final width = constraints.maxWidth;
-                  final height = constraints.maxHeight;
+                  final w = constraints.maxWidth;
+                  final h = constraints.maxHeight;
     
                   return Stack(
                     children: [
                       Image.asset(
                         widget.user.setting['placeID'], 
                         fit: BoxFit.cover, 
-                        height: double.infinity, width: double.infinity
+                        height: h, width: w
                         ),
                       Positioned(
-                        left: width * 0.4, top: height * 0.5,
+                        left: w * 0.5, top: h * 0.6,
                         child: Image.asset(
                           widget.pet.image, 
                           fit: BoxFit.cover, 
-                          height: height * 0.5, width: width * 0.4
+                          height: h * 0.2, width: w * 0.2,
                         ),
                       ),
                     ],
                   );
                 }
               ),
-          ),),
+            ),
+          ),
         ),
       ],
     );
@@ -122,169 +123,170 @@ class _PetmainState extends State<Petmain> {
       return Center(child: CircularProgressIndicator());
     }
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-              // MainArea()로 변경
-            ),
-          ),
-          //화면 하단 구성
-          Expanded(
-            flex: 4,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Row(
+            appBar: AppBar(),
+            body: Column(
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                    // MainArea()로 변경
+                  ),
+                ),
+                //화면 하단 구성
+                Expanded(
+                  flex: 4,
+                  child: Container(
+                    padding: EdgeInsets.all(8.0),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Expanded(
-                            child: mainButton(onNext: widget.onNext, buttonName: "창고", icon: "assets/icons/icon-list-alt.png", pageNumber: 1,),
-                          ),
-                          SizedBox(width: 10.0,),
-                          Expanded(
-                            child: mainButton(onNext: widget.onNext, buttonName: "상점", icon: "assets/icons/icon-store.png", pageNumber: 5,),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 10.0,),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Stack(
+                            child: Row(
                               children: [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final changed =await Navigator.push<bool> (
-                                      context,
-                                      MaterialPageRoute(builder: (_) => CleanGameScreen(
-                                        onNext: (int index) {
-                                          Navigator.pop(context);
-                                          widget.onNext(index);
-                                        },
-                                        soundEffectsOn: widget.soundEffectsOn,
-                                        pet: widget.pet,
-                                        uid: 'HiHgtVpIvdyCZVtiFCOc',
-                                        petId: widget.user.nowPet,
-                                      )),
-                                    );
-                                    if (changed == true) {
-                                      setState(() {
-                                      });
-                                    }
-                                    // Handle button press
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue[100],
-                                  ),
-                                  child: Center(
-                                    child: Text("청소", style: TextStyle(fontSize: 16, color: Colors.black)),
-                                  ),
+                                Expanded(
+                                  child: mainButton(onNext: widget.onNext, buttonName: "창고", icon: "assets/icons/icon-list-alt.png", pageNumber: 1,),
                                 ),
-                                Positioned(
-                                  left: 0, top: 0,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.blueAccent,
-                                    radius: 35,
-                                    child: Image.asset(
-                                      "assets/icons/icon-paintbrush.png", 
-                                      fit: BoxFit.fill, width: 50, height: 50
-                                    ),
-                                  ),
+                                SizedBox(width: 10.0,),
+                                Expanded(
+                                  child: mainButton(onNext: widget.onNext, buttonName: "상점", icon: "assets/icons/icon-store.png", pageNumber: 5,),
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(width: 10.0,),
+                          SizedBox(height: 10.0,),
                           Expanded(
-                            child:Stack(
+                            child: Row(
                               children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    // Handle button press
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => RunGameScreen(
-                                        onNext: (int index) {
-                                          Navigator.pop(context);
-                                          widget.onNext(index);
+                                Expanded(
+                                  child: Stack(
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          final changed =await Navigator.push<bool> (
+                                            context,
+                                            MaterialPageRoute(builder: (_) => CleanGameScreen(
+                                              onNext: (int index) {
+                                                Navigator.pop(context);
+                                                widget.onNext(index);
+                                              },
+                                              soundEffectsOn: widget.soundEffectsOn,
+                                              pet: widget.pet,
+                                              uid: 'HiHgtVpIvdyCZVtiFCOc',
+                                              petId: widget.user.nowPet,
+                                            )),
+                                          );
+                                          if (changed == true) {
+                                            setState(() {
+                                            });
+                                          }
+                                          // Handle button press
                                         },
-                                        soundEffectsOn: widget.soundEffectsOn,
-                                        pet: widget.pet,
-                                      )),
-                                    ).then((value) {
-                                      setState(() {
-                                      });
-                                    });
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue[100],
-                                  ),
-                                  child: Center(
-                                    child: Text("놀이", style: TextStyle(fontSize: 16, color: Colors.black)),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.blue[100],
+                                        ),
+                                        child: Center(
+                                          child: Text("청소", style: TextStyle(fontSize: 16, color: Colors.black)),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 0, top: 0,
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.blueAccent,
+                                          radius: 35,
+                                          child: Image.asset(
+                                            "assets/icons/icon-paintbrush.png", 
+                                            fit: BoxFit.fill, width: 50, height: 50
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Positioned(
-                                  left: 0, top: 0,
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.blueAccent,
-                                    radius: 35,
-                                    child: Image.asset(
-                                      "assets/icons/icon-raceflag.png", 
-                                      fit: BoxFit.fill, width: 50, height: 50
-                                    ),
-                                  ), 
+                                SizedBox(width: 10.0,),
+                                Expanded(
+                                  child:Stack(
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          // Handle button press
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (_) => RunGameScreen(
+                                              onNext: (int index) {
+                                                Navigator.pop(context);
+                                                widget.onNext(index);
+                                              },
+                                              soundEffectsOn: widget.soundEffectsOn,
+                                              pet: widget.pet,
+                                            )),
+                                          ).then((value) {
+                                            setState(() {
+                                            });
+                                          });
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.blue[100],
+                                        ),
+                                        child: Center(
+                                          child: Text("놀이", style: TextStyle(fontSize: 16, color: Colors.black)),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 0, top: 0,
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.blueAccent,
+                                          radius: 35,
+                                          child: Image.asset(
+                                            "assets/icons/icon-raceflag.png", 
+                                            fit: BoxFit.fill, width: 50, height: 50
+                                          ),
+                                        ), 
+                                      ),
+                                    ],
+                                  )
                                 ),
                               ],
-                            )
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      ),
-      // 하단 앱바
-      bottomNavigationBar: BottomAppBar(
-          color: Theme.of(context).bottomAppBarTheme.color,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-
-                IconButton(
-                  icon: const Icon(Icons.calendar_month),
-                  onPressed: () {
-                    widget.onNext(3); // Navigate to PlannerMain
-                  },
-                ),
-
-                IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () {}, // 현재 페이지이므로 빈 처리
-                ),
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {widget.onNext(6);
-                    },
-                ),
+                  ),
               ],
             ),
-          ),
-        ),
-    );
+            // 하단 앱바
+            bottomNavigationBar: BottomAppBar(
+                color: Theme.of(context).bottomAppBarTheme.color,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+          
+                      IconButton(
+                        icon: const Icon(Icons.calendar_month),
+                        onPressed: () {
+                          widget.onNext(3); // Navigate to PlannerMain
+                        },
+                      ),
+          
+                      IconButton(
+                        icon: Icon(Icons.home),
+                        onPressed: () {}, // 현재 페이지이므로 빈 처리
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.settings),
+                        onPressed: () {widget.onNext(6);
+                          },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          );
+      
   }
 }
