@@ -48,7 +48,7 @@ class _MainareaState extends State<Mainarea> {
     
     return Column(
       children: [
-        PetStatArea(pet: widget.pet, pageType: widget.pageType,),
+        PetStatArea(pet: widget.pet, user: widget.user, pageType: widget.pageType,),
         Expanded(
           child: GestureDetector(
             onLongPress: () {

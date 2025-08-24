@@ -39,8 +39,9 @@ Row happyStatus(BuildContext context, int nowHappy) {
 
 class PetStatArea extends StatefulWidget{
   final Pets pet;
+  final Users user;
   final int pageType;
-  const PetStatArea({required this.pet, required this.pageType, super.key});
+  const PetStatArea({required this.pet, required this.user, required this.pageType, super.key});
 
   @override
   State<PetStatArea> createState() => _PetStatAreaState();
@@ -58,7 +59,7 @@ class _PetStatAreaState extends State<PetStatArea> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0),
               ),
-              child: PetStatus(pet: widget.pet),
+              child: PetStatus(pet: widget.pet, user: widget.user,),
             );
           },
         );
@@ -101,7 +102,8 @@ class _PetStatAreaState extends State<PetStatArea> {
 
 class PetStatus extends StatelessWidget{
   final Pets pet;
-  const PetStatus({required this.pet, super.key});
+  final Users user;
+  const PetStatus({required this.pet, required this.user, super.key});
 
   /*
   경험치가 증가하거나 감소했을 때, 레벨 업 혹은 레벨 다운.
@@ -162,19 +164,19 @@ class PetStatus extends StatelessWidget{
           Row(
             children: [
               Expanded(child: Text("총 달린 거리", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("15km", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(child: Text('${user.statistics['distance']}', style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
             ],
           ),
           Row(
             children: [
               Expanded(child: Text("행복도 증가 횟수", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("124번", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(child: Text('${user.statistics['doCount']}', style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
             ],
           ),
           Row(
             children: [
               Expanded(child: Text("먹이 준 횟수", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("56번", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(child: Text('${user.statistics['feedCount']}', style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
             ],
           ),
           Row(
@@ -186,13 +188,13 @@ class PetStatus extends StatelessWidget{
           Row(
             children: [
               Expanded(child: Text("경험치 총 획득량", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("1130pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(child: Text("${user.gotPoint}pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
             ],
           ),
           Row(
             children: [
               Expanded(child: Text("포인트 총 소비량", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("830pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(child: Text("${user.gotPoint - user.currentPoint}pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
             ],
           ),
           SizedBox(height: 20.0),

@@ -109,6 +109,7 @@ class Users {
   int gotPoint;
   String nowPet;
   Map<String, dynamic> setting;
+  Map<String, dynamic> statistics;
   
 
   Users(
@@ -117,6 +118,7 @@ class Users {
       required this.gotPoint,
       required this.nowPet,
       required this.setting,
+      required this.statistics,
     }
   );
 
@@ -132,6 +134,16 @@ class Users {
         'push': map['setting']['push'],
         'sound': map['setting']['sound']
       },
+      statistics: {
+        'doCount': map['statistics']['doCount'], 
+        'dayCount': map['statistics']['dayCount'], 
+        'feedCount': map['statistics']['feedCount'], 
+        'actionCount': map['statistics']['actionCount'], 
+        'weekcheck': map['statistics']['week-check'], 
+        'weektask': map['statistics']['week-task'], 
+        'clearCount': map['statistics']['clearCount'], 
+        'distance': map['statistics']['distance']
+      }
     );
   }
 
@@ -140,6 +152,7 @@ class Users {
     'gotPoint': gotPoint,
     'nowPet': nowPet,
     'setting': setting,
+    'statistics': statistics
   };
 }
 

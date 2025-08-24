@@ -37,6 +37,7 @@ class RootState extends State<Root> {
     gotPoint: 0,
     nowPet: "",
     setting: {},
+    statistics: {}
   );
 
   bool isLoading = true;
