@@ -147,9 +147,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                     └─────────────────────────────────────────────┘
                                     */
                                   });
+                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                  petSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.nowPet, widget.pet);
                                 }
-                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                petSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.nowPet, widget.pet);
                                 Navigator.pop(context);
                                 },
                             ),
@@ -287,20 +287,20 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                             TextButton(
                               child: Text('구매'),
                               onPressed: () {
-                                setState(() {
-                                  if (item.price < widget.user.currentPoint) {
-                                  widget.user.currentPoint -= item.price;
-                                  item.count++;
-                                  /*
-                                  ┌─────────────────────────────────────────────┐
-                                    firestore에 User 하위의 Item 정보 갱신 요청.
-                                    firestore에 User의 currentPoint 정보 갱신 요청.
-                                  └─────────────────────────────────────────────┘
-                                  */
-                                  }
-                                });
-                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                userSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
+                                if (item.price < widget.user.currentPoint) {
+                                  setState(() {
+                                    widget.user.currentPoint -= item.price;
+                                    item.count++;
+                                    /*
+                                    ┌─────────────────────────────────────────────┐
+                                      firestore에 User 하위의 Item 정보 갱신 요청.
+                                      firestore에 User의 currentPoint 정보 갱신 요청.
+                                    └─────────────────────────────────────────────┘
+                                    */ 
+                                  });
+                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                  userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
+                                }
                                 Navigator.pop(context);
                                 },
                             ),
@@ -467,8 +467,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                     └─────────────────────────────────────────────┘
                                     */
                                   });
+                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                  petSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.nowPet, widget.pet);
                                 }
-                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
                                 Navigator.pop(context);
                                 },
                             ),
@@ -604,7 +605,9 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                             TextButton(
                               child: Text('구매'),
                               onPressed: () {
-                                setState(() {
+                                if (item.price < widget.user.currentPoint) {
+                                  setState(() {
+                                  widget.user.currentPoint -= item.price;
                                   item.count++;
                                   /*
                                   ┌─────────────────────────────────────────────┐
@@ -612,8 +615,10 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                     firestore에 User의 currentPoint 정보 갱신 요청.
                                   └─────────────────────────────────────────────┘
                                   */
-                                });
-                                itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                  });
+                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                  userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
+                                }
                                 Navigator.pop(context);
                                 },
                             ),
@@ -777,7 +782,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                   setState(() {
                                     widget.user.setting['placeID'] = "assets/images/${item.name}.png";
                                   });                              
-                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                  userSavePlaceDB("HiHgtVpIvdyCZVtiFCOc", widget.user.setting['placeID']);
                                   Navigator.pop(context);
                                 },
                               ),
@@ -788,7 +793,6 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                       },
                       leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
                     ),
                   );
                 },
@@ -918,16 +922,19 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                 TextButton(
                                   child: Text('구매'),
                                   onPressed: () {
-                                    setState(() {
-                                      item.count++;
+                                    if (item.price < widget.user.currentPoint) {
+                                      setState(() {
+                                        widget.user.currentPoint -= item.price;
                                       /*
                                       ┌─────────────────────────────────────────────┐
                                         firestore에 User 하위의 Item 정보 갱신 요청.
                                         firestore에 User의 currentPoint 정보 갱신 요청.
                                       └─────────────────────────────────────────────┘
                                       */
-                                    });
-                                    itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                      });
+                                      itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
+                                      userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
+                                    }
                                     Navigator.pop(context);
                                     },
                                 ),
@@ -1008,7 +1015,7 @@ class ItemlistPage4 extends StatefulWidget {
 }
 
 class _ItemlistPage4State extends State<ItemlistPage4> {
-  String usedItem = "기본";
+  String usedItem = "prairie";
 
   @override
   Widget build(BuildContext context) {
@@ -1239,13 +1246,14 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                 TextButton(
                                   child: Text('구매'),
                                   onPressed: () {
-                                    if (item.count == 0) {
+                                    if (item.price < widget.user.currentPoint) {
                                       setState(() {
-                                        item.count++;
+                                        widget.user.currentPoint -= item.price;
                                       });
                                       itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                      Navigator.pop(context);
+                                      userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
                                     }
+                                    Navigator.pop(context);
                                   },
                                 ),
                               ],

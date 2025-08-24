@@ -279,13 +279,37 @@ Future<void> petSaveDB(String userID, String petID, Pets pet) async {
       );
 }
 
-Future<void> userSaveDB(String userID, int point) async {
+Future<void> petSaveStyleDB(String userID, String petID, String styleID) async {
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userID)
+      .collection('pets')
+      .doc(petID)
+      .update(
+        {
+          'styleID': styleID
+        },
+      );
+}
+
+Future<void> userSavePointDB(String userID, int point) async {
   await FirebaseFirestore.instance
       .collection('Users')
       .doc(userID)
       .update(
         {
           'currentPoint': point
+        },
+      );
+}
+
+Future<void> userSavePlaceDB(String userID, String placeID) async {
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(userID)
+      .update(
+        {
+          'placeID': placeID
         },
       );
 }
