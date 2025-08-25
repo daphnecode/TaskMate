@@ -1,24 +1,17 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'run_game.dart';
 
 class Background extends SpriteComponent {
-  final RunGame game;
-  Background(this.game, Sprite sprite) : super(
-    priority: -10,
-    position: Vector2.zero(),
-    sprite: sprite,
-    ); // 모든 컴포넌트 뒤에 그리기
+  Background() : super(anchor: Anchor.topLeft);
 
   @override
   Future<void> onLoad() async {
-    size = game.size; // 전체 화면 크기에 맞게
+    sprite = await Sprite.load('beach.png');
   }
 
-  @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    this.size = size; // 화면 크기 변경 시 크기 조정
+  void resize(Vector2 gameSize) {
+    size = gameSize;       // 화면 전체를 덮도록 크기 조정
+    position = Vector2.zero();
   }
 }
 

@@ -5,7 +5,7 @@ import 'obstacle.dart';
 
 class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   final RunGame game;
-  Dino(this.game, {required this.groundY}) : super(size: Vector2(128, 128), priority: 10);
+  Dino(this.game, {required this.groundY}) : super(size: Vector2(128, 128), priority: 10, anchor: Anchor.bottomLeft);
 
   double travelDistance = 0.0; // 진행 거리 (미터)
   double speed = 25;    // 초당 100미터 속도
@@ -14,7 +14,7 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   double gravity = 800; // 중력 (픽셀/초²)
   double jumpForce = -500; // 점프 시 초기 속도 (음수: 위로)
 
-  final double groundY;
+  double groundY;
 
   bool isJumping = false;
 
@@ -29,8 +29,16 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
         textureSize: Vector2(128, 128),
       ),
     );
-    position = Vector2(50, game.size.y - 128); // 바닥 위
+    
+    size = Vector2(128, 128);
+    
+
     add(RectangleHitbox());
+  }
+
+  void resize(Vector2 gameSize) {
+    size = Vector2.all(128) * (gameSize.y / 600); // 예: 기본 600px 기준 스케일
+    groundY = gameSize.y - size.y + 50;
   }
   
   @override
@@ -50,15 +58,16 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   @override
   void update(double dt) {
     super.update(dt);
-    // 점프, 중력 등 처리
-     y += velocityY * dt;
-
     // 중력 적용
     velocityY += gravity * dt;
+    // 점프, 중력 등 처리
+    position.y += velocityY * dt;
+
+    
 
     // 바닥에 도달하면 멈춤
-    if (y >= groundY) {
-      y = groundY;
+    if (position.y >= groundY) {
+      position.y = groundY;
       velocityY = 0;
       isJumping = false;
     }

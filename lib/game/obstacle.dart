@@ -5,8 +5,9 @@ import 'run_game.dart';
 
 class Obstacle extends SpriteComponent with CollisionCallbacks {
   final RunGame game;
+  final double groundY;
   final double speed;
-  Obstacle(this.game, {required this.speed})
+  Obstacle(this.game, {required this.groundY, required this.speed})
       : super(size: Vector2(32, 48)); // 선인장 등 크기 설정
 
   @override
@@ -19,7 +20,7 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
       upDown = 0;
     }
 
-    position = Vector2(game.size.x, game.size.y - size.y - upDown); // 오른쪽에서 시작
+    position = Vector2(game.size.x, groundY - upDown); // 오른쪽에서 시작
 
     add(RectangleHitbox());
   }
