@@ -5,7 +5,9 @@ import 'dino.dart';
 import 'background.dart';
 
 class RunGame extends FlameGame with HasCollisionDetection {
-  late Dino _dino;
+  Dino? _dino;
+  Background? background;
+  final List<Obstacle> obstacles = [];
   bool isGameRunning = false;
   double targetDistance = 0;
   late Timer obstacleTimer;
@@ -24,41 +26,54 @@ class RunGame extends FlameGame with HasCollisionDetection {
     groundY = size.y - 128;
     
     _dino = Dino(this, groundY: groundY)
-        ..y = groundY
+        ..y = 0
         ..x = 50;
-    add(_dino);
+    await add(_dino!);
     // add(Ground(this));
-    final bgSprite = await loadSprite('beach.png');
-    add(Background(this, bgSprite));
+    background = Background();
+    await add(background!);
 
     obstacleTimer = Timer(2, onTick: spawnObstacle, repeat: true);
     obstacleTimer.start();
   }
 
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    if (background != null) background!.resize(size);
+    if (_dino != null) _dino!.resize(size);
+    
+    for (final obstacle in obstacles) {
+      // 예: width와 height를 화면 크기에 비례
+      obstacle.resize(size);
+    }
+  }
+
   void spawnObstacle() {
-    final obstacle = Obstacle(this, speed: _currentSpeed);
+    final obstacle = Obstacle(this, groundY: groundY, speed: _currentSpeed);
+    obstacles.add(obstacle);
     add(obstacle);
   }
 
   void startGame(double distance) {
     targetDistance = distance;
     isGameRunning = true;
-    elapsedDistance = _dino.travelDistance;
+    elapsedDistance = _dino!.travelDistance;
     maxDistance = distance;
     
     // 예: dino 달리기 애니메이션 시작, 장애물 주기적 생성 등
-    _dino.run(); 
+    _dino!.run(); 
     // 장애물 타이머 등 추가 가능
   }
 
   void stopGame() {
     isGameRunning = false;
-    _dino.idle(); // 대기 상태로
+    _dino!.idle(); // 대기 상태로
     // 타이머 취소 등
   }
 
   void jump() {
-    _dino.jump();
+    _dino!.jump();
   }
 
   @override
@@ -66,12 +81,12 @@ class RunGame extends FlameGame with HasCollisionDetection {
     super.update(dt);
     if (!isGameRunning) return;
     // 진행 거리 체크 (예시)
-    _dino.travelDistance += _dino.speed * dt;
-    if (_dino.travelDistance >= targetDistance) {
+    _dino!.travelDistance += _dino!.speed * dt;
+    if (_dino!.travelDistance >= targetDistance) {
       stopGame();
       overlays.add('ClearPopup'); // 클리어 팝업
     }
-    elapsedDistance += _dino.speed * dt;
+    elapsedDistance += _dino!.speed * dt;
     
     _currentSpeed += _speedIncreaseRate * dt;
     obstacleTimer.update(dt);
@@ -84,6 +99,6 @@ class RunGame extends FlameGame with HasCollisionDetection {
   }
 
   double travel() {
-    return _dino.travelDistance;
+    return _dino!.travelDistance;
   }
 }

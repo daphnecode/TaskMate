@@ -5,23 +5,29 @@ import 'run_game.dart';
 
 class Obstacle extends SpriteComponent with CollisionCallbacks {
   final RunGame game;
+  final double groundY;
   final double speed;
-  Obstacle(this.game, {required this.speed})
-      : super(size: Vector2(32, 48)); // 선인장 등 크기 설정
+  late int upDown;
+  Obstacle(this.game, {required this.groundY, required this.speed})
+      : super(size: Vector2(32, 32)); // 선인장 등 크기 설정
 
   @override
   Future<void> onLoad() async {
     sprite = await game.loadSprite('dragon.png');
-    final int upDown;
     if (Random().nextInt(9) % 2 == 1) {
       upDown = 200;
     } else {
       upDown = 0;
     }
 
-    position = Vector2(game.size.x, game.size.y - size.y - upDown); // 오른쪽에서 시작
+    position = Vector2(game.size.x, groundY - upDown + 50); // 오른쪽에서 시작
 
     add(RectangleHitbox());
+  }
+
+  void resize(Vector2 gameSize) {
+    size = Vector2(gameSize.x * 0.05, gameSize.y * 0.05);
+    position.y = groundY - upDown + 50;
   }
 
   @override
