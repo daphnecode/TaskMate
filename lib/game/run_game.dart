@@ -45,10 +45,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
     
     for (final obstacle in obstacles) {
       // 예: width와 height를 화면 크기에 비례
-      obstacle.size = Vector2(size.x * 0.05, size.y * 0.1);
-
-      // x 위치는 그대로 두거나, 필요시 비율로 이동
-      obstacle.position.y = groundY - obstacle.size.y; // 바닥에 맞춤
+      obstacle.resize(size);
     }
   }
 
