@@ -54,49 +54,52 @@ class _RunGameScreenState extends State<RunGameScreen> {
           Expanded(
             flex: 6,
             child: 
-            Stack(
-              children: [
-                GameWidget(
-                  game: _game,
-                  overlayBuilderMap: {
-                    'ClearPopup': (context, _) => ClearPopup(
-                      onClose: () {
-                        _game.overlays.remove('ClearPopup');
-                        setState(() {
-                          _isPlaying = false;  // 다시 거리 버튼 보이도록
-                          widget.pet.happy += 10;
-                          widget.pet.hunger -= 10;
-                        });
-                        /*
-                        게임이 클리어 시, 
-                          펫의 행복도 증가.
-                          펫의 포만도 감소.
-                          로그 남기기.
-                          통계 변화.
-                        */
-                        Navigator.pop(context);
-                      },
-                    ),
-                    'FailPopup' : (context, _) => FailPopup(
-                      onClose: () {
-                        _game.overlays.remove('FailPopup');
-                        setState(() {
-                          _isPlaying = false; // 다시 거리 버튼 보이도록
-                        });
-                        Navigator.pop(context);
-                      },
-                    )
-                  },
-                  initialActiveOverlays: const [],
-                ),
-                Positioned(
-                  child: 
-                  ProgressBarOverlay(
-                    elapsedTime: _game.elapsedDistance,
-                    totalTime: _game.maxDistance,
+            AspectRatio(
+              aspectRatio: 1 / 1,
+              child: Stack(
+                children: [
+                  GameWidget(
+                    game: _game,
+                    overlayBuilderMap: {
+                      'ClearPopup': (context, _) => ClearPopup(
+                        onClose: () {
+                          _game.overlays.remove('ClearPopup');
+                          setState(() {
+                            _isPlaying = false;  // 다시 거리 버튼 보이도록
+                            widget.pet.happy += 10;
+                            widget.pet.hunger -= 10;
+                          });
+                          /*
+                          게임이 클리어 시, 
+                            펫의 행복도 증가.
+                            펫의 포만도 감소.
+                            로그 남기기.
+                            통계 변화.
+                          */
+                          Navigator.pop(context);
+                        },
+                      ),
+                      'FailPopup' : (context, _) => FailPopup(
+                        onClose: () {
+                          _game.overlays.remove('FailPopup');
+                          setState(() {
+                            _isPlaying = false; // 다시 거리 버튼 보이도록
+                          });
+                          Navigator.pop(context);
+                        },
+                      )
+                    },
+                    initialActiveOverlays: const [],
                   ),
-                )
-              ],
+                  Positioned(
+                    child: 
+                    ProgressBarOverlay(
+                      elapsedTime: _game.elapsedDistance,
+                      totalTime: _game.maxDistance,
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
 

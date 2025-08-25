@@ -28,7 +28,8 @@ class RunGame extends FlameGame with HasCollisionDetection {
         ..x = 50;
     add(_dino);
     // add(Ground(this));
-    add(Background(this));
+    final bgSprite = await loadSprite('beach.png');
+    add(Background(this, bgSprite));
 
     obstacleTimer = Timer(2, onTick: spawnObstacle, repeat: true);
     obstacleTimer.start();
