@@ -221,10 +221,15 @@ class _PetmainState extends State<Petmain> {
                                               },
                                               soundEffectsOn: widget.soundEffectsOn,
                                               pet: widget.pet,
-                                            )),
-                                          ).then((value) {
-                                            setState(() {
-                                            });
+                                              uid: 'HiHgtVpIvdyCZVtiFCOc',
+                                              petId: widget.user.nowPet,
+                                            ),
+                                            ),
+                                          ).then((changed) {
+                                            if(changed == true){
+                                              setState(() {
+                                              });
+                                            }
                                           });
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -240,10 +245,10 @@ class _PetmainState extends State<Petmain> {
                                           backgroundColor: Colors.blueAccent,
                                           radius: 35,
                                           child: Image.asset(
-                                            "assets/icons/icon-raceflag.png", 
+                                            "assets/icons/icon-raceflag.png",
                                             fit: BoxFit.fill, width: 50, height: 50
                                           ),
-                                        ), 
+                                        ),
                                       ),
                                     ],
                                   )

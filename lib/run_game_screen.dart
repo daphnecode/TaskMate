@@ -6,12 +6,22 @@ import 'package:taskmate/game/background.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'main.dart';
 import 'object.dart';
+import 'package:taskmate/DBtest/firestore_service.dart';
 
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
   final bool soundEffectsOn;
   final Pets pet;
-  const RunGameScreen({super.key, required this.onNext, required this.soundEffectsOn, required this.pet});
+  final String uid;
+  final String petId;
+
+  const RunGameScreen({super.key,
+    required this.onNext,
+    required this.soundEffectsOn,
+    required this.pet,
+    required this.uid,
+    required this.petId,
+  });
 
   @override
   State<RunGameScreen> createState() => _RunGameScreenState();
@@ -20,6 +30,10 @@ class RunGameScreen extends StatefulWidget {
 class _RunGameScreenState extends State<RunGameScreen> {
   final RunGame _game = RunGame();
   bool _isPlaying = false;
+
+  //중복 보상 방지
+  bool _rewardApplied = false;
+
 
   @override
   void initState() {
@@ -62,33 +76,42 @@ class _RunGameScreenState extends State<RunGameScreen> {
                     game: _game,
                     overlayBuilderMap: {
                       'ClearPopup': (context, _) => ClearPopup(
-                        onClose: () {
+                        onClose: () async {
+                          if (_rewardApplied) return; // ✅ 두 번 실행 방지
+                          _rewardApplied = true;
+
                           _game.overlays.remove('ClearPopup');
-                          setState(() {
-                            _isPlaying = false;  // 다시 거리 버튼 보이도록
-                            widget.pet.happy += 10;
-                            widget.pet.hunger -= 10;
-                          });
-                          /*
-                          게임이 클리어 시, 
-                            펫의 행복도 증가.
-                            펫의 포만도 감소.
-                            로그 남기기.
-                            통계 변화.
-                          */
-                          Navigator.pop(context);
-                        },
-                      ),
-                      'FailPopup' : (context, _) => FailPopup(
-                        onClose: () {
-                          _game.overlays.remove('FailPopup');
+
+
+                          // 1) 로컬 반영 (즉시 체감)
                           setState(() {
                             _isPlaying = false; // 다시 거리 버튼 보이도록
+                            widget.pet.happy =
+                                (widget.pet.happy + 10).clamp(0, 100);
+                            widget.pet.hunger =
+                                (widget.pet.hunger - 10).clamp(0, 100);
                           });
-                          Navigator.pop(context);
+
+                          // 2) DB 반영
+                          try {
+                            await petSaveDB(widget.uid, widget.petId, widget.pet);
+                          } catch (e) {
+
+                          }
+
+                          // 3) 부모에 변경 신호(true) 주고 닫기
+                          if (mounted) Navigator.pop(context, true);
                         },
-                      )
+                      ),
+                      'FailPopup': (context, _) => FailPopup(
+                        onClose: () {
+                          _game.overlays.remove('FailPopup');
+                          setState(() => _isPlaying = false);
+                          Navigator.pop(context, false);
+                        },
+                      ),
                     },
+
                     initialActiveOverlays: const [],
                   ),
                   Positioned(
