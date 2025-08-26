@@ -13,7 +13,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_page.dart';
 import 'login_page.dart';
 
 void main() async {
@@ -117,7 +116,15 @@ class RootState extends State<Root> {
             return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
           if (snapshot.hasData) {
-            return HomePage(user: snapshot.data!);
+            return MyHomePage(
+              title: 'Virtual Pet',
+              user: user,
+              onDarkModeChanged: toggleDarkMode,
+              onPushChanged: togglePushNotification,
+              onSortingChanged: toggleSortingMethod,
+              onSoundEffectsChanged: toggleSoundEffects,
+              onPointsAdded:_onPointsAdded,
+            );
           }
           return const LoginPage();
         },
