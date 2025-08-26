@@ -1,5 +1,4 @@
 // src/index.ts
-import * as admin from "firebase-admin";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { db } from "../firebase";
 
