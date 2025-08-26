@@ -43,15 +43,17 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         
         const newHunger = Math.max(0, petHunger - 2);
         const newHappy = Math.max(0, petHappy - 2);
+        let updates: any = { hunger: newHunger, happy: newHappy };
 
         // 4. 상태 업데이트
-        if (petHappy < 2) {
-          const newExp = Math.max(0, petExp + petHappy - 2);
-          await petRef.set({ hunger: newHunger, happy: newHappy, currentExp: newExp }, { merge: true });
+        if (newHappy === 0) {
+          const lostHappy = petHappy - newHappy;
+          const newExp = Math.max(0, petExp - lostHappy);
+          updates.currentExp = newExp;
         }
-        else {
-          await petRef.set({ hunger: newHunger, happy: newHappy }, { merge: true });
-        }
+        
+        await petRef.set(updates, { merge: true });
+        
 
         console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updateStatus);
       }
