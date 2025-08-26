@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
 class StatisticsPage extends StatefulWidget {
@@ -11,23 +12,21 @@ class StatisticsPage extends StatefulWidget {
 }
 
 class _StatisticsPageState extends State<StatisticsPage> {
-  final String userId = "HiHgtVpIvdyCZVtiFCOc"; // TODO: Firebase Auth 연동 시 교체
   bool isLoading = true;
 
-  int totalCompleted = 0;              // ✅ stats/summary에서 읽음
-  int streakDays = 0;                  // ✅ stats/summary에서 읽음
-  double weeklyAchievementRate = 0;    // ✅ 최근 8주 로그로 계산
-  int visitedDays = 0;                 // ✅ 최근 8주 로그로 계산
-  Map<String, double> weeklyData = {}; // ✅ 최근 8주 로그로 계산
+  // 요약값(Users/{uid}/stats/summary)
+  int totalCompleted = 0;
+  int streakDays = 0;
 
-  // 날짜 헬퍼
-  DateTime onlyDate(DateTime d) => DateTime(d.year, d.month, d.day);
-  String ymd(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
+  // 최근 4주 뷰 지표(Users/{uid}/log)
+  double weeklyAchievementRate = 0; // 이번 주 달성률(%)
+  int visitedDays = 0;              // 최근 8주 중 방문일수(참고)
+  Map<String, double> weeklyData = {}; // 파이차트용(최근 4주만)
 
-  //  KST 고정 헬퍼 추가 (기기 설정에 따라 UTC로 인식되는 것 방지)
-  DateTime kstNow() => DateTime.now().toUtc().add(const Duration(hours: 9));
-  DateTime onlyDateKST(DateTime d) => DateTime(d.year, d.month, d.day);
-  String ymdKST(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
+  // ── Time helpers (KST 기준)
+  DateTime _kstNow() => DateTime.now().toUtc().add(const Duration(hours: 9));
+  DateTime _onlyDate(DateTime d) => DateTime(d.year, d.month, d.day);
+  String _ymd(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
 
   @override
   void initState() {
@@ -35,17 +34,26 @@ class _StatisticsPageState extends State<StatisticsPage> {
     _loadStatistics();
   }
 
-  // didChangeDependencies()는 중복 호출 될 수 있어 제거
-
   Future<void> _loadStatistics() async {
     setState(() => isLoading = true);
 
     try {
-      final userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) {
+        // 로그인 전 접근 보호
+        setState(() => isLoading = false);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그인 후 이용할 수 있습니다.')),
+        );
+        return;
+      }
 
-      // 1) summary에서 핵심 값(총 완료 수, 스트릭) 먼저 로드
-      final summaryRef = userRef.collection('stats').doc('summary');
-      final summarySnap = await summaryRef.get();
+      final userRef = FirebaseFirestore.instance.collection('Users').doc(uid);
+
+      // 1) summary(요약) 값 읽기: totalCompleted, streakDays
+      final summarySnap =
+      await userRef.collection('stats').doc('summary').get();
       int sumTotal = 0;
       int sumStreak = 0;
       if (summarySnap.exists) {
@@ -54,13 +62,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
         sumStreak = (data['streakDays'] ?? 0) as int;
       }
 
-      // 2) 최근 8주 로그만 로드해서 뷰 지표 계산
-      final today = onlyDateKST(kstNow()); // KST
-      final start = onlyDate(today.subtract(const Duration(days: 56)));
-      final startStr = ymd(start);
-      final endStr = ymd(today);
+      // 2) 최근 8주 로그 로드 후 파생지표 계산
+      final todayKST = _onlyDate(_kstNow());
+      final start = _onlyDate(todayKST.subtract(const Duration(days: 56)));
+      final startStr = _ymd(start);
+      final endStr = _ymd(todayKST);
 
-      // 문서 ID가 'YYYY-MM-DD' 형식이라는 전제
       final logsSnap = await userRef
           .collection('log')
           .orderBy(FieldPath.documentId)
@@ -70,16 +77,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
       int visitedCount = 0;
       int weekCompleted = 0, weekTotal = 0;
-      Map<String, double> weekData = {};
+      final Map<String, double> weekData = {};
 
-      // 이번 주 범위
-      final weekStart = onlyDateKST(today.subtract(Duration(days: today.weekday - 1))); // Mon
-      final weekEnd = onlyDateKST(weekStart.add(const Duration(days: 6)));              // Sun
+      // 이번 주 범위(Mon~Sun)
+      final weekStart =
+      _onlyDate(todayKST.subtract(Duration(days: todayKST.weekday - 1)));
+      final weekEnd = _onlyDate(weekStart.add(const Duration(days: 6)));
 
       for (final doc in logsSnap.docs) {
         final data = doc.data();
-        final date = onlyDateKST(DateFormat('yyyy-MM-dd').parse(doc.id)); // KST로 취급
-
+        // 문서 id = 'YYYY-MM-DD'
+        final date = _onlyDate(DateFormat('yyyy-MM-dd').parse(doc.id));
 
         final completed = (data['completedCount'] ?? 0) as int;
         final total = (data['totalTasks'] ?? 0) as int;
@@ -87,28 +95,44 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
         if (visited) visitedCount++;
 
+        // 이번 주 달성률 계산용
         if (!date.isBefore(weekStart) && !date.isAfter(weekEnd)) {
           weekCompleted += completed;
           weekTotal += total;
         }
 
-        // 파이차트용 주간 버킷
-        final ws = onlyDate(date.subtract(Duration(days: date.weekday - 1)));
-        final we = onlyDate(ws.add(const Duration(days: 6)));
-        final key = "${DateFormat('M/d').format(ws)}~${DateFormat('M/d').format(we)}";
+        // 파이차트: 주간 버킷 누적
+        final ws = _onlyDate(date.subtract(Duration(days: date.weekday - 1))); // Mon
+        final we = _onlyDate(ws.add(const Duration(days: 6)));                 // Sun
+        final key =
+            "${DateFormat('M/d').format(ws)}~${DateFormat('M/d').format(we)}";
         weekData[key] = (weekData[key] ?? 0) + completed.toDouble();
       }
 
+      // 🔹 파이차트에는 "최근 4주만" 남기기
+      // key는 "M/d~M/d" 형식. 시작일 쪽(M/d)을 DateTime으로 변환해 정렬 후 최근 4개만 유지.
+      DateTime _parseRangeStart(String k) =>
+          DateFormat('M/d').parse(k.split('~').first);
+      final sortedKeys = weekData.keys.toList()
+        ..sort((a, b) => _parseRangeStart(a).compareTo(_parseRangeStart(b)));
+      final last4Keys = sortedKeys.length > 4
+          ? sortedKeys.sublist(sortedKeys.length - 4)
+          : sortedKeys;
+      final Map<String, double> filteredLast4 = {
+        for (final k in last4Keys) k: weekData[k]!,
+      };
+
       if (!mounted) return;
       setState(() {
-        // ✅ 요약값은 summary 우선
+        // summary 우선값
         totalCompleted = sumTotal;
         streakDays = sumStreak;
 
-        // ✅ 최근 8주 기반 뷰 지표
+        // 최근 로그 기반 뷰 값
         visitedDays = visitedCount;
-        weeklyAchievementRate = weekTotal == 0 ? 0 : (weekCompleted / weekTotal * 100);
-        weeklyData = weekData.isEmpty ? {"데이터 없음": 1} : weekData;
+        weeklyAchievementRate =
+        weekTotal == 0 ? 0 : (weekCompleted / weekTotal * 100);
+        weeklyData = filteredLast4.isEmpty ? {"데이터 없음": 1} : filteredLast4;
 
         isLoading = false;
       });
@@ -116,6 +140,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
       if (!mounted) return;
       setState(() => isLoading = false);
       
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('통계를 불러오지 못했습니다: $e')),
+      );
     }
   }
 
@@ -150,23 +177,26 @@ class _StatisticsPageState extends State<StatisticsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 StatCard(
-                  title: '주간 달성률',
+                  title: '이번 주 달성률',
                   value: '${weeklyAchievementRate.toStringAsFixed(1)}%',
                 ),
-                StatCard(title: '접속 일수', value: '$visitedDays'),
+                StatCard(title: '접속 일수(최근 8주)', value: '$visitedDays'),
               ],
             ),
             const SizedBox(height: 20),
             Expanded(
               child: Card(
                 color: Theme.of(context).cardColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("가장 바빴던 주", style: Theme.of(context).textTheme.bodyLarge),
+                      Text("가장 바빴던 주(최근 4주)", // 제목 명확화
+                          style: Theme.of(context).textTheme.bodyLarge),
                       const SizedBox(height: 8),
                       Expanded(
                         child: PieChart(
@@ -181,7 +211,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           chartValuesOptions: const ChartValuesOptions(
                             showChartValues: true,
                             showChartValuesInPercentage: false,
-                            decimalPlaces: 0, // 소수점 0자리
+                            decimalPlaces: 0,
                           ),
                         ),
                       ),

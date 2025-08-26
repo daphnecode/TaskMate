@@ -3,22 +3,22 @@ import 'DBtest/task.dart';
 import 'daily_edit.dart';
 import 'DBtest/firestore_service.dart';
 
-
-//위젯
+// 위젯
 import 'package:taskmate/widgets/repeat_edit_box.dart';
 import 'package:taskmate/widgets/today_edit_box.dart';
 
-class PlannerEditPage extends StatefulWidget {
+import 'package:firebase_auth/firebase_auth.dart';
 
+class PlannerEditPage extends StatefulWidget {
   final VoidCallback onBackToMain;
   final void Function(int) onNext;
   final List<Task> repeatTaskList;
   final List<Task> todayTaskList;
-  final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList) onUpdateTasks;
+  final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList)
+  onUpdateTasks;
   final Map<String, List<Task>> dailyTaskMap;
   final DateTime selectedDate;
   final void Function(Map<String, List<Task>>) onDailyMapChanged;
-
 
   const PlannerEditPage({
     required this.onNext,
@@ -29,46 +29,62 @@ class PlannerEditPage extends StatefulWidget {
     required this.dailyTaskMap,
     required this.selectedDate,
     required this.onDailyMapChanged,
-    super.key});
+    super.key,
+  });
 
   @override
   _PlannerEditPageState createState() => _PlannerEditPageState();
 }
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
-  final String userId = "HiHgtVpIvdyCZVtiFCOc";
+  // ❌ 기존: final String userId = "HiHgtVpIvdyCZVtiFCOc";
+  // ✅ 변경: 로그인한 사용자 uid로 런타임에 초기화
+  late final String userId;
 
   String _dateKey(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
-
 
   late List<Task> repeatTaskList;
   late List<Task> todayTaskList;
   late DateTime selectedDate;
   late Map<String, List<Task>> dailyTaskMap;
 
-  bool showFullRepeat =false;
+  bool showFullRepeat = false;
   bool showFullToday = false;
 
   @override
   void initState() {
-    super.initState(); // 부모 위젯으로부터 전달받은 리스트 복사
+    super.initState();
+
+    // ✅ 로그인한 사용자 uid 고정
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      // 이 화면은 로그인 후에만 들어오므로 거의 발생하지 않지만 방어 로직
+      // uid가 없으면 그냥 뒤로 보내버림
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.of(context).pop();
+      });
+      return;
+    }
+    userId = uid;
+
+    // 부모 위젯에서 받은 상태 복사
     repeatTaskList = List.from(widget.repeatTaskList);
     todayTaskList = List.from(widget.todayTaskList);
-    selectedDate =widget.selectedDate;
-    dailyTaskMap =  Map<String, List<Task>>.from(widget.dailyTaskMap);
+    selectedDate = widget.selectedDate;
+    dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
   }
-
 
   void updateTasks(int type, List<Task> newTasks) {
     setState(() {
       if (type == 0) {
+        // type == 0 : 반복 리스트
         repeatTaskList = newTasks;
-  } // type == 0 : 반복 리스트
-      else if (type == 1) {
+      } else if (type == 1) {
+        // type == 1 : 일일 리스트
         todayTaskList = newTasks;
-  } // type == 1 : 일일 리스트
+      }
     });
   }
 
@@ -97,13 +113,12 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(actions: [
         IconButton(
-          icon: Icon(Icons.calendar_today),
+          icon: const Icon(Icons.calendar_today),
           onPressed: () async {
             // 🔹 현재 데이터 저장
             await saveCurrentTasks();
@@ -165,7 +180,8 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             children: [
               RepeatEditBox(
                 taskList: repeatTaskList,
-                onTaskListUpdated: (updated) => updateTasks(0, updated),
+                onTaskListUpdated: (updated) =>
+                    updateTasks(0, updated),
                 onExpand: () {
                   setState(() {
                     showFullRepeat = true;
@@ -174,7 +190,8 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
               ),
               TodayEditBox(
                 taskList: todayTaskList,
-                onTaskListUpdated: (updated) => updateTasks(1, updated),
+                onTaskListUpdated: (updated) =>
+                    updateTasks(1, updated),
                 onExpand: () {
                   setState(() {
                     showFullToday = true;
@@ -186,30 +203,29 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
           ),
         ),
       ),
-
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).cardColor,
         elevation: 0,
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Builder(
                 builder: (context) => IconButton(
-                  icon: Icon(Icons.calendar_month),
-                  onPressed: () => saveAndNavigate(1),// 플래너 메인으로
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () => saveAndNavigate(1), // 플래너 메인으로
                 ),
-
               ),
               IconButton(
-                icon: Icon(Icons.home),
-                onPressed: () => saveAndNavigate(0), // 펫 메인화면(홈)으로
+                icon: const Icon(Icons.home),
+                onPressed: () => saveAndNavigate(0), // 펫 메인(홈)으로
               ),
               IconButton(
-                icon: Icon(Icons.settings),
-                onPressed: () {widget.onNext(6);
-                  },
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  widget.onNext(6);
+                },
               ),
             ],
           ),
@@ -218,4 +234,3 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     );
   }
 }
-

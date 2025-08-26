@@ -6,29 +6,24 @@ import 'statistics.dart';
 import 'DBtest/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-
-
-
-//위젯
+// 위젯
 import 'package:taskmate/widgets/date_badge.dart';
 import 'package:taskmate/widgets/repeat_task_box.dart';
 import 'package:taskmate/widgets/today_task_box.dart';
-
 
 class PlannerMain extends StatefulWidget {
   final void Function(int) onNext;
   final String sortingMethod;
   final void Function(int delta)? onPointsAdded;
 
-  const PlannerMain(
-      {
-        required this.onNext,
-        required this.sortingMethod,
-        this.onPointsAdded,
-        super.key
-      }
-    );
+  const PlannerMain({
+    required this.onNext,
+    required this.sortingMethod,
+    this.onPointsAdded,
+    super.key,
+  });
 
   @override
   State<PlannerMain> createState() => _PlannerMainState();
@@ -39,17 +34,17 @@ class _PlannerMainState extends State<PlannerMain> {
   Map<String, List<Task>> dailyTaskMap = {};
   late DateTime selectedDate;
 
-
   bool showFullRepeat = false;
   bool showFullToday = false;
   bool _isSubmitted = false;
   bool _submitting = false;
 
-  String userId = "HiHgtVpIvdyCZVtiFCOc";
+  // 기존: String userId = "HiHgtVpIvdyCZVtiFCOc";
+  //  변경: 로그인한 사용자의 uid로 런타임에 초기화
+  late final String userId;
 
   String _dateKey(DateTime date) {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day
-        .toString().padLeft(2, '0')}";
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
   void toggleCheck(List<Task> tasklist, int index) {
@@ -58,7 +53,7 @@ class _PlannerMainState extends State<PlannerMain> {
         isChecked: !tasklist[index].isChecked,
       );
     });
-    _autoSave(); // Firestore에 바로 저장
+    _autoSave();
   }
 
   void toggleEditingMode(List<Task> taskList) {
@@ -77,30 +72,41 @@ class _PlannerMainState extends State<PlannerMain> {
         isEditing: false,
       );
     });
-    _autoSave(); // Firestore에 바로 저장
+    _autoSave();
   }
 
-  // Firestore 저장 함수
   void _autoSave() {
     final dateKey = _dateKey(selectedDate);
-    updateTasksToFirestore(userId, dateKey, todayTaskList); // 일일 리스트 저장
-    updateRepeatTasks(userId, repeatTaskList); // 반복 리스트 저장
+    updateTasksToFirestore(userId, dateKey, todayTaskList);
+    updateRepeatTasks(userId, repeatTaskList);
   }
 
   DateTime getKstNow() {
-    return DateTime.now().toUtc().add(const Duration(hours: 9)); // 한국 시간
+    return DateTime.now().toUtc().add(const Duration(hours: 9));
   }
 
   int _calcEarnedPointsForToday() {
     int sum = 0;
-    for (final t in todayTaskList) { if (t.isChecked) sum += (t.point ?? 0); }
-    for (final t in repeatTaskList) { if (t.isChecked) sum += (t.point ?? 0); }
+    for (final t in todayTaskList) {
+      if (t.isChecked) sum += (t.point ?? 0);
+    }
+    for (final t in repeatTaskList) {
+      if (t.isChecked) sum += (t.point ?? 0);
+    }
     return sum;
   }
 
   @override
   void initState() {
     super.initState();
+
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      return;
+    }
+    userId = uid;
+
     selectedDate = getKstNow();
     final dateKey = _dateKey(selectedDate);
 
@@ -133,7 +139,8 @@ class _PlannerMainState extends State<PlannerMain> {
 
   @override
   Widget build(BuildContext context) {
-    selectedDate = getKstNow(); // 항상 최신 날짜로 갱신
+    selectedDate = getKstNow();
+
     if (isEditMode) {
       return PlannerEditPage(
         onNext: widget.onNext,
@@ -153,7 +160,7 @@ class _PlannerMainState extends State<PlannerMain> {
 
             isEditMode = false;
           });
-          _autoSave(); // 편집 후 Firestore 바로 저장
+          _autoSave();
         },
         onBackToMain: () {
           setState(() {
@@ -170,24 +177,22 @@ class _PlannerMainState extends State<PlannerMain> {
       );
     }
 
-    // MaterialApp 없애고 Scaffold만 남김
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
         leading: Builder(
-          builder: (context) =>
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const StatisticsPage(),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.pie_chart),
-              ),
+          builder: (context) => IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const StatisticsPage(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.pie_chart),
+          ),
         ),
         title: const DateBadge(),
         centerTitle: true,
@@ -211,19 +216,27 @@ class _PlannerMainState extends State<PlannerMain> {
                           setState(() => _submitting = true);
 
                           try {
-                            await submitTasksToFirestore(userId, dateKey, todayTaskList, repeatTaskList); //플래너 내용 저장
-                            final earned = _calcEarnedPointsForToday(); // 오늘 얻은 포인트 계산
+                            await submitTasksToFirestore(
+                                userId, dateKey, todayTaskList, repeatTaskList);
+                            final earned = _calcEarnedPointsForToday();
                             final functions = FirebaseFunctions.instance;
-                            final callable = functions.httpsCallable('submitReward');
+                            final callable =
+                            functions.httpsCallable('submitReward');
+
                             if (earned > 0) {
-                              widget.onPointsAdded?.call(earned); // 로컬 즉시 반영
+                              widget.onPointsAdded?.call(earned); // 로컬 반영
                               try {
-                                await callable.call({'uid': userId, 'earned': earned, 'dateKey': dateKey});
+                                await callable.call({
+                                  'uid': userId,
+                                  'earned': earned,
+                                  'dateKey': dateKey
+                                });
                               } catch (e) {
-                                widget.onPointsAdded?.call(-earned); // 실패 시 되돌리기
+                                widget.onPointsAdded?.call(-earned); // 실패 시 롤백
                                 rethrow;
                               }
                             }
+
                             setState(() => _isSubmitted = true);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("제출 완료!")),
@@ -231,7 +244,8 @@ class _PlannerMainState extends State<PlannerMain> {
                           } catch (e) {
                             showDialog(
                               context: context,
-                              builder: (_) => AlertDialog(content: Text(e.toString())),
+                              builder: (_) =>
+                                  AlertDialog(content: Text(e.toString())),
                             );
                           }
                         },
@@ -248,9 +262,7 @@ class _PlannerMainState extends State<PlannerMain> {
                 },
               );
             },
-            child: const Text(
-              '제출',
-            ),
+            child: const Text('제출'),
           ),
         ],
       ),
@@ -316,8 +328,7 @@ class _PlannerMainState extends State<PlannerMain> {
                   showFullRepeat = true;
                 });
               },
-              onEditPoints: () =>
-                  toggleEditingMode(repeatTaskList),
+              onEditPoints: () => toggleEditingMode(repeatTaskList),
               onEditPoint: (index, newPoint) =>
                   updatePoint(repeatTaskList, index, newPoint),
               onStartEditing: (index) {
@@ -343,8 +354,7 @@ class _PlannerMainState extends State<PlannerMain> {
                   showFullToday = true;
                 });
               },
-              onEditPoints: () =>
-                  toggleEditingMode(todayTaskList),
+              onEditPoints: () => toggleEditingMode(todayTaskList),
               onEditPoint: (index, newPoint) =>
                   updatePoint(todayTaskList, index, newPoint),
               onStartEditing: (index) {

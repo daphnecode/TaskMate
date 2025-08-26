@@ -4,33 +4,27 @@ import 'petmain.dart';
 import 'object.dart';
 import 'package:taskmate/utils/icon_utis.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 
 String nameChange(String name) {
   String result;
   switch (name) {
     case "assets/images/prairie.png":
       result = "prairie";
-      return result;
     case "assets/images/beach.png":
       result = "beach";
-      return result;
     case "assets/images/forest.png":
       result = "forest";
-      return result;
     case "assets/images/cloud.png":
       result = "cloud";
-      return result;
     case "assets/images/volcano.png":
       result = "volcano";
-      return result;
     case "assets/images/nightcity.png":
       result = "nightcity";
-      return result;
     default:
       result = "assets/images/prairie.png";
-      return result;
   }
+  return result;
 }
 
 class ItemlistPage1 extends StatefulWidget {
@@ -41,11 +35,11 @@ class ItemlistPage1 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage1({
-    required this.onNext, 
-    required this.pet, 
-    required this.user, 
-    required this.pageType, 
-    required this.isUseItem, 
+    required this.onNext,
+    required this.pet,
+    required this.user,
+    required this.pageType,
+    required this.isUseItem,
     required this.inventory,
     super.key});
 
@@ -58,52 +52,52 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
   Widget build(BuildContext context) {
     if (widget.isUseItem) {
       return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child:Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/icon-list-alt.png", 
-                    width: 30, height: 30,
-                  ),
-                  SizedBox(width: 10.0,),
-                  Text("창고 - 음식", 
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                ],
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               ),
             ),
-          ), // Placeholder for Mainareaaceholder for Mainarea
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
+            Expanded(
+              flex: 1,
+              child:Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(8.0),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/icon-list-alt.png",
+                      width: 30, height: 30,
+                    ),
+                    SizedBox(width: 10.0,),
+                    Text("창고 - 음식",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                itemCount: widget.inventory.length,
-                itemBuilder: (context, index) {
-                  final item = widget.inventory[index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
+                  itemCount: widget.inventory.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.inventory[index];
+                    return ListTile(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Center(child: Text(item.name)),
+                            content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 getThemedIcon(
@@ -120,55 +114,52 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text(item.itemText, 
-                                style: TextStyle(fontSize: 16)),
+                                Text(item.itemText,
+                                    style: TextStyle(fontSize: 16)),
                               ],
                             ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () {
-                                Navigator.pop(context);
+                            actions: [
+                              TextButton(
+                                child: Text('취소'),
+                                onPressed: () {
+                                  Navigator.pop(context);
                                 },
-                            ),
-                            TextButton(
-                              child: Text('사용'),
-                              onPressed: () {
-                                if(item.count > 0) {
-                                  setState(() {
-                                    item.count--;
-                                    widget.pet.hunger += item.hunger;
-                                    widget.pet.happy += item.happy;
-                                    /*
-                                    ┌─────────────────────────────────────────────┐
-                                      firestore에 User 하위의 Pet 정보 갱신 요청.
-                                      firestore에 User의 statistics 정보 갱신 요청.
-                                      firestore에 User 하위의 Item 정보 갱신 요청.
-                                    └─────────────────────────────────────────────┘
-                                    */
-                                  });
-                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                  petSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.nowPet, widget.pet);
-                                }
-                                Navigator.pop(context);
+                              ),
+                              TextButton(
+                                child: Text('사용'),
+                                onPressed: () async {
+                                  if(item.count > 0) {
+                                    setState(() {
+                                      item.count--;
+                                      widget.pet.hunger += item.hunger;
+                                      widget.pet.happy += item.happy;
+                                    });
+                                    // ✅ 현재 로그인한 사용자 uid 사용
+                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    if (uid != null) {
+                                      await itemSaveDB(uid, item.name, item);
+                                      await petSaveDB(uid, widget.user.nowPet, widget.pet);
+                                    }
+                                  }
+                                  Navigator.pop(context);
                                 },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: getThemedIcon(context, item.icon, width: 30, height: 30),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
-                  );
-                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                      title: Text(item.name, style: TextStyle(fontSize: 18)),
+                      trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -195,7 +186,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                   onPressed: () {
                     Navigator.pop(context);
                     widget.onNext(6);
-                    },
+                  },
                 ),
               ],
             ),
@@ -205,60 +196,60 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
     }
     else {
       return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/icon-store.png", 
-                    width: 30, height: 30,
-                  ),
-                  SizedBox(width: 10.0,),
-                  Text("상점 - 음식", 
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      child: Text("${widget.user.currentPoint}pt", 
-                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               ),
             ),
-          ), // Placeholder for Mainarea
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
+            Expanded(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(8.0),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/icon-store.png",
+                      width: 30, height: 30,
+                    ),
+                    SizedBox(width: 10.0,),
+                    Text("상점 - 음식",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.centerRight,
+                        child: Text("${widget.user.currentPoint}pt",
+                          style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                itemCount: widget.inventory.length,
-                itemBuilder: (context, index) {
-                  final item = widget.inventory[index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
+                  itemCount: widget.inventory.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.inventory[index];
+                    return ListTile(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Center(child: Text(item.name)),
+                            content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 getThemedIcon(
@@ -275,51 +266,49 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text('가격은 ${item.price}pt입니다.', 
-                                style: TextStyle(fontSize: 16)),
+                                Text('가격은 ${item.price}pt입니다.',
+                                    style: TextStyle(fontSize: 16)),
                               ],
                             ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('구매'),
-                              onPressed: () {
-                                if (item.price < widget.user.currentPoint) {
-                                  setState(() {
-                                    widget.user.currentPoint -= item.price;
-                                    item.count++;
-                                    /*
-                                    ┌─────────────────────────────────────────────┐
-                                      firestore에 User 하위의 Item 정보 갱신 요청.
-                                      firestore에 User의 currentPoint 정보 갱신 요청.
-                                    └─────────────────────────────────────────────┘
-                                    */ 
-                                  });
-                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                  userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
-                                }
-                                Navigator.pop(context);
+                            actions: [
+                              TextButton(
+                                child: Text('취소'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              TextButton(
+                                child: Text('구매'),
+                                onPressed: () async {
+                                  if (item.price < widget.user.currentPoint) {
+                                    setState(() {
+                                      widget.user.currentPoint -= item.price;
+                                      item.count++;
+                                    });
+                                    // ✅ 현재 로그인한 사용자 uid 사용
+                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    if (uid != null) {
+                                      await itemSaveDB(uid, item.name, item);
+                                      await userSavePointDB(uid, widget.user.currentPoint);
+                                    }
+                                  }
+                                  Navigator.pop(context);
                                 },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: getThemedIcon(context, item.icon, width: 30, height: 30),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
-                  );
-                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                      title: Text(item.name, style: TextStyle(fontSize: 18)),
+                      trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -346,7 +335,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                   onPressed: () {
                     Navigator.pop(context);
                     widget.onNext(6);
-                    },
+                  },
                 ),
               ],
             ),
@@ -365,11 +354,11 @@ class ItemlistPage2 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage2({
-    required this.onNext, 
-    required this.pet, 
-    required this.user, 
-    required this.pageType, 
-    required this.isUseItem, 
+    required this.onNext,
+    required this.pet,
+    required this.user,
+    required this.pageType,
+    required this.isUseItem,
     required this.inventory,
     super.key});
 
@@ -382,52 +371,52 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
   Widget build(BuildContext context) {
     if (widget.isUseItem) {
       return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/icon-list-alt.png", 
-                    width: 30, height: 30,
-                  ),
-                  SizedBox(width: 10.0,),
-                  Text("창고 - 장난감", 
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                ],
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               ),
             ),
-          ), // Placeholder for Mainarea
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: widget.inventory.length,
-                itemBuilder: (context, index) {
-                  final item = widget.inventory[index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
+            Expanded(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(8.0),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/icon-list-alt.png",
+                      width: 30, height: 30,
+                    ),
+                    SizedBox(width: 10.0,),
+                    Text("창고 - 장난감",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView.builder(
+                  itemCount: widget.inventory.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.inventory[index];
+                    return ListTile(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Center(child: Text(item.name)),
+                            content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 getThemedIcon(
@@ -443,52 +432,49 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text(item.itemText, 
-                                style: TextStyle(fontSize: 16)),
+                                Text(item.itemText,
+                                    style: TextStyle(fontSize: 16)),
                               ],
                             ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('사용'),
-                              onPressed: () {
-                                if(item.count > 0) {
-                                  setState(() {
-                                    item.count--;
-                                    widget.pet.happy += item.happy;
-                                    /*
-                                    ┌─────────────────────────────────────────────┐
-                                      firestore에 User 하위의 Pet 정보 갱신 요청.
-                                      firestore에 User의 statistics 정보 갱신 요청.
-                                      firestore에 User 하위의 Item 정보 갱신 요청.
-                                    └─────────────────────────────────────────────┘
-                                    */
-                                  });
-                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                  petSaveDB("HiHgtVpIvdyCZVtiFCOc", widget.user.nowPet, widget.pet);
-                                }
-                                Navigator.pop(context);
+                            actions: [
+                              TextButton(
+                                child: Text('취소'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              TextButton(
+                                child: Text('사용'),
+                                onPressed: () async {
+                                  if(item.count > 0) {
+                                    setState(() {
+                                      item.count--;
+                                      widget.pet.happy += item.happy;
+                                    });
+                                    // ✅ 현재 로그인한 사용자 uid 사용
+                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    if (uid != null) {
+                                      await itemSaveDB(uid, item.name, item);
+                                      await petSaveDB(uid, widget.user.nowPet, widget.pet);
+                                    }
+                                  }
+                                  Navigator.pop(context);
                                 },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: getThemedIcon(context, item.icon, width: 30, height: 30),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
-                  );
-                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                      title: Text(item.name, style: TextStyle(fontSize: 18)),
+                      trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
         ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -515,13 +501,13 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   onPressed: () {
                     Navigator.pop(context);
                     widget.onNext(6);
-                    },
+                  },
                 ),
               ],
             ),
           ),
         ),
-        );  
+      );
     } else {
       return Scaffold(
         appBar: AppBar(),
@@ -543,17 +529,17 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                 child: Row(
                   children: [
                     Image.asset(
-                      "assets/icons/icon-store.png", 
+                      "assets/icons/icon-store.png",
                       width: 30, height: 30,
                     ),
                     SizedBox(width: 10.0,),
-                    Text("상점 - 장난감", 
+                    Text("상점 - 장난감",
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                     Expanded(
                       child: Container(
                         alignment: Alignment.centerRight,
-                        child: Text("${widget.user.currentPoint}pt", 
+                        child: Text("${widget.user.currentPoint}pt",
                           style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -561,7 +547,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   ],
                 ),
               ),
-            ), // Placeholder for Mainarea
+            ),
             Expanded(
               flex: 3,
               child: Container(
@@ -573,11 +559,11 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                     final item = widget.inventory[index];
                     return ListTile(
                       onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Center(child: Text(item.name)),
+                            content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 getThemedIcon(
@@ -593,39 +579,37 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text('가격은 ${item.price}pt입니다.', 
-                                style: TextStyle(fontSize: 16)),
+                                Text('가격은 ${item.price}pt입니다.',
+                                    style: TextStyle(fontSize: 16)),
                               ],
                             ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('구매'),
-                              onPressed: () {
-                                if (item.price < widget.user.currentPoint) {
-                                  setState(() {
-                                  widget.user.currentPoint -= item.price;
-                                  item.count++;
-                                  /*
-                                  ┌─────────────────────────────────────────────┐
-                                    firestore에 User 하위의 Item 정보 갱신 요청.
-                                    firestore에 User의 currentPoint 정보 갱신 요청.
-                                  └─────────────────────────────────────────────┘
-                                  */
-                                  });
-                                  itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                  userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
-                                }
-                                Navigator.pop(context);
+                            actions: [
+                              TextButton(
+                                child: Text('취소'),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              TextButton(
+                                child: Text('구매'),
+                                onPressed: () async {
+                                  if (item.price < widget.user.currentPoint) {
+                                    setState(() {
+                                      widget.user.currentPoint -= item.price;
+                                      item.count++;
+                                    });
+                                    // ✅ 현재 로그인한 사용자 uid 사용
+                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    if (uid != null) {
+                                      await itemSaveDB(uid, item.name, item);
+                                      await userSavePointDB(uid, widget.user.currentPoint);
+                                    }
+                                  }
+                                  Navigator.pop(context);
                                 },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                       leading: getThemedIcon(context, item.icon, width: 30, height: 30),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
                       trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
@@ -638,41 +622,41 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
         ),
         bottomNavigationBar: BottomAppBar(
           color: Theme.of(context).bottomAppBarTheme.color,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
 
-                  IconButton(
-                    icon: const Icon(Icons.calendar_month),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.onNext(3); // Navigate to PlannerMain
-                    },
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(3); // Navigate to PlannerMain
+                  },
+                ),
 
-                  IconButton(
-                    icon: Icon(Icons.home),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.onNext(0);
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.settings),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.onNext(6);
-                      },
-                  ),
-                ],
-              ),
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                  },
+                ),
+              ],
             ),
           ),
-        );
-      }
+        ),
+      );
     }
+  }
 }
 
 class ItemlistPage3 extends StatefulWidget {
@@ -683,11 +667,11 @@ class ItemlistPage3 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage3({
-    required this.onNext, 
-    required this.pet, 
-    required this.user, 
-    required this.pageType, 
-    required this.isUseItem, 
+    required this.onNext,
+    required this.pet,
+    required this.user,
+    required this.pageType,
+    required this.isUseItem,
     required this.inventory,
     super.key});
 
@@ -704,203 +688,60 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 
     if (widget.isUseItem) {
       return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/icon-list-alt.png", 
-                    width: 30, height: 30,
-                  ),
-                  SizedBox(width: 10.0,),
-                  Text("창고 - 배경", 
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                ],
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               ),
             ),
-          ), // Placeholder for Mainarea
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: widget.inventory.length,
-                itemBuilder: (context, index) {
-                  final item = widget.inventory[index];
-                  final isHighlighted = item.name == nameChange(widget.user.setting['placeID']);
-                  return Container(
-                    color: isHighlighted
-                        ? (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey // 다크모드에서 하이라이트 색
-                        : Colors.yellow) // 라이트모드에서 하이라이트 색
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if (!isHighlighted) {
-                          showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: Center(child: Text(item.name)),
-                            content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  getThemedIcon(
-                                    context,
-                                    item.icon,
-                                    width: 100,
-                                    height: 100,
-                                  ),
-                                  SizedBox(height: 10),
-                                  Text(item.itemText, 
-                                  style: TextStyle(fontSize: 16)),
-                                ],
-                              ),
-                            actions: [
-                              TextButton(
-                                child: Text('취소'),
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                              TextButton(
-                                child: Text('사용'),
-                                onPressed: () {
-                                  setState(() {
-                                    widget.user.setting['placeID'] = "assets/images/${item.name}.png";
-                                  });                              
-                                  userSavePlaceDB("HiHgtVpIvdyCZVtiFCOc", widget.user.setting['placeID']);
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                        }
-                      },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
+            Expanded(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(8.0),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/icon-list-alt.png",
+                      width: 30, height: 30,
                     ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-
-                IconButton(
-                  icon: const Icon(Icons.calendar_month),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    widget.onNext(3); // Navigate to PlannerMain
-                  },
-                ),
-
-                IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    widget.onNext(0);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    widget.onNext(6);
-                    },
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/icon-store.png", 
-                    width: 30, height: 30,
-                  ),
-                  SizedBox(width: 10.0,),
-                  Text("상점 - 배경", 
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      child: Text("${widget.user.currentPoint}pt", 
-                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
-                      ),
+                    SizedBox(width: 10.0,),
+                    Text("창고 - 배경",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ), // Placeholder for Mainarea
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: widget.inventory.length,
-                itemBuilder: (context, index) {
-                  final item = widget.inventory[index];
-                  final check = (item.count != 0);
-                  
-                  return Container(
-                    color: check
-                        ? (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey // 다크모드에서 색
-                        : Colors.red)  // 라이트모드에서 색
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if (!check) {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Center(child: Text(item.name)),
-                              content: Column(
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView.builder(
+                  itemCount: widget.inventory.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.inventory[index];
+                    final isHighlighted = item.name == nameChange(widget.user.setting['placeID']);
+                    return Container(
+                      color: isHighlighted
+                          ? (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey
+                          : Colors.yellow)
+                          : Colors.transparent,
+                      child: ListTile(
+                        onTap: () {
+                          if (!isHighlighted) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     getThemedIcon(
@@ -910,52 +751,46 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text('가격은 ${item.price}pt입니다.', 
-                                    style: TextStyle(fontSize: 16)),
+                                    Text(item.itemText,
+                                        style: TextStyle(fontSize: 16)),
                                   ],
                                 ),
-                              actions: [
-                                TextButton(
-                                  child: Text('취소'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text('구매'),
-                                  onPressed: () {
-                                    if (item.price < widget.user.currentPoint) {
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  TextButton(
+                                    child: Text('사용'),
+                                    onPressed: () async {
                                       setState(() {
-                                        widget.user.currentPoint -= item.price;
-                                      /*
-                                      ┌─────────────────────────────────────────────┐
-                                        firestore에 User 하위의 Item 정보 갱신 요청.
-                                        firestore에 User의 currentPoint 정보 갱신 요청.
-                                      └─────────────────────────────────────────────┘
-                                      */
+                                        widget.user.setting['placeID'] = "assets/images/${item.name}.png";
                                       });
-                                      itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                      userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
-                                    }
-                                    Navigator.pop(context);
+                                      // ✅ 현재 로그인한 사용자 uid 사용
+                                      final uid = FirebaseAuth.instance.currentUser?.uid;
+                                      if (uid != null) {
+                                        await userSavePlaceDB(uid, widget.user.setting['placeID']);
+                                      }
+                                      Navigator.pop(context);
                                     },
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
-                    ),
-                  );
-                },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        title: Text(item.name, style: TextStyle(fontSize: 18)),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -982,7 +817,158 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   onPressed: () {
                     Navigator.pop(context);
                     widget.onNext(6);
-                    },
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(8.0),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/icon-store.png",
+                      width: 30, height: 30,
+                    ),
+                    SizedBox(width: 10.0,),
+                    Text("상점 - 배경",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.centerRight,
+                        child: Text("${widget.user.currentPoint}pt",
+                          style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView.builder(
+                  itemCount: widget.inventory.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.inventory[index];
+                    final check = (item.count != 0);
+
+                    return Container(
+                      color: check
+                          ? (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey
+                          : Colors.red)
+                          : Colors.transparent,
+                      child: ListTile(
+                        onTap: () {
+                          if (!check) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text('가격은 ${item.price}pt입니다.',
+                                        style: TextStyle(fontSize: 16)),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  TextButton(
+                                    child: Text('구매'),
+                                    onPressed: () async {
+                                      if (item.price < widget.user.currentPoint) {
+                                        setState(() {
+                                          widget.user.currentPoint -= item.price;
+                                        });
+                                        // ✅ 현재 로그인한 사용자 uid 사용
+                                        final uid = FirebaseAuth.instance.currentUser?.uid;
+                                        if (uid != null) {
+                                          await itemSaveDB(uid, item.name, item);
+                                          await userSavePointDB(uid, widget.user.currentPoint);
+                                        }
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        title: Text(item.name, style: TextStyle(fontSize: 18)),
+                        trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).bottomAppBarTheme.color,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(3); // Navigate to PlannerMain
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(0);
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    widget.onNext(6);
+                  },
                 ),
               ],
             ),
@@ -990,7 +976,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
         ),
       );
     }
-    
+
   }
 }
 
@@ -1002,11 +988,11 @@ class ItemlistPage4 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage4({
-    required this.onNext, 
-    required this.pet, 
-    required this.user, 
-    required this.pageType, 
-    required this.isUseItem, 
+    required this.onNext,
+    required this.pet,
+    required this.user,
+    required this.pageType,
+    required this.isUseItem,
     required this.inventory,
     super.key});
 
@@ -1021,61 +1007,61 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
   Widget build(BuildContext context) {
     if (widget.isUseItem) {
       return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/icon-list-alt.png", 
-                    width: 30, height: 30,
-                  ),
-                  SizedBox(width: 10.0,),
-                  Text("창고 - 스타일", 
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                ],
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               ),
             ),
-          ), // Placeholder for Mainarea
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: widget.inventory.length,
-                itemBuilder: (context, index) {
-                  final item = widget.inventory[index];
-                  final isHighlighted = item.name == usedItem;
+            Expanded(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(8.0),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/icon-list-alt.png",
+                      width: 30, height: 30,
+                    ),
+                    SizedBox(width: 10.0,),
+                    Text("창고 - 스타일",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView.builder(
+                  itemCount: widget.inventory.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.inventory[index];
+                    final isHighlighted = item.name == usedItem;
 
-                  return Container(
-                    color: isHighlighted
-                        ? (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey // 다크모드에서 하이라이트
-                        : Colors.yellow) // 라이트모드에서 하이라이트
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if(!isHighlighted) {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Center(child: Text(item.name)),
-                              content: Column(
+                    return Container(
+                      color: isHighlighted
+                          ? (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey
+                          : Colors.yellow)
+                          : Colors.transparent,
+                      child: ListTile(
+                        onTap: () {
+                          if(!isHighlighted) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     getThemedIcon(
@@ -1085,49 +1071,47 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text(item.itemText, 
-                                    style: TextStyle(fontSize: 16)),
+                                    Text(item.itemText,
+                                        style: TextStyle(fontSize: 16)),
                                   ],
                                 ),
-                              actions: [
-                                TextButton(
-                                  child: Text('취소'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text('사용'),
-                                  onPressed: () {
-                                    setState(() {
-                                      usedItem = item.name;
-                                      /*
-                                      ┌─────────────────────────────────────────────┐
-                                        firestore에 User의 statistics 정보 갱신 요청.
-                                        firestore에 User 하위의 Item 정보 갱신 요청.
-                                      └─────────────────────────────────────────────┘
-                                      */
-                                    });
-                                    itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                    Navigator.pop(context);
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  TextButton(
+                                    child: Text('사용'),
+                                    onPressed: () async {
+                                      setState(() {
+                                        usedItem = item.name;
+                                      });
+                                      // ✅ 현재 로그인한 사용자 uid 사용
+                                      final uid = FirebaseAuth.instance.currentUser?.uid;
+                                      if (uid != null) {
+                                        await itemSaveDB(uid, item.name, item);
+                                      }
+                                      Navigator.pop(context);
                                     },
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
-                    ),
-                  );
-                },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        title: Text(item.name, style: TextStyle(fontSize: 18)),
+                        trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -1154,7 +1138,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   onPressed: () {
                     Navigator.pop(context);
                     widget.onNext(6);
-                    },
+                  },
                 ),
               ],
             ),
@@ -1163,68 +1147,68 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
       );
     } else {
       return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Container(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              color: Colors.blue,
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/icons/icon-store.png", 
-                    width: 30, height: 30,
-                  ),
-                  SizedBox(width: 10.0,),
-                  Text("상점 - 스타일", 
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      child: Text("${widget.user.currentPoint}pt", 
-                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 6,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
               ),
             ),
-          ), // Placeholder for Mainarea
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: EdgeInsets.all(8.0),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: widget.inventory.length,
-                itemBuilder: (context, index) {
-                  final item = widget.inventory[index];
-                  final check = (item.count != 0);
-                  return Container(
-                    color: check
-                        ? (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey // 다크모드일 때
-                        : Colors.red)  // 라이트모드일 때
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if (!check) {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Center(child: Text(item.name)),
-                              content: Column(
+            Expanded(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(8.0),
+                color: Colors.blue,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      "assets/icons/icon-store.png",
+                      width: 30, height: 30,
+                    ),
+                    SizedBox(width: 10.0,),
+                    Text("상점 - 스타일",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.centerRight,
+                        child: Text("${widget.user.currentPoint}pt",
+                          style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: EdgeInsets.all(8.0),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                child: ListView.builder(
+                  itemCount: widget.inventory.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.inventory[index];
+                    final check = (item.count != 0);
+                    return Container(
+                      color: check
+                          ? (Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey
+                          : Colors.red)
+                          : Colors.transparent,
+                      child: ListTile(
+                        onTap: () {
+                          if (!check) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     getThemedIcon(
@@ -1234,46 +1218,50 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text('가격은 ${item.price}pt입니다.', 
-                                    style: TextStyle(fontSize: 16)),
+                                    Text('가격은 ${item.price}pt입니다.',
+                                        style: TextStyle(fontSize: 16)),
                                   ],
                                 ),
-                              actions: [
-                                TextButton(
-                                  child: Text('취소'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text('구매'),
-                                  onPressed: () {
-                                    if (item.price < widget.user.currentPoint) {
-                                      setState(() {
-                                        widget.user.currentPoint -= item.price;
-                                      });
-                                      itemSaveDB("HiHgtVpIvdyCZVtiFCOc", item.name, item);
-                                      userSavePointDB("HiHgtVpIvdyCZVtiFCOc", widget.user.currentPoint);
-                                    }
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
-                    ),
-                  );
-                },
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  TextButton(
+                                    child: Text('구매'),
+                                    onPressed: () async {
+                                      if (item.price < widget.user.currentPoint) {
+                                        setState(() {
+                                          widget.user.currentPoint -= item.price;
+                                        });
+                                        // ✅ 현재 로그인한 사용자 uid 사용
+                                        final uid = FirebaseAuth.instance.currentUser?.uid;
+                                        if (uid != null) {
+                                          await itemSaveDB(uid, item.name, item);
+                                          await userSavePointDB(uid, widget.user.currentPoint);
+                                        }
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        title: Text(item.name, style: TextStyle(fontSize: 18)),
+                        trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Theme.of(context).bottomAppBarTheme.color,
+          ],
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).bottomAppBarTheme.color,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
@@ -1300,7 +1288,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   onPressed: () {
                     Navigator.pop(context);
                     widget.onNext(6);
-                    },
+                  },
                 ),
               ],
             ),
@@ -1331,16 +1319,22 @@ class _ItemCategoryState extends State<ItemCategory> {
     loadItems();
   }
 
-
   Future<void> loadItems() async {
     List<Item> itemDoc = [];
 
+    // ✅ 현재 로그인한 사용자 uid 사용
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      setState(() { inventory = []; });
+      return;
+    }
+
     QuerySnapshot snapshot1 = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .collection('items')
-      .get();
-    
+        .collection('Users')
+        .doc(uid)
+        .collection('items')
+        .get();
+
     if (snapshot1.docs.isNotEmpty) {
       itemDoc = snapshot1.docs.map((doc) {
         return Item.fromMap(doc.data() as Map<String, dynamic>);
@@ -1379,201 +1373,195 @@ class _ItemCategoryState extends State<ItemCategory> {
               child: Row(
                 children: [
                   Image.asset(
-                    "assets/icons/icon-list-alt.png", 
+                    "assets/icons/icon-list-alt.png",
                     width: 30, height: 30,
                   ),
                   SizedBox(width: 10.0,),
-                  Text("창고", 
+                  Text("창고",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ],
               ),
             ),
-          ), // Placeholder for Mainarea
+          ),
           Expanded(
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ItemlistPage1(
+                                      onNext: widget.onNext,
+                                      pet: widget.pet,
+                                      user: widget.user,
+                                      pageType: 2,
+                                      isUseItem: true,
+                                      inventory: getItemsByCategory(1),
+                                    ),
+                                  )
+                              ).then((value) {
+                                setState(() {});
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(
+                              child: Image.asset(
+                                  "assets/icons/icon-chicken.png",
+                                  width: 30, height: 30
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10.0,),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(
-                                      onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 2, 
-                                      isUseItem: true,
-                                      inventory: getItemsByCategory(1),
-                                      ),
-                                )
-                                ).then((value) {
-                                  setState(() {
-
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/icons/icon-chicken.png", 
-                                  width: 30, height: 30
+                                  builder: (context) => ItemlistPage2(
+                                    onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 2,
+                                    isUseItem: true,
+                                    inventory: getItemsByCategory(2),
+                                  ),
                                 ),
-                              ),
+                              ).then((value) {
+                                setState(() {});
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(child: Image.asset(
+                                "assets/icons/icon-teddybear.png",
+                                width: 30, height: 30
+                            ),
                             ),
                           ),
-                          SizedBox(width: 10.0,),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(
-                                      onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 2, 
-                                      isUseItem: true,
-                                      inventory: getItemsByCategory(2),
-                                      ),
-                                ),
-                                ).then((value) {
-                                  setState(() {
-
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(child: Image.asset(
-                                  "assets/icons/icon-teddybear.png", 
-                                  width: 30, height: 30
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10.0,),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
+                  ),
+                  SizedBox(height: 10.0,),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 2, 
-                                      isUseItem: true,
-                                      inventory: getItemsByCategory(3),
-                                      ),
+                                  builder: (context) => ItemlistPage3(onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 2,
+                                    isUseItem: true,
+                                    inventory: getItemsByCategory(3),
+                                  ),
                                 ),
-                                ).then((value) {
-                                  setState(() {
-                                  });
+                              ).then((value) {
+                                setState(() {
                                 });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/icons/icon-mountains.png", 
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(
+                              child: Image.asset(
+                                  "assets/icons/icon-mountains.png",
                                   width: 30, height: 30
-                                ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 10.0,),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
+                        ),
+                        SizedBox(height: 10.0,),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 2, 
-                                      isUseItem: true,
-                                      inventory: getItemsByCategory(4),
-                                      ),
+                                  builder: (context) => ItemlistPage4(onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 2,
+                                    isUseItem: true,
+                                    inventory: getItemsByCategory(4),
+                                  ),
                                 ),
-                                ).then((value) {
-                                  setState(() {
-
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(child: Image.asset(
-                                  "assets/icons/icon-pivotx.png", 
-                                  width: 30, height: 30
-                                ),
-                              ),
+                              ).then((value) {
+                                setState(() {});
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(child: Image.asset(
+                                "assets/icons/icon-pivotx.png",
+                                width: 30, height: 30
+                            ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              // SubArea()로 변경
+                  ),
+                ],
               ),
+              // SubArea()로 변경
             ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).bottomAppBarTheme.color,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
 
-                IconButton(
-                  icon: const Icon(Icons.calendar_month),
-                  onPressed: () {
-                    widget.onNext(3); // Navigate to PlannerMain
-                  },
-                ),
+              IconButton(
+                icon: const Icon(Icons.calendar_month),
+                onPressed: () {
+                  widget.onNext(3); // Navigate to PlannerMain
+                },
+              ),
 
-                IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () {widget.onNext(0);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    widget.onNext(6);
-                    },
-                ),
-              ],
-            ),
+              IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {widget.onNext(0);
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.pop(context);
+                  widget.onNext(6);
+                },
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }
@@ -1600,10 +1588,10 @@ class _ShopCategoryState extends State<ShopCategory> {
 
   Future<void> loadItems() async {
     List<Item> shopDoc = [];
-    
+
     QuerySnapshot snapshot2 = await FirebaseFirestore.instance
-      .collection('aLLitems')
-      .get();
+        .collection('aLLitems')
+        .get();
 
     if (snapshot2.docs.isNotEmpty) {
       shopDoc = snapshot2.docs.map((doc) {
@@ -1643,17 +1631,17 @@ class _ShopCategoryState extends State<ShopCategory> {
               child: Row(
                 children: [
                   Image.asset(
-                    "assets/icons/icon-store.png", 
+                    "assets/icons/icon-store.png",
                     width: 30, height: 30,
                   ),
                   SizedBox(width: 10.0,),
-                  Text("상점", 
+                  Text("상점",
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("${widget.user.currentPoint}pt", 
+                      child: Text("${widget.user.currentPoint}pt",
                         style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -1661,195 +1649,187 @@ class _ShopCategoryState extends State<ShopCategory> {
                 ],
               ),
             ),
-          ), // Placeholder for Mainarea
+          ),
           Expanded(
             flex: 3,
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(
-                                      onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 3, 
-                                      isUseItem: false,
-                                      inventory: getItemsByCategory(1),
-                                      ),
+                                  builder: (context) => ItemlistPage1(
+                                    onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 3,
+                                    isUseItem: false,
+                                    inventory: getItemsByCategory(1),
+                                  ),
                                 ),
-                                ).then((value) {
-                                  setState(() {
-
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/icons/icon-chicken.png", 
+                              ).then((value) {
+                                setState(() {});
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(
+                              child: Image.asset(
+                                  "assets/icons/icon-chicken.png",
                                   width: 30, height: 30
-                                ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 10.0,),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
+                        ),
+                        SizedBox(width: 10.0,),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage2(
-                                      onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 3, 
-                                      isUseItem: false,
-                                      inventory: getItemsByCategory(2),
-                                      ),
+                                  builder: (context) => ItemlistPage2(
+                                    onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 3,
+                                    isUseItem: false,
+                                    inventory: getItemsByCategory(2),
+                                  ),
                                 ),
-                                ).then((value) {
-                                  setState(() {
-
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(child: Image.asset(
-                                  "assets/icons/icon-teddybear.png", 
-                                  width: 30, height: 30
-                                ),
-                              ),
+                              ).then((value) {
+                                setState(() {});
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(child: Image.asset(
+                                "assets/icons/icon-teddybear.png",
+                                width: 30, height: 30
+                            ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10.0,),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
+                  ),
+                  SizedBox(height: 10.0,),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage3(
-                                      onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 3, 
-                                      isUseItem: false,
-                                      inventory: getItemsByCategory(3),
-                                      ),
+                                  builder: (context) => ItemlistPage3(
+                                    onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 3,
+                                    isUseItem: false,
+                                    inventory: getItemsByCategory(3),
+                                  ),
                                 ),
-                                ).then((value) {
-                                  setState(() {
-
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/icons/icon-mountains.png", 
+                              ).then((value) {
+                                setState(() {});
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(
+                              child: Image.asset(
+                                  "assets/icons/icon-mountains.png",
                                   width: 30, height: 30
-                                ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 10.0,),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
+                        ),
+                        SizedBox(width: 10.0,),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ItemlistPage4(
-                                      onNext: widget.onNext, 
-                                      pet: widget.pet, 
-                                      user: widget.user, 
-                                      pageType: 3, 
-                                      isUseItem: false,
-                                      inventory: getItemsByCategory(4),
-                                      ),
+                                  builder: (context) => ItemlistPage4(
+                                    onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 3,
+                                    isUseItem: false,
+                                    inventory: getItemsByCategory(4),
+                                  ),
                                 ),
-                                ).then((value) {
-                                  setState(() {
-
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue[100],
-                              ),
-                              child: Center(child: Image.asset(
-                                  "assets/icons/icon-pivotx.png", 
-                                  width: 30, height: 30
-                                ),
-                              ),
+                              ).then((value) {
+                                setState(() {});
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[100],
+                            ),
+                            child: Center(child: Image.asset(
+                                "assets/icons/icon-pivotx.png",
+                                width: 30, height: 30
+                            ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              // SubArea()로 변경
+                  ),
+                ],
               ),
+              // SubArea()로 변경
             ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).bottomAppBarTheme.color,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
 
-                IconButton(
-                  icon: const Icon(Icons.calendar_month),
-                  onPressed: () {
-                    widget.onNext(3); // Navigate to PlannerMain
-                  },
-                ),
+              IconButton(
+                icon: const Icon(Icons.calendar_month),
+                onPressed: () {
+                  widget.onNext(3); // Navigate to PlannerMain
+                },
+              ),
 
-                IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () {
-                    widget.onNext(0);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    widget.onNext(6);
-                  },
-                ),
-              ],
-            ),
+              IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {
+                  widget.onNext(0);
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.pop(context);
+                  widget.onNext(6);
+                },
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }

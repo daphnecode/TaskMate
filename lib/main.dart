@@ -22,6 +22,7 @@ void main() async {
   );
   runApp(const Root());
 }
+
 class Root extends StatefulWidget {
   const Root({super.key});
   @override
@@ -35,11 +36,11 @@ class RootState extends State<Root> {
   사용자 로그인, 인증.
   */
   Users user = Users(
-    currentPoint: 0,
-    gotPoint: 0,
-    nowPet: "",
-    setting: {},
-    statistics: {}
+      currentPoint: 0,
+      gotPoint: 0,
+      nowPet: "",
+      setting: {},
+      statistics: {}
   );
 
   bool isLoading = true;
@@ -47,10 +48,9 @@ class RootState extends State<Root> {
   void _onPointsAdded(int delta) {
     setState(() {
       user.currentPoint += delta;
-      user.gotPoint += delta; // 원하면 함께 올려두기
+      user.gotPoint += delta;
     });
   }
-
 
   @override
   void initState() {
@@ -59,21 +59,33 @@ class RootState extends State<Root> {
   }
 
   Future<void> loadUser() async {
+    // 현재 로그인된 유저가 있으면 그 uid 사용, 없으면 기존 유지
+    final String fallbackUid = 'HiHgtVpIvdyCZVtiFCOc';
+    final String uid =
+        FirebaseAuth.instance.currentUser?.uid ?? fallbackUid;
+
     DocumentSnapshot doc1 = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .get();
-    
-    
+        .collection('Users')
+        .doc(uid)
+        .get();
+
     setState(() {
       if (doc1.exists) {
         user = Users.fromMap(doc1.data() as Map<String, dynamic>);
+      } else {
+        // 문서가 아직 없으면 기본값 유지
+        user = Users(
+          currentPoint: 0,
+          gotPoint: 0,
+          nowPet: "",
+          setting: {},
+          statistics: {},
+        );
       }
+      isLoading = false; // ✅ 로딩 종료는 여기서 확실히
     });
-
-    isLoading = false;
   }
-  
+
   void toggleDarkMode(bool value) {
     setState(() => user.setting['darkMode'] = value);
   }
@@ -81,7 +93,7 @@ class RootState extends State<Root> {
   void togglePushNotification(bool value) {
     setState(() => user.setting['push'] = value);
   }
-  
+
   void toggleSortingMethod(String value) {
     setState(() => user.setting['listSort'] = value);
   }
@@ -108,24 +120,114 @@ class RootState extends State<Root> {
         iconTheme: const IconThemeData(color: Colors.white),
         bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey[900]), // 다크모드 하단바
       ),
-      themeMode: user.setting['darkMode'] ? ThemeMode.dark : ThemeMode.light,
+      themeMode: (user.setting?['darkMode'] == true) ? ThemeMode.dark : ThemeMode.light,
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          debugPrint('authStateChanges → '
+              'state=${snapshot.connectionState}, hasData=${snapshot.hasData}, user=${snapshot.data?.uid}');
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(body: Center(child: CircularProgressIndicator()));
           }
-          if (snapshot.hasData) {
-            return MyHomePage(
-              title: 'Virtual Pet',
-              user: user,
-              onDarkModeChanged: toggleDarkMode,
-              onPushChanged: togglePushNotification,
-              onSortingChanged: toggleSortingMethod,
-              onSoundEffectsChanged: toggleSoundEffects,
-              onPointsAdded:_onPointsAdded,
+
+          if (snapshot.hasData && snapshot.data != null) {
+            // 로그인된 경우: 해당 uid의 사용자 문서를 "실시간" 구독
+            final String uid = snapshot.data!.uid;
+            final userDocRef = FirebaseFirestore.instance.collection('Users').doc(uid);
+
+            return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              stream: userDocRef.snapshots(),
+              builder: (context, uSnap) {
+                debugPrint('userDocRef.snapshots → '
+                    'state=${uSnap.connectionState}, hasData=${uSnap.hasData}, exists=${uSnap.data?.exists}');
+                if (uSnap.hasError) {
+                  return Scaffold(
+                    body: Center(child: Text('Firestore 오류: ${uSnap.error}')),
+                  );
+                }
+
+                // 첫 스냅샷 전이거나 문서가 없어도 기본값으로 바로 진입
+                if (!uSnap.hasData || !(uSnap.data?.exists ?? false)) {
+                  final loadedUser = Users.fromMap({
+                    'currentPoint': 0,
+                    'gotPoint': 0,
+                    'nowPet': '',
+                    'setting': {
+                      'darkMode': false,
+                      'push': false,
+                      'listSort': 'default',
+                      'sound': true,
+                    },
+                    'statistics': {},
+                  });
+                  return MyHomePage(
+                    title: 'Virtual Pet',
+                    user: loadedUser,
+                    onDarkModeChanged: toggleDarkMode,
+                    onPushChanged: togglePushNotification,
+                    onSortingChanged: toggleSortingMethod,
+                    onSoundEffectsChanged: toggleSoundEffects,
+                    onPointsAdded: _onPointsAdded,
+                  );
+                }
+
+                // ✅ fromMap 전에 원본 맵을 안전하게 보정
+                final raw = Map<String, dynamic>.from(uSnap.data!.data()!);
+
+                // 최상위 필드 기본값
+                raw['currentPoint'] = (raw['currentPoint'] ?? 0) as int;
+                raw['gotPoint']     = (raw['gotPoint'] ?? 0) as int;
+                raw['nowPet']       = (raw['nowPet'] ?? '') as String;
+
+                // setting 맵 기본값
+                raw['setting'] = (raw['setting'] is Map<String, dynamic>)
+                    ? Map<String, dynamic>.from(raw['setting'])
+                    : <String, dynamic>{};
+
+                raw['setting']['darkMode'] = raw['setting']['darkMode'] ?? false;
+                raw['setting']['push']     = raw['setting']['push'] ?? false;
+                raw['setting']['listSort'] = raw['setting']['listSort'] ?? 'default';
+                raw['setting']['sound']    = raw['setting']['sound'] ?? true;
+
+                // statistics 맵 기본값
+                raw['statistics'] = (raw['statistics'] is Map<String, dynamic>)
+                    ? Map<String, dynamic>.from(raw['statistics'])
+                    : <String, dynamic>{};
+
+                Users loadedUser;
+                try {
+                  loadedUser = Users.fromMap(raw);
+                } catch (e) {
+                  debugPrint('Users.fromMap error: $e');
+                  loadedUser = Users(
+                    currentPoint: 0,
+                    gotPoint: 0,
+                    nowPet: '',
+                    setting: {
+                      'darkMode': false,
+                      'push': false,
+                      'listSort': 'default',
+                      'sound': true,
+                    },
+                    statistics: {},
+                  );
+                }
+
+                return MyHomePage(
+                  title: 'Virtual Pet',
+                  user: loadedUser,
+                  onDarkModeChanged: toggleDarkMode,
+                  onPushChanged: togglePushNotification,
+                  onSortingChanged: toggleSortingMethod,
+                  onSoundEffectsChanged: toggleSoundEffects,
+                  onPointsAdded: _onPointsAdded,
+                );
+              },
             );
           }
+
+          // 비로그인: 로그인 페이지
           return const LoginPage();
         },
       ),
@@ -171,13 +273,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
 
   Pets pet = Pets(
-    image: "",
-    name: "",
-    hunger:0,
-    happy: 0,
-    level: 0,
-    currentExp: 0,
-    styleID: ""
+      image: "",
+      name: "",
+      hunger:0,
+      happy: 0,
+      level: 0,
+      currentExp: 0,
+      styleID: ""
   );
 
   @override
@@ -193,30 +295,39 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> loadPets() async {
+    // 현재 로그인 uid 우선, 없으면 으로 호환
+    final String fallbackUid = 'HiHgtVpIvdyCZVtiFCOc';
+    final String uid =
+        FirebaseAuth.instance.currentUser?.uid ?? fallbackUid;
+
+    final String petId =
+    (widget.user.nowPet is String && widget.user.nowPet.isNotEmpty)
+        ? widget.user.nowPet
+        : 'default';
+
     DocumentSnapshot petDoc = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc')
-      .collection('pets')
-      .doc(widget.user.nowPet)
-      .get();
-    
+        .collection('Users')
+        .doc(uid)
+        .collection('pets')
+        .doc(petId)
+        .get();
+
     final Pets loadedItems2;
-    
+
     if (petDoc.exists) {
       final data = petDoc.data() as Map<String, dynamic>;
       loadedItems2 = Pets.fromMap(data);
     } else {
       loadedItems2 = Pets(
-        image: "",
-        name: "",
-        hunger:0,
-        happy: 0,
-        level: 0,
-        currentExp: 0,
-        styleID: ""
+          image: "",
+          name: "",
+          hunger:0,
+          happy: 0,
+          level: 0,
+          currentExp: 0,
+          styleID: ""
       );
     }
-
 
     setState(() {
       pet = loadedItems2;
@@ -241,7 +352,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (_currentIndex) {
       case 0:
-        currentWidget = Petmain(onNext: goNext, pet: pet, user: widget.user, pageType: 0, soundEffectsOn: widget.user.setting['sound'],);
+        currentWidget = Petmain(onNext: goNext, pet: pet, user: widget.user, pageType: 0,  soundEffectsOn: widget.user.setting?['sound'] ?? true,);
         break;
       case 1:
         currentWidget = ItemCategory(onNext: goNext, pet: pet, user: widget.user, pageType: 1,);
@@ -251,9 +362,9 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 3:
         currentWidget = PlannerMain(
-            onNext: goNext,
-            sortingMethod: widget.user.setting['listSort'],
-            onPointsAdded: widget.onPointsAdded,
+          onNext: goNext,
+          sortingMethod: widget.user.setting?['listSort'] ?? 'default',
+          onPointsAdded: widget.onPointsAdded,
         );
         break;
       case 4:
@@ -298,10 +409,10 @@ class _MyHomePageState extends State<MyHomePage> {
       case 6:
         currentWidget = SettingsPage(
           onNext: goNext,
-          isDarkMode: widget.user.setting['darkMode'],
-          soundEffectsEnabled: widget.user.setting['sound'],
-          notificationsEnabled: widget.user.setting['push'],
-          sortingMethod: widget.user.setting['listSort'],
+          isDarkMode: widget.user.setting?['darkMode'] ?? false,
+          soundEffectsEnabled: widget.user.setting?['sound'] ?? true,
+          notificationsEnabled: widget.user.setting?['push'] ?? false,
+          sortingMethod: widget.user.setting?['listSort'] ?? 'default',
           onDarkModeChanged: widget.onDarkModeChanged,
           onNotificationsChanged: widget.onPushChanged,
           onChangeSortingMethod: widget.onSortingChanged,
@@ -310,11 +421,11 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
 
       default:
-        currentWidget = Text('기본');
+        currentWidget = const Text('기본');
     }
 
     return Scaffold(
-        body:currentWidget
+        body: currentWidget
     );
   }
 }

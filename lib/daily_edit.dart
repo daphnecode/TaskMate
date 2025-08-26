@@ -3,16 +3,15 @@ import 'package:table_calendar/table_calendar.dart';
 import 'DBtest/task.dart'; // Task 클래스 정의된 파일
 import 'DBtest/firestore_service.dart';
 
-
-//위젯
+// 위젯
 import 'package:taskmate/widgets/today_edit_box.dart';
 
-class DailyTaskEditPage extends StatefulWidget {
+import 'package:firebase_auth/firebase_auth.dart';
 
+class DailyTaskEditPage extends StatefulWidget {
   final Map<String, List<Task>> dailyTaskMap;
   final DateTime selectedDate;
   final void Function(Map<String, List<Task>>) onUpdateDailyTaskMap;
-
 
   const DailyTaskEditPage({
     required this.dailyTaskMap,
@@ -28,12 +27,16 @@ class DailyTaskEditPage extends StatefulWidget {
 class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   DateTime _selectedDate = DateTime.now();
   Map<String, List<Task>> _dailyTaskMap = {};
-  final String userId = "HiHgtVpIvdyCZVtiFCOc";
 
-// Firestore에서 해당 날짜 할 일 불러오기
+  // ❌ 기존: final String userId = "HiHgtVpIvdyCZVtiFCOc";
+  // ✅ 변경: 로그인 사용자 uid로 런타임 초기화
+  late final String userId;
+
+  // Firestore에서 해당 날짜 할 일 불러오기
   Future<void> _loadTasksForDate(DateTime date) async {
     final key = _dateKey(date);
-    final tasks = await fetchDailyTasks(userId, key);  // 🔹 Firestore에서 불러오기
+    final tasks = await fetchDailyTasks(userId, key); // 🔹 Firestore에서 불러오기
+    if (!mounted) return;
     setState(() {
       _dailyTaskMap[key] = tasks;
     });
@@ -45,15 +48,13 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
       _dailyTaskMap[key] = updatedList;
     });
     await saveDailyTasks(userId, key, updatedList); // Firestore 저장
-    await updateTasksToFirestore(userId, key, _dailyTaskMap[key] ?? []); // planner컬렉션에 반영
+    await updateTasksToFirestore(userId, key, _dailyTaskMap[key] ?? []); // planner 컬렉션에 반영
     widget.onUpdateDailyTaskMap(_dailyTaskMap);
   }
 
   DateTime getKstNow() {
     return DateTime.now().toUtc().add(const Duration(hours: 9)); // 한국 시간 변환
   }
-
-
 
   // 날짜 키 문자열 (예: 2025-06-27)
   String _dateKey(DateTime date) {
@@ -63,6 +64,18 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   @override
   void initState() {
     super.initState();
+
+    // ✅ 로그인된 사용자 uid 고정
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      // 로그인 전 진입 방지 (상위에서 가드하므로 거의 안옴)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.of(context).pop();
+      });
+      return;
+    }
+    userId = uid;
+
     _selectedDate = getKstNow();
     _dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
     _loadTasksForDate(_selectedDate); // 앱 첫 로드시 Firestore 데이터 불러오기
@@ -75,7 +88,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
         title: const Text('일일 리스트 편집'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
             onPressed: () async {
               final key = _dateKey(_selectedDate);
               final tasks = _dailyTaskMap[key] ?? [];
@@ -119,12 +132,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-
-            const SizedBox(height: 16),
-
 
             // 일일 리스트 편집 박스
             Padding(
@@ -136,11 +144,9 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
                 onExpand: () {},
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 }
-

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'object.dart';
 
 class Mainarea1 extends StatelessWidget {
@@ -9,12 +10,15 @@ class Mainarea1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.purple[100],
-      child: Center(
-        child: Container(
+      child: const Center(
+        child: Padding(
           padding: EdgeInsets.all(8.0),
           child: Text(
+            '함께할 펫을 선택해주세요!',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            '함께할 펫을 선택해주세요!',))),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -28,85 +32,103 @@ class Subarea1 extends StatefulWidget {
 
 class _Subarea1State extends State<Subarea1> {
   Future<Pets> loadPet(String currentPet) async {
-    final tmp = FirebaseFirestore.instance
-      .collection('Users')
-      .doc('HiHgtVpIvdyCZVtiFCOc');
-    
-    DocumentSnapshot petDoc = await tmp
-      .collection('pets')
-      .doc(currentPet)
-      .get();
-    
-    final Pets loadedItems2;
-    
-    if (petDoc.exists) {
-      final data = petDoc.data() as Map<String, dynamic>;
-      loadedItems2 = Pets.fromMap(data);
-    } else {
-      loadedItems2 = Pets(
-        image: "",
-        name: "",
-        hunger:0,
-        happy: 0,
-        level: 0,
-        currentExp: 0,
-        styleID: ""
-      );
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      throw Exception("로그인 필요");
     }
 
-    await tmp.update({
-      'nowPet': currentPet
-    });
+    final userRef = FirebaseFirestore.instance.collection('Users').doc(uid);
 
-    return loadedItems2;
+    // 선택한 펫 문서 읽기
+    final petDoc = await userRef.collection('pets').doc(currentPet).get();
+    final Pets loaded = petDoc.exists
+        ? Pets.fromMap(petDoc.data() as Map<String, dynamic>)
+        : Pets(
+      image: "",
+      name: "",
+      hunger: 0,
+      happy: 0,
+      level: 0,
+      currentExp: 0,
+      styleID: "",
+    );
+
+    // 현재 선택 펫 저장
+    await userRef.update({'nowPet': currentPet});
+
+    return loaded;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-                Navigator.pop(context, loadPet("dragon"));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[100],
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () async {
+              final pet = await loadPet("dragon"); // ✅ Pets 객체 획득
+              if (!mounted) return;
+              Navigator.pop(context, pet);          // ✅ Pets로 pop
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[100],
+            ),
+            child: Center(
+              child: Image.asset(
+                "assets/images/dragon.png",
+                fit: BoxFit.cover,
+                height: 100.0,
+                width: 100.0,
               ),
-              child: Center(
-                child: Image.asset("assets/images/dragon.png", fit: BoxFit.cover, height: 100.0, width: 100.0)),
             ),
           ),
-          SizedBox(height: 10.0,),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-                Navigator.pop(context, loadPet("unicon"));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[100],
+        ),
+        const SizedBox(height: 10.0),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () async {
+              final pet = await loadPet("unicon");
+              if (!mounted) return;
+              Navigator.pop(context, pet);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[100],
+            ),
+            child: Center(
+              child: Image.asset(
+                "assets/images/unicon.png",
+                fit: BoxFit.cover,
+                height: 100.0,
+                width: 100.0,
               ),
-              child: Center(child: Image.asset("assets/images/unicon.png", fit: BoxFit.cover, height: 100.0, width: 100.0)),
             ),
           ),
-          SizedBox(height: 10.0,),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                // Handle button press
-                Navigator.pop(context, loadPet("unicon"));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[100],
+        ),
+        const SizedBox(height: 10.0),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () async {
+              // 필요하면 다른 펫 ID로 교체
+              final pet = await loadPet("unicon");
+              if (!mounted) return;
+              Navigator.pop(context, pet);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[100],
+            ),
+            child: Center(
+              child: Image.asset(
+                "assets/images/unicon.png",
+                fit: BoxFit.cover,
+                height: 100.0,
+                width: 100.0,
               ),
-              child: Center(child: Image.asset("assets/images/unicon.png", fit: BoxFit.cover, height: 100.0, width: 100.0)),
             ),
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 }
 
@@ -123,52 +145,50 @@ class PetChoose extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Container(
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea1(),
+              child: const Mainarea1(),
             ),
           ),
           Expanded(
             flex: 4,
             child: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: Subarea1(),
-              ),
+              child: const Subarea1(),
             ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).bottomAppBarTheme.color,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-
-                IconButton(
-                  icon: const Icon(Icons.calendar_month),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    onNext(3); // Navigate to PlannerMain
-                  },
-                ),
-
-                IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    onNext(0);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {},
-                ),
-              ],
-            ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.calendar_month),
+                onPressed: () {
+                  Navigator.pop(context);
+                  onNext(3);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.home),
+                onPressed: () {
+                  Navigator.pop(context);
+                  onNext(0);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {},
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }
