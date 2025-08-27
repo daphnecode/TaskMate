@@ -1,4 +1,6 @@
+// lib/settingspage.dart
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:taskmate/widgets/settings_widgets.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -32,19 +34,48 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final List<String> _sortOptions = ['사전 순', '포인트 순', '등록 순'];
+  bool _signingOut = false;
+
+  Future<void> _confirmAndSignOut() async {
+    if (_signingOut) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('로그아웃'),
+        content: const Text('정말 로그아웃하시겠습니까?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('로그아웃')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+
+    setState(() => _signingOut = true);
+    try {
+      await FirebaseAuth.instance.signOut();
+      // 루트에서 authStateChanges()가 LoginPage를 띄움.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그아웃되었습니다.')),
+        );
+        // 네비게이션 스택 정리(선택): 뒤로 가기 시 로그인으로 남도록
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    } finally {
+      if (mounted) setState(() => _signingOut = false);
+    }
+  }
 
   void onSortingChangedDialog(BuildContext context) async {
-    widget.onChangeSortingMethod;
     String? selected = await showDialog<String>(
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text('정렬 방법 선택'),
+          title: const Text('정렬 방법 선택'),
           children: _sortOptions.map((option) {
             return SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, option); // 선택한 값을 반환
-              },
+              onPressed: () => Navigator.pop(context, option),
               child: Text(option),
             );
           }).toList(),
@@ -64,7 +95,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
           children: [
-             Text(
+            Text(
               '설정',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
@@ -102,20 +133,36 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: Icons.volume_up,
               label: '효과음',
               value: widget.soundEffectsEnabled,
-              onChanged: (value) {
-                widget.onSoundEffectsChanged?.call(value); // 상태만 바꿈
-              },
+              onChanged: (value) => widget.onSoundEffectsChanged?.call(value),
             ),
+
             const SizedBox(height: 20),
             buildListTile(
               context: context,
-              icon: Icons.volunteer_activism, // 원하는 아이콘으로 변경 가능
+              icon: Icons.volunteer_activism,
               label: '도움을 주신 분들',
               value: '',
               onTap: () {
-                // 추후 연결
-                Navigator.push(context,MaterialPageRoute(builder: (context) => CreditsPage(),));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) =>  CreditsPage()),
+                );
               },
+            ),
+
+            const SizedBox(height: 30),
+            const Divider(),
+
+            // 로그아웃
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: Text(
+                _signingOut ? '로그아웃 중…' : '로그아웃',
+                style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
+              ),
+              onTap: _signingOut ? null : _confirmAndSignOut,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              tileColor: Theme.of(context).cardColor,
             ),
           ],
         ),
@@ -138,7 +185,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
-                onPressed: () {}, // 현재 페이지이므로 빈 처리
+                onPressed: () {}, // 현재 페이지
               ),
             ],
           ),
@@ -149,7 +196,7 @@ class _SettingsPageState extends State<SettingsPage> {
 }
 
 class CreditsPage extends StatelessWidget {
-  const CreditsPage({super.key});
+  CreditsPage({super.key}); // const 제거
 
   @override
   Widget build(BuildContext context) {
@@ -166,14 +213,14 @@ class CreditsPage extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               "• 아이콘: WebHostingHub Glyphs\n"
-              "  출처: https://www.webhostinghub.com/glyphs\n"
-              "  라이선스: SIL Open Font License 1.1",
+                  "  출처: https://www.webhostinghub.com/glyphs\n"
+                  "  라이선스: SIL Open Font License 1.1",
               style: TextStyle(fontSize: 14),
             ),
             SizedBox(height: 20),
             Text(
               "아이콘의 저작권은 WebHostingHub에 있으며, 본 앱은 "
-              "SIL Open Font License 1.1에 따라 해당 아이콘을 사용합니다.",
+                  "SIL Open Font License 1.1에 따라 해당 아이콘을 사용합니다.",
               style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
             ),
           ],
