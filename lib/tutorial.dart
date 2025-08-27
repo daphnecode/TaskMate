@@ -4,30 +4,30 @@ List<Widget> getTutorialPagesFor(int pageType) {
     switch (pageType) {
       case 0:
         return [
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage1(),)),
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage2(),)),
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage3(),)),
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage4(),)),
+          Center(child: SingleChildScrollView(child: TutorialPage1()),),
+          Center(child: SingleChildScrollView(child: TutorialPage2()),),
+          Center(child: SingleChildScrollView(child: TutorialPage3()),),
+          Center(child: SingleChildScrollView(child: TutorialPage4()),),
         ];
       case 1:
         return [
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage5(),)),
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage6(),)),
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage7(),)),
+          Center(child: SingleChildScrollView(child: TutorialPage5()),),
+          Center(child: SingleChildScrollView(child: TutorialPage6()),),
+          Center(child: SingleChildScrollView(child: TutorialPage7()),),
         ];
       case 2:
         return [
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage8(),)),
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage9(),)),
+          Center(child: SingleChildScrollView(child: TutorialPage8()),),
+          Center(child: SingleChildScrollView(child: TutorialPage9()),),
         ];
       case 3:
         return [
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage10(),)),
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage11(),)),
+          Center(child: SingleChildScrollView(child: TutorialPage10()),),
+          Center(child: SingleChildScrollView(child: TutorialPage11()),),
         ];
       default:
         return [
-          Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 350), child: TutorialPage1(),)),
+          Center(child: SingleChildScrollView(child: TutorialPage1()),),
         ];
     }
 }
@@ -42,124 +42,192 @@ void showTutorial(BuildContext context, int pageType) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
-        child: PageView(
-          children: getTutorialPagesFor(pageType),
-        ),
+        child: TutorialDialog(pageType: pageType),
       );
     },
   );
 }
 
+class TutorialDialog extends StatefulWidget {
+  final int pageType;
+  const TutorialDialog({required this.pageType, super.key});
+
+  @override
+  State<TutorialDialog> createState() => _TutorialDialogState();
+}
+
+class _TutorialDialogState extends State<TutorialDialog> {
+  final PageController _controller = PageController();
+  int _currentPage = 0;
+  List<Widget> _pages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = getTutorialPagesFor(widget.pageType);
+  }
+
+  void _nextPage() {
+    if (_currentPage < _pages.length - 1) {
+      _currentPage++;
+      _controller.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _previousPage() {
+    if (_currentPage > 0) {
+      _currentPage--;
+      _controller.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.all(16),
+      child: SizedBox(
+        width: 400,
+        height: 600,
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView(
+                controller: _controller,
+                physics: const NeverScrollableScrollPhysics(), // 웹에서 드래그 막기
+                children: _pages.toList(),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_left),
+                  onPressed: _previousPage,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_right),
+                  onPressed: _nextPage,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
 class TutorialPage1 extends StatelessWidget {
   const TutorialPage1({super.key});
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.arrow_left,),
-                Image.asset(
-                  "assets/images/petTuto1.png",
-                  height: 500.0,
-                  width: 250.0,
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            "assets/images/petTuto1.png",
+            height: 500.0,
+            width: 250.0,
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "1.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                Icon(Icons.arrow_right,),
-              ],
-            ),
-            SizedBox(height: 10,),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 번호 (고정 너비)
-                SizedBox(
-                  width: 24,
-                  child: Text(
-                    "1.",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "상태창",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ),
-                // 제목 + 설명
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "상태창",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "펫의 포만도, 행복도, 레벨을 확인한다. 클릭하면 상세하게 보여준다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "펫의 포만도, 행복도, 레벨을 확인한다.\n클릭하면 상세하게 보여준다.",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10,),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 번호 (고정 너비)
-                SizedBox(
-                  width: 24,
-                  child: Text(
-                    "2.",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
                     ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 번호 (고정 너비)
+              SizedBox(
+                width: 24,
+                child: Text(
+                  "2.",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                // 제목 + 설명
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "게임 기능",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+              ),
+              // 제목 + 설명
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "게임 기능",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "미니게임을 진행한다.\n아이템을 사용하거나 구매한다.",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          height: 1.5,
-                        ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "미니게임을 진행한다.\n아이템을 사용하거나 구매한다.",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("닫기"),
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("닫기"),
+          ),
+        ],
       ),
     );
   }
@@ -174,17 +242,10 @@ class TutorialPage2 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto1.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,17 +348,10 @@ class TutorialPage3 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto1.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,17 +454,10 @@ class TutorialPage4 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto1.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,17 +600,10 @@ class TutorialPage5 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto3.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -666,17 +706,10 @@ class TutorialPage6 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto2.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -779,17 +812,10 @@ class TutorialPage7 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto2.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -892,17 +918,10 @@ class TutorialPage8 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto4.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1005,17 +1024,10 @@ class TutorialPage9 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto5.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1118,17 +1130,10 @@ class TutorialPage10 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto6.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1231,17 +1236,10 @@ class TutorialPage11 extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.arrow_left,),
-              Image.asset(
+          Image.asset(
                 "assets/images/petTuto7.png",
                 height: 500.0,
-                width: 250.0,
-              ),
-              Icon(Icons.arrow_right,),
-            ],
-          ),
+                width: 250.0,),
           SizedBox(height: 10,),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
