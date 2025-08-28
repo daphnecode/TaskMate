@@ -93,15 +93,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
 
-    // items/seed
-    final itemsRef = userRef.collection('items').doc('seed');
-    if (!(await itemsRef.get()).exists) {
-      batch.set(itemsRef, {
-        'starterPack': true,
-        'coins': 0,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    }
+    
 
     // dailyTasks/yyyy-mm-dd
     final todayId = DateTime.now().toIso8601String().substring(0, 10);
