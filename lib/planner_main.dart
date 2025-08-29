@@ -13,6 +13,9 @@ import 'package:taskmate/widgets/date_badge.dart';
 import 'package:taskmate/widgets/repeat_task_box.dart';
 import 'package:taskmate/widgets/today_task_box.dart';
 
+/// 🔧 Functions 리전 (배포한 리전에 맞게 수정)
+const String kFunctionsRegion = 'asia-northeast3';
+
 class PlannerMain extends StatefulWidget {
   final void Function(int) onNext;
   final String sortingMethod;
@@ -39,9 +42,8 @@ class _PlannerMainState extends State<PlannerMain> {
   bool _isSubmitted = false;
   bool _submitting = false;
 
-  // 기존: String userId = "HiHgtVpIvdyCZVtiFCOc";
-  //  변경: 로그인한 사용자의 uid로 런타임에 초기화
-  late final String userId;
+  // 로그인 전에도 안전하도록 nullable 처리
+  String? userId;
 
   String _dateKey(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
@@ -76,9 +78,10 @@ class _PlannerMainState extends State<PlannerMain> {
   }
 
   void _autoSave() {
+    if (userId == null) return; // 로그인 전 안전 가드
     final dateKey = _dateKey(selectedDate);
-    updateTasksToFirestore(userId, dateKey, todayTaskList);
-    updateRepeatTasks(userId, repeatTaskList);
+    updateTasksToFirestore(userId!, dateKey, todayTaskList);
+    updateRepeatTasks(userId!, repeatTaskList);
   }
 
   DateTime getKstNow() {
@@ -100,20 +103,20 @@ class _PlannerMainState extends State<PlannerMain> {
   void initState() {
     super.initState();
 
-
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) {
-      return;
-    }
-    userId = uid;
+    userId = FirebaseAuth.instance.currentUser?.uid;
 
     selectedDate = getKstNow();
     final dateKey = _dateKey(selectedDate);
 
-    // 🔹 dailyTasks → planner (오늘 날짜 동기화)
-    syncDailyToPlanner(userId, dateKey).then((_) {
-      // 🔹 dailyTasks 동기화 후 일일 리스트 불러오기
-      fetchTasks(userId, dateKey).then((data) {
+    if (userId == null) {
+      // 비로그인 상태면 데이터 로딩만 건너뜀
+      return;
+    }
+
+    // dailyTasks → planner 동기화 후 오늘 리스트 로드
+    syncDailyToPlanner(userId!, dateKey).then((_) {
+      fetchTasks(userId!, dateKey).then((data) {
+        if (!mounted) return;
         setState(() {
           todayTaskList = data['todayTasks'];
           _isSubmitted = data['submitted'];
@@ -121,16 +124,17 @@ class _PlannerMainState extends State<PlannerMain> {
       });
     });
 
-    // 🔹 방문 로그 기록 (visited)
+    // 방문 로그 기록
     firestore
         .collection('Users')
-        .doc(userId)
+        .doc(userId!)
         .collection('log')
         .doc(dateKey)
         .set({'visited': true}, SetOptions(merge: true));
 
-    // 반복 리스트 불러오기
-    fetchRepeatTasks(userId).then((repeatTasks) {
+    // 반복 리스트 로드
+    fetchRepeatTasks(userId!).then((repeatTasks) {
+      if (!mounted) return;
       setState(() {
         repeatTaskList = repeatTasks;
       });
@@ -200,6 +204,16 @@ class _PlannerMainState extends State<PlannerMain> {
           TextButton(
             onPressed: () {
               if (_submitting) return;
+
+              // 로그인 확인
+              final uid = userId ?? FirebaseAuth.instance.currentUser?.uid;
+              if (uid == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('로그인이 필요합니다.')),
+                );
+                return;
+              }
+
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -209,34 +223,45 @@ class _PlannerMainState extends State<PlannerMain> {
                       TextButton(
                         onPressed: () async {
                           Navigator.of(context).pop();
+
                           final dateKey = _dateKey(selectedDate);
-
-                          if (!mounted) return;
-
                           setState(() => _submitting = true);
 
                           try {
+                            // 플래너 저장
                             await submitTasksToFirestore(
-                                userId, dateKey, todayTaskList, repeatTaskList);
+                              uid,
+                              dateKey,
+                              todayTaskList,
+                              repeatTaskList,
+                            );
+
+                            // 이번에 얻을 포인트 합계
                             final earned = _calcEarnedPointsForToday();
-                            final functions = FirebaseFunctions.instance;
-                            final callable =
-                            functions.httpsCallable('submitReward');
+
+                            // ✅ Functions 리전 명시
+                            final functions = FirebaseFunctions.instanceFor(
+                              region: kFunctionsRegion,
+                            );
+                            final callable = functions.httpsCallable('submitReward');
 
                             if (earned > 0) {
-                              widget.onPointsAdded?.call(earned); // 로컬 반영
+                              // UI 즉시 반영
+                              widget.onPointsAdded?.call(earned);
                               try {
                                 await callable.call({
-                                  'uid': userId,
+                                  'uid': uid,
                                   'earned': earned,
-                                  'dateKey': dateKey
+                                  'dateKey': dateKey,
                                 });
                               } catch (e) {
-                                widget.onPointsAdded?.call(-earned); // 실패 시 롤백
+                                // 실패 시 롤백
+                                widget.onPointsAdded?.call(-earned);
                                 rethrow;
                               }
                             }
 
+                            if (!mounted) return;
                             setState(() => _isSubmitted = true);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("제출 완료!")),
@@ -244,9 +269,10 @@ class _PlannerMainState extends State<PlannerMain> {
                           } catch (e) {
                             showDialog(
                               context: context,
-                              builder: (_) =>
-                                  AlertDialog(content: Text(e.toString())),
+                              builder: (_) => AlertDialog(content: Text(e.toString())),
                             );
+                          } finally {
+                            if (mounted) setState(() => _submitting = false);
                           }
                         },
                         child: const Text('예'),
@@ -333,8 +359,8 @@ class _PlannerMainState extends State<PlannerMain> {
                   updatePoint(repeatTaskList, index, newPoint),
               onStartEditing: (index) {
                 setState(() {
-                  repeatTaskList[index] = repeatTaskList[index]
-                      .copyWith(isEditing: true);
+                  repeatTaskList[index] =
+                      repeatTaskList[index].copyWith(isEditing: true);
                 });
               },
               sortingMethod: widget.sortingMethod,
@@ -359,8 +385,8 @@ class _PlannerMainState extends State<PlannerMain> {
                   updatePoint(todayTaskList, index, newPoint),
               onStartEditing: (index) {
                 setState(() {
-                  todayTaskList[index] = todayTaskList[index]
-                      .copyWith(isEditing: true);
+                  todayTaskList[index] =
+                      todayTaskList[index].copyWith(isEditing: true);
                 });
               },
               sortingMethod: widget.sortingMethod,

@@ -1,19 +1,18 @@
-// lib/settingspage.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:taskmate/widgets/settings_widgets.dart';
 
 class SettingsPage extends StatefulWidget {
-  final bool isDarkMode; // 다크모드 켜져있는지 여부
-  final bool notificationsEnabled; // 알림설정 여부
-  final bool soundEffectsEnabled; // 효과음 여부
-  final String sortingMethod; // 리스트 정렬 방식 표시 텍스트
+  final bool isDarkMode;
+  final bool notificationsEnabled;
+  final bool soundEffectsEnabled;
+  final String sortingMethod;
   final void Function(int) onNext;
 
-  final void Function(bool)? onDarkModeChanged; // 다크 모드 토글 시 호출
-  final void Function(bool)? onNotificationsChanged; // 알림설정 토글 시 호출
-  final void Function(bool)? onSoundEffectsChanged; // 효과음 토글 시 호출
-  final void Function(String)? onChangeSortingMethod; // 정렬 방식 항목 클릭 시 실행
+  final void Function(bool)? onDarkModeChanged;
+  final void Function(bool)? onNotificationsChanged;
+  final void Function(bool)? onSoundEffectsChanged;
+  final void Function(String)? onChangeSortingMethod;
 
   const SettingsPage({
     super.key,
@@ -54,12 +53,10 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() => _signingOut = true);
     try {
       await FirebaseAuth.instance.signOut();
-      // 루트에서 authStateChanges()가 LoginPage를 띄움.
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('로그아웃되었습니다.')),
         );
-        // 네비게이션 스택 정리(선택): 뒤로 가기 시 로그인으로 남도록
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } finally {
@@ -68,17 +65,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void onSortingChangedDialog(BuildContext context) async {
-    String? selected = await showDialog<String>(
+    final selected = await showDialog<String>(
       context: context,
       builder: (context) {
         return SimpleDialog(
           title: const Text('정렬 방법 선택'),
-          children: _sortOptions.map((option) {
-            return SimpleDialogOption(
-              onPressed: () => Navigator.pop(context, option),
-              child: Text(option),
-            );
-          }).toList(),
+          children: _sortOptions
+              .map((option) => SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, option),
+            child: Text(option),
+          ))
+              .toList(),
         );
       },
     );
@@ -97,7 +94,10 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Text(
               '설정',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
@@ -133,7 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: Icons.volume_up,
               label: '효과음',
               value: widget.soundEffectsEnabled,
-              onChanged: (value) => widget.onSoundEffectsChanged?.call(value),
+              onChanged: (v) => widget.onSoundEffectsChanged?.call(v),
             ),
 
             const SizedBox(height: 20),
@@ -145,7 +145,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) =>  CreditsPage()),
+                  MaterialPageRoute(builder: (_) => CreditsPage()),
                 );
               },
             ),
@@ -158,16 +158,18 @@ class _SettingsPageState extends State<SettingsPage> {
               leading: const Icon(Icons.logout, color: Colors.redAccent),
               title: Text(
                 _signingOut ? '로그아웃 중…' : '로그아웃',
-                style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    color: Colors.redAccent, fontWeight: FontWeight.w600),
               ),
               onTap: _signingOut ? null : _confirmAndSignOut,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               tileColor: Theme.of(context).cardColor,
             ),
           ],
         ),
       ),
-
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).bottomAppBarTheme.color,
         child: Padding(
@@ -228,7 +230,6 @@ class CreditsPage extends StatelessWidget {
               "Icons (Basic Straight Lineal) by Freepik - www.freepik.com",
               style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
             ),
-
           ],
         ),
       ),
