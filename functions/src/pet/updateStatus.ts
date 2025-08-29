@@ -47,7 +47,7 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         // 4. 상태 업데이트
         if (newHappy === 0) {
           const lostHappy = petHappy - newHappy;
-          const newExp = Math.max(0, petExp - (lostHappy ? lostHappy : 2));
+          const newExp = Math.max(0, petExp - (petHappy === 0 ? lostHappy : 2));
           updates.currentExp = newExp;
         }
         
