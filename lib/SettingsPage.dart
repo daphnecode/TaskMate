@@ -223,6 +223,12 @@ class CreditsPage extends StatelessWidget {
                   "SIL Open Font License 1.1에 따라 해당 아이콘을 사용합니다.",
               style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
             ),
+            SizedBox(height: 20),
+            Text(
+              "Icons (Basic Straight Lineal) by Freepik - www.freepik.com",
+              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+            ),
+
           ],
         ),
       ),
