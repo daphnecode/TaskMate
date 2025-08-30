@@ -123,7 +123,7 @@ class RootState extends State<Root> {
         bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey[900]),
       ),
       themeMode:
-      (user.setting?['darkMode'] == true) ? ThemeMode.dark : ThemeMode.light,
+      (user.setting['darkMode'] == true) ? ThemeMode.dark : ThemeMode.light,
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -278,7 +278,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final String uid = FirebaseAuth.instance.currentUser?.uid ?? fallbackUid;
 
     final String petId =
-    (widget.user.nowPet is String && widget.user.nowPet.isNotEmpty)
+    (widget.user.nowPet.isNotEmpty)
         ? widget.user.nowPet
         : 'default';
 
@@ -327,7 +327,7 @@ class _MyHomePageState extends State<MyHomePage> {
           pet: pet,
           user: widget.user,
           pageType: 0,
-          soundEffectsOn: widget.user.setting?['sound'] ?? true,
+          soundEffectsOn: widget.user.setting['sound'] ?? true,
         );
         break;
       case 1:
@@ -340,7 +340,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 3:
         currentWidget = PlannerMain(
           onNext: goNext,
-          sortingMethod: widget.user.setting?['listSort'] ?? 'default',
+          sortingMethod: widget.user.setting['listSort'] ?? 'default',
           onPointsAdded: widget.onPointsAdded,
         );
         break;
@@ -378,10 +378,10 @@ class _MyHomePageState extends State<MyHomePage> {
       case 6:
         currentWidget = SettingsPage(
           onNext: goNext,
-          isDarkMode: widget.user.setting?['darkMode'] ?? false,
-          soundEffectsEnabled: widget.user.setting?['sound'] ?? true,
-          notificationsEnabled: widget.user.setting?['push'] ?? false,
-          sortingMethod: widget.user.setting?['listSort'] ?? 'default',
+          isDarkMode: widget.user.setting['darkMode'] ?? false,
+          soundEffectsEnabled: widget.user.setting['sound'] ?? true,
+          notificationsEnabled: widget.user.setting['push'] ?? false,
+          sortingMethod: widget.user.setting['listSort'] ?? 'default',
           onDarkModeChanged: widget.onDarkModeChanged,
           onNotificationsChanged: widget.onPushChanged,
           onChangeSortingMethod: widget.onSortingChanged,
