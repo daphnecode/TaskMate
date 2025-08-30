@@ -42,14 +42,9 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         
         const newHunger = Math.max(0, petHunger - 2);
         const newHappy = Math.max(0, petHappy - 2);
-        let updates: any = { hunger: newHunger, happy: newHappy };
-
-        // 4. 상태 업데이트
-        if (newHappy === 0) {
-          const lostHappy = petHappy - newHappy;
-          const newExp = Math.max(0, petExp - (petHappy === 0 ? lostHappy : 2));
-          updates.currentExp = newExp;
-        }
+        const newExp = Math.max(0, petExp - 2);
+        let updates: any = { hunger: newHunger, happy: newHappy , currentExp: newExp};
+        
         
         await petRef.set(updates, { merge: true });
         
