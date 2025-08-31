@@ -49,7 +49,8 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         await petRef.set(updates, { merge: true });
         
 
-        console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updateStatus);
+        console.log(`유저 ${userId}의 펫 ${nowPetId} 의 currentExp : ${newExp}`);
+        console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updateStatus);        
       }
 
       console.log("모든 유저의 펫 상태 감소 완료 ✅");
