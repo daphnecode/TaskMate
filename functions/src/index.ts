@@ -3,6 +3,7 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as admin from "firebase-admin";
 import { db } from "./firebase";
 
+import { updateStatus } from "./pet/updateStatus";
 
 // KST 기준 YYYY-MM-DD 문자열
 function kstDateStr(date = new Date()): string {
@@ -117,4 +118,4 @@ export const onTaskSubmitted = onDocumentWritten(
 );
 
 export * from "./submitReward";
-export * from "./pet/updateStatus";
+exports.updatesStatus = updateStatus;
