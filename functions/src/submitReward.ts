@@ -1,10 +1,14 @@
-// functions/src/submitReward.ts
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { db } from "./firebase";
 
-
-export const submitReward = onCall(
+/**
+ * 보상 지급 (아시아 리전 고정)
+ * - Users/{uid} 가 없을 수 있으므로 먼저 set(merge:true)로 보장
+ * - currentPoint, gotPoint 증가
+ * - Users/{uid}/log/{dateKey} 에 rewarded 기록
+ */
+export const submitRewardAN3 = onCall(
   { region: "asia-northeast3" },
   async (req) => {
     const uid = (req.auth?.uid as string) || (req.data.uid as string);
@@ -24,10 +28,10 @@ export const submitReward = onCall(
       const already = logSnap.exists && logSnap.data()?.rewarded === true;
       if (already) return;
 
-      //  Users/{uid} 문서가 없어서 update가 실패하지 않도록, 먼저 존재 보장
+      // Users/{uid} 보장
       tx.set(userRef, {}, { merge: true });
 
-      //  increment는 set(merge:true)로 안전하게
+      // 포인트 증가
       tx.set(
         userRef,
         {
@@ -37,12 +41,13 @@ export const submitReward = onCall(
         { merge: true }
       );
 
+      // 로그 표식
       tx.set(
         logRef,
         {
           rewarded: true,
           earnedPoints: earned,
-          rewardedBy: "function",
+          rewardedBy: "submitRewardAN3",
           rewardedAt: admin.firestore.FieldValue.serverTimestamp(),
         },
         { merge: true }

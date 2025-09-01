@@ -243,7 +243,7 @@ class _PlannerMainState extends State<PlannerMain> {
                             final functions = FirebaseFunctions.instanceFor(
                               region: kFunctionsRegion,
                             );
-                            final callable = functions.httpsCallable('submitReward');
+                            final callable = functions.httpsCallable('submitRewardAN3');
 
                             if (earned > 0) {
                               // UI 즉시 반영
