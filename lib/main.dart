@@ -290,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .get();
 
     final Pets loadedItems2;
-    if (petDoc.exists) {
+    if (!petDoc.exists) {
       final data = petDoc.data() as Map<String, dynamic>;
       loadedItems2 = Pets.fromMap(data);
     } else {
@@ -299,7 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
         name: "",
         hunger: 0,
         happy: 0,
-        level: 0,
+        level: 100,
         currentExp: 0,
         styleID: "",
       );
@@ -320,6 +320,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final idx = widget.currentIndex; // 🔸 로컬 state 대신 props 사용
     Widget currentWidget;
 
+
+    print("pet in myhomepage: ${pet.toMap()}");
     switch (idx) {
       case 0:
         currentWidget = Petmain(

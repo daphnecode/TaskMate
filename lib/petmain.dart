@@ -43,8 +43,8 @@ class _MainareaState extends State<Mainarea> {
 
   @override
   Widget build(BuildContext context) {
-    final String placeAsset = (widget.user.setting?['placeID'] ?? '') as String;
-    final String petAsset = widget.pet.image ?? '';
+    final String placeAsset = (widget.user.setting['placeID'] ?? '') as String;
+    final String petAsset = widget.pet.image;
 
     return Column(
       children: [

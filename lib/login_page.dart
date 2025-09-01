@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   bool isLogin = true;      // true: 로그인, false: 회원가입
-  bool isLoading = false;   // 버튼 로딩 스피너
+  bool isLoading = false;
   bool _obscure = true;
 
   @override
@@ -26,22 +26,25 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  /// 최초 로그인한 사용자의 Firestore 문서 초기 세팅 (이메일 인증 완료/익명 로그인 시)
+  /// 최초 로그인/회원가입 이후 사용자 문서 초기화
+  /// - 신규 계정: 기본 문서/컬렉션 시드 생성
+  /// - 기존 계정: lastLoginAt 갱신 + 누락 필드만 보완(덮어쓰기 금지)
   Future<void> _bootstrapUserDoc(User user, {required String provider}) async {
     final usersDoc = FirebaseFirestore.instance.collection('Users').doc(user.uid);
     final snap = await usersDoc.get().timeout(const Duration(seconds: 10));
 
     if (!snap.exists) {
-      await usersDoc
-          .set({
+      // 신규 계정 → 기본 필드 세팅
+      await usersDoc.set({
         'email': user.email,
         'provider': provider, // 'password' | 'anonymous'
         'createdAt': FieldValue.serverTimestamp(),
+        'lastLoginAt': FieldValue.serverTimestamp(),
+        // 상위 기본
         'currentPoint': 0,
         'currentExp': 0,
         'gotPoint': 0,
         'nowPet': 'dragon',
-        // 신규 계정 기본 세팅/통계
         'setting': {
           'darkMode': false,
           'push': false,
@@ -50,42 +53,54 @@ class _LoginPageState extends State<LoginPage> {
           'placeID': 'assets/images/prairie.png',
         },
         'statistics': {},
-        'lastLoginAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true))
-          .timeout(const Duration(seconds: 10));
+      }, SetOptions(merge: true));
 
-      // ✅ 하위 컬렉션 시드 생성 (없을 때만 생성)
+      // 하위 컬렉션 시드(없을 때만 생성)
       await _seedUserCollections(user.uid);
-      await ensureUserStructure(user.uid);
+
+      // 누락 필드만 보완(중복 안전)
+      await ensureUserStructureSafe(user.uid);
     } else {
-      // 로그인 시 갱신 + 누락 보완
-      await usersDoc
-          .set({
+      // 기존 계정 → 덮어쓰기 금지. 메타만 갱신.
+      await usersDoc.set({
         'email': user.email,
         'provider': provider,
         'lastLoginAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true))
-          .timeout(const Duration(seconds: 10));
+      }, SetOptions(merge: true));
 
+      // “없을 때만” 생성하는 시드 & 안전 보강
       await _seedUserCollections(user.uid);
-      await ensureUserStructure(user.uid);
+      await ensureUserStructureSafe(user.uid);
     }
   }
 
-  /// 하위 컬렉션들(예: pets/items/dailyTasks/log) 없으면 기본 문서 만들어줌
+  /// 하위 컬렉션 시드 (없을 때만 생성)
   Future<void> _seedUserCollections(String uid) async {
     final fs = FirebaseFirestore.instance;
     final userRef = fs.collection('Users').doc(uid);
-    final batch = fs.batch();
 
     // pets/dragon
-    final petRef = userRef.collection('pets').doc('dragon');
-    if (!(await petRef.get()).exists) {
-      batch.set(petRef, {
-        'name': 'Dragon',
+    final dragon = userRef.collection('pets').doc('dragon');
+    if (!(await dragon.get()).exists) {
+      await dragon.set({
         'image': 'assets/images/dragon.png',
-        'hunger': 0,
-        'happy': 0,
+        'name': '드래곤',
+        'hunger': 50,
+        'happy': 50,
+        'level': 1,
+        'currentExp': 0,
+        'styleID': 'basic',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+    // pets/unicon
+    final unicon = userRef.collection('pets').doc('unicon');
+    if (!(await unicon.get()).exists) {
+      await unicon.set({
+        'image': 'assets/images/unicon.png',
+        'name': '유니콘',
+        'hunger': 50,
+        'happy': 50,
         'level': 1,
         'currentExp': 0,
         'styleID': 'basic',
@@ -93,29 +108,75 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
 
-    
-
-    // dailyTasks/yyyy-mm-dd
+    // dailyTasks/today(빈 시드 – 선택)
     final todayId = DateTime.now().toIso8601String().substring(0, 10);
-    final dailyRef = userRef.collection('dailyTasks').doc(todayId);
-    if (!(await dailyRef.get()).exists) {
-      batch.set(dailyRef, {
+    final daily = userRef.collection('dailyTasks').doc(todayId);
+    if (!(await daily.get()).exists) {
+      await daily.set({
         'date': todayId,
-        'tasks': <dynamic>[], // 빈 리스트
+        'tasks': <dynamic>[],
         'createdAt': FieldValue.serverTimestamp(),
       });
     }
 
-    // log/first
-    final logRef = userRef.collection('log').doc('first');
-    if (!(await logRef.get()).exists) {
-      batch.set(logRef, {
+    // log/first (환영 메시지 – 선택)
+    final logFirst = userRef.collection('log').doc('first');
+    if (!(await logFirst.get()).exists) {
+      await logFirst.set({
         'message': 'Welcome!',
         'ts': FieldValue.serverTimestamp(),
       });
     }
 
-    await batch.commit();
+
+    // 기존 문서면 갱신하지 않음.
+    final statsSummary = userRef.collection('stats').doc('summary');
+    if (!(await statsSummary.get()).exists) {
+      await statsSummary.set({
+        'totalCompleted': 0,
+        'streakDays': 0,
+        'lastUpdatedDateStr': null, // 첫 제출 시 함수가 채움
+        'lastUpdated': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  /// 누락된 키만 “보완” (덮어쓰지 않음)
+  Future<void> ensureUserStructureSafe(String uid) async {
+    final users = FirebaseFirestore.instance.collection('Users');
+    final userDoc = users.doc(uid);
+    final snap = await userDoc.get();
+    final data = (snap.data() as Map<String, dynamic>?) ?? {};
+
+    final Map<String, dynamic> patch = {};
+    if (!data.containsKey('currentPoint')) patch['currentPoint'] = 0;
+    if (!data.containsKey('currentExp'))   patch['currentExp'] = 0;
+    if (!data.containsKey('gotPoint'))     patch['gotPoint'] = 0;
+    if (!data.containsKey('nowPet'))       patch['nowPet'] = 'dragon';
+
+    final setting = Map<String, dynamic>.from(data['setting'] ?? {});
+    final Map<String, dynamic> settingPatch = {};
+    if (!setting.containsKey('darkMode')) settingPatch['darkMode'] = false;
+    if (!setting.containsKey('push'))     settingPatch['push'] = false;
+    if (!setting.containsKey('listSort')) settingPatch['listSort'] = 'default';
+    if (!setting.containsKey('sound'))    settingPatch['sound'] = true;
+    if (!setting.containsKey('placeID'))  settingPatch['placeID'] = 'assets/images/prairie.png';
+    if (settingPatch.isNotEmpty) patch['setting'] = {...setting, ...settingPatch};
+
+    if (patch.isNotEmpty) {
+      await userDoc.set(patch, SetOptions(merge: true));
+    }
+
+    // stats/summary는 “없을 때만” 시드. 기존이면 건드리지 않음.
+    final statsSummary = userDoc.collection('stats').doc('summary');
+    if (!(await statsSummary.get()).exists) {
+      await statsSummary.set({
+        'totalCompleted': 0,
+        'streakDays': 0,
+        'lastUpdatedDateStr': null,
+        'lastUpdated': FieldValue.serverTimestamp(),
+      });
+    }
   }
 
   void _showError(String msg) {
@@ -125,15 +186,13 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInAnonymously() async {
     setState(() => isLoading = true);
     try {
-      final cred =
-      await _auth.signInAnonymously().timeout(const Duration(seconds: 10));
+      final cred = await _auth.signInAnonymously().timeout(const Duration(seconds: 10));
       final user = cred.user;
       if (user == null) {
         throw FirebaseAuthException(code: 'unknown', message: '익명 로그인 실패');
       }
-      await _bootstrapUserDoc(user, provider: 'anonymous')
-          .timeout(const Duration(seconds: 10));
-      // 화면 전환은 상위(authStateChanges)에서 자동 처리됨
+      await _bootstrapUserDoc(user, provider: 'anonymous');
+      // 화면 전환은 상위(authStateChanges)에서 처리
     } on TimeoutException {
       _showError('요청이 지연됩니다. 네트워크를 확인해주세요.');
     } on FirebaseException catch (e) {
@@ -184,8 +243,7 @@ class _LoginPageState extends State<LoginPage> {
           return;
         }
 
-        await _bootstrapUserDoc(fresh!, provider: 'password')
-            .timeout(const Duration(seconds: 10));
+        await _bootstrapUserDoc(fresh!, provider: 'password');
       } else {
         // 회원가입
         final cred = await _auth
@@ -214,16 +272,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  /// 인증 메일(재)발송 시도
   Future<void> _maybeSendVerificationEmail(User? user) async {
-    try {
-      await user?.sendEmailVerification();
-    } catch (_) {}
+    try { await user?.sendEmailVerification(); } catch (_) {}
   }
 
-  /// 인증 안내 다이얼로그
-  Future<void> _showVerifyDialog(
-      {required bool emailSent, required String email}) async {
+  Future<void> _showVerifyDialog({required bool emailSent, required String email}) async {
     if (!mounted) return;
     await showDialog<void>(
       context: context,
@@ -262,7 +315,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // ─ UI 헬퍼
   InputDecoration _inputDeco(String label, {Widget? suffix}) {
     final base = Theme.of(context);
     return InputDecoration(
@@ -282,8 +334,7 @@ class _LoginPageState extends State<LoginPage> {
           width: 2,
         ),
       ),
-      contentPadding:
-      const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       suffixIcon: suffix,
     );
   }
@@ -347,10 +398,8 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: _inputDeco(
                             '비밀번호',
                             suffix: IconButton(
-                              icon: Icon(
-                                  _obscure ? Icons.visibility_off : Icons.visibility),
-                              onPressed: () =>
-                                  setState(() => _obscure = !_obscure),
+                              icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                              onPressed: () => setState(() => _obscure = !_obscure),
                               tooltip: _obscure ? '표시' : '숨기기',
                             ),
                           ),
@@ -375,8 +424,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               child: Text(
                                 submitText,
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w700),
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                               ),
                             ),
                           ),
@@ -385,16 +433,12 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             height: 48,
                             child: OutlinedButton(
-                              onPressed: () =>
-                                  setState(() => isLogin = !isLogin),
+                              onPressed: () => setState(() => isLogin = !isLogin),
                               style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                side: BorderSide(
-                                  color: base.colorScheme.primary
-                                      .withOpacity(0.35),
-                                ),
+                                side: BorderSide(color: base.colorScheme.primary.withOpacity(0.35)),
                               ),
                               child: Text(
                                 toggleText,
@@ -406,10 +450,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          Opacity(
-                            opacity: 0.5,
-                            child: Divider(color: base.dividerColor),
-                          ),
+                          Opacity(opacity: 0.5, child: Divider(color: base.dividerColor)),
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
@@ -447,80 +488,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-
-Future<void> ensureUserStructure(String uid) async {
-  final users = FirebaseFirestore.instance.collection('Users');
-  final userDoc = users.doc(uid);
-
-  // Users/{uid} 기본 필드 보강 (이미 있으면 merge)
-  await userDoc.set({
-    'currentPoint': 0,
-    'currentExp': 0,
-    'gotPoint': 0,
-    'nowPet': 'dragon',
-    'setting': {
-      'darkMode': false,
-      'push': false,
-      'listSort': 'default',
-      'sound': true,
-      'placeID': 'assets/images/prairie.png'
-    },
-    'statistics': {},
-  }, SetOptions(merge: true));
-
-  final pets = userDoc.collection('pets');
-  final dragon = await pets.doc('dragon').get();
-  if (!dragon.exists) {
-    await pets.doc('dragon').set({
-      'image': 'assets/images/dragon.png',
-      'name': '드래곤',
-      'hunger': 50,
-      'happy': 50,
-      'level': 1,
-      'currentExp': 0,
-      'styleID': 'style123',
-    });
-  }
-  final unicon = await pets.doc('unicon').get();
-  if (!unicon.exists) {
-    await pets.doc('unicon').set({
-      'image': 'assets/images/unicon.png',
-      'name': '유니콘',
-      'hunger': 50,
-      'happy': 50,
-      'level': 1,
-      'currentExp': 0,
-      'styleID': 'style123',
-    });
-  }
-
-
-
-  final itemsCol = userDoc.collection('items');
-  final cookie = itemsCol.doc('cookie');
-  if (!(await cookie.get()).exists) {
-    await cookie.set({
-      'name': 'cookie',
-      'icon': 'assets/icons/icon-chicken.png',
-      'category': 1,    // 음식
-      'hunger': 15,
-      'happy': 4,
-      'price': 40,
-      'count': 0,
-      'itemText': '먹으면 힘이 난다',
-    });
-  }
-
-  // ✅ 통계 요약(stats/summary) 시드
-  final statsSummaryRef = userDoc.collection('stats').doc('summary');
-  await statsSummaryRef.set({
-    'totalCompleted': 0,
-    'streakDays': 0,
-    // 처음엔 null 가능. 함수가 첫 제출 시 오늘 날짜로 갱신함
-    'lastUpdatedDateStr': null,
-    'lastUpdated': FieldValue.serverTimestamp(),
-  }, SetOptions(merge: true));
-
 }

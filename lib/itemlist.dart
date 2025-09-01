@@ -1610,6 +1610,7 @@ class _ShopCategoryState extends State<ShopCategory> {
 
   @override
   Widget build(BuildContext context) {
+    print("pet in shopcategory: ${widget.pet.toMap()}");
     return Scaffold(
       appBar: AppBar(),
       body: Column(
