@@ -290,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .get();
 
     final Pets loadedItems2;
-    if (!petDoc.exists) {
+    if (petDoc.exists) {
       final data = petDoc.data() as Map<String, dynamic>;
       loadedItems2 = Pets.fromMap(data);
     } else {
