@@ -11,7 +11,7 @@ import 'package:taskmate/DBtest/firestore_service.dart';
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
   final bool soundEffectsOn;
-  final Pets pet;
+  final Pets? pet;
   final String uid;
   final String petId;
 
@@ -86,10 +86,10 @@ class _RunGameScreenState extends State<RunGameScreen> {
                           // 1) 로컬 반영 (즉시 체감)
                           setState(() {
                             _isPlaying = false; // 다시 거리 버튼 보이도록
-                            widget.pet.happy =
-                                (widget.pet.happy + 10).clamp(0, 100);
-                            widget.pet.hunger =
-                                (widget.pet.hunger - 10).clamp(0, 100);
+                            widget.pet!.happy =
+                                (widget.pet!.happy + 10).clamp(0, 100);
+                            widget.pet!.hunger =
+                                (widget.pet!.hunger - 10).clamp(0, 100);
                           });
 
                           // 2) DB 반영

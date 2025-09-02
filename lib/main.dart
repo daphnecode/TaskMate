@@ -188,7 +188,7 @@ class RootState extends State<Root> {
                       gotPoint: 0,
                       nowPet: '',
                       setting: {
-                        'darkMode': false,
+                        'darkMode': true,
                         'push': false,
                         'listSort': 'default',
                         'sound': true,
@@ -198,9 +198,13 @@ class RootState extends State<Root> {
                   }
                 }
 
-                final nowPetId = loadedUser.nowPet;
-                final petDocRef = userDocRef.collection("Pets").doc(nowPetId);
-                print("pet id is ${nowPetId}");
+                print("user is ${loadedUser.toMap()}");
+                final nowPetId = loadedUser.nowPet ?? "";
+                if (nowPetId.isEmpty) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                final petDocRef = FirebaseFirestore.instance.collection('Users').doc(uid).collection("pets").doc(nowPetId);
+                print(nowPetId);
                 
                 return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   stream: petDocRef.snapshots(),
@@ -210,7 +214,11 @@ class RootState extends State<Root> {
                     }
 
                     final petData = petSnap.data!.data();
-                    Pets pet = Pets.fromMap(petData!);
+                    final pet = petData != null ? Pets.fromMap(petData) : null; 
+
+                    if (petData == null) {
+                      return Center(child: Text("펫 정보가 없습니다."));
+                    }
 
                     return MyHomePage(
                       title: "Virtual Pet",
@@ -251,7 +259,7 @@ class RootState extends State<Root> {
 
 class MyHomePage extends StatefulWidget {
   final Users user;
-  final Pets pet;
+  final Pets? pet;
   final int currentIndex;              // 🔸 외부에서 전달
   final void Function(int) setIndex;   // 🔸 외부 콜백
 
@@ -352,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget currentWidget;
 
 
-    print("pet in myhomepage: ${widget.pet.toMap()}");
+    print("pet in myhomepage: ${widget.pet!.toMap()}");
     switch (idx) {
       case 0:
         currentWidget = Petmain(

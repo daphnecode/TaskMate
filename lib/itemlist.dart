@@ -29,7 +29,7 @@ String nameChange(String name) {
 
 class ItemlistPage1 extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   final bool isUseItem;
@@ -131,8 +131,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                   if(item.count > 0) {
                                     setState(() {
                                       item.count--;
-                                      widget.pet.hunger += item.hunger;
-                                      widget.pet.happy += item.happy;
+                                      widget.pet!.hunger += item.hunger;
+                                      widget.pet!.happy += item.happy;
                                     });
                                     // ✅ 현재 로그인한 사용자 uid 사용
                                     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -348,7 +348,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 
 class ItemlistPage2 extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   final bool isUseItem;
@@ -447,7 +447,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                   if(item.count > 0) {
                                     setState(() {
                                       item.count--;
-                                      widget.pet.happy += item.happy;
+                                      widget.pet!.happy += item.happy;
                                     });
                                     // ✅ 현재 로그인한 사용자 uid 사용
                                     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -661,7 +661,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 
 class ItemlistPage3 extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   final bool isUseItem;
@@ -982,7 +982,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 
 class ItemlistPage4 extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   final bool isUseItem;
@@ -1301,7 +1301,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 
 class ItemCategory extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   const ItemCategory({required this.onNext,required this.pet, required this.user, required this.pageType, super.key});
@@ -1568,7 +1568,7 @@ class _ItemCategoryState extends State<ItemCategory> {
 
 class ShopCategory extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   const ShopCategory({required this.onNext, required this.pet, required this.user,  required this.pageType, super.key});
@@ -1610,7 +1610,7 @@ class _ShopCategoryState extends State<ShopCategory> {
 
   @override
   Widget build(BuildContext context) {
-    print("pet in shopcategory: ${widget.pet.toMap()}");
+    print("pet in shopcategory: ${widget.pet!.toMap()}");
     return Scaffold(
       appBar: AppBar(),
       body: Column(

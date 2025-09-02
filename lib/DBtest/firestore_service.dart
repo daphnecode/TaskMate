@@ -265,7 +265,7 @@ Future<void> itemSaveDB(String userID, String itemID, Item target) async {
   }
 }
 
-Future<void> petSaveDB(String userID, String petID, Pets pet) async {
+Future<void> petSaveDB(String userID, String petID, Pets? pet) async {
   await FirebaseFirestore.instance
       .collection('Users')
       .doc(userID)
@@ -273,7 +273,7 @@ Future<void> petSaveDB(String userID, String petID, Pets pet) async {
       .doc(petID)
       .update(
         {
-          'hunger': pet.hunger,
+          'hunger': pet!.hunger,
           'happy': pet.happy,
         },
       );

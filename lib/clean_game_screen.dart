@@ -10,7 +10,7 @@ import 'package:taskmate/DBtest/firestore_service.dart';
 class CleanGameScreen extends StatefulWidget {
   final void Function(int) onNext;
   final bool soundEffectsOn;
-  final Pets pet;
+  final Pets? pet;
   final String uid;
   final String petId;
 
@@ -66,7 +66,7 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
 
                     // 로컬 즉시 반영
                     setState(() {
-                      widget.pet.happy = (widget.pet.happy + 10).clamp(0, 9999);
+                      widget.pet!.happy = (widget.pet!.happy + 10).clamp(0, 9999);
                     });
 
                     //  DB 반영

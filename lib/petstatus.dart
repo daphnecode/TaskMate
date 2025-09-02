@@ -38,7 +38,7 @@ Row happyStatus(BuildContext context, int nowHappy) {
 }
 
 class PetStatArea extends StatefulWidget{
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   const PetStatArea({required this.pet, required this.user, required this.pageType, super.key});
@@ -71,10 +71,10 @@ class _PetStatAreaState extends State<PetStatArea> {
               Expanded(
                 child: Text(
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold), 
-                  "LV ${widget.pet.level}",),
+                  "LV ${widget.pet!.level}",),
               ),
               Expanded(
-                child: happyStatus(context, widget.pet.happy),
+                child: happyStatus(context, widget.pet!.happy),
               ),
             ],
           ),
@@ -90,7 +90,7 @@ class _PetStatAreaState extends State<PetStatArea> {
                   ),
               ),
               Expanded(
-                child: hungerStatus(context, widget.pet.hunger),
+                child: hungerStatus(context, widget.pet!.hunger),
               ),
             ],
           ),
@@ -101,7 +101,7 @@ class _PetStatAreaState extends State<PetStatArea> {
 }
 
 class PetStatus extends StatelessWidget{
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   const PetStatus({required this.pet, required this.user, super.key});
 
@@ -110,7 +110,7 @@ class PetStatus extends StatelessWidget{
   */
   @override
   Widget build(BuildContext context) {
-    double progress = pet.currentExp / petLevelTable[pet.level-1].expToNext;
+    double progress = pet!.currentExp / petLevelTable[pet!.level-1].expToNext;
     return Padding(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -121,7 +121,7 @@ class PetStatus extends StatelessWidget{
               Expanded(
                 flex: 2,
                 child: Text(
-                  "LV ${pet.level}",
+                  "LV ${pet!.level}",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -143,7 +143,7 @@ class PetStatus extends StatelessWidget{
                       SizedBox(width: 4),
                     ],
                   ),
-                    Text("${pet.currentExp}/${petLevelTable[pet.level-1].expToNext}"),
+                    Text("${pet!.currentExp}/${petLevelTable[pet!.level-1].expToNext}"),
                   ],
                 ),
               ),
@@ -152,9 +152,9 @@ class PetStatus extends StatelessWidget{
           Row(
             children: [
               Expanded(child: getThemedIcon(context, "assets/icons/icon-heart.png")),
-              Expanded(child: Text("${pet.happy}/100")),
+              Expanded(child: Text("${pet!.happy}/100")),
               Expanded(child: getThemedIcon(context, "assets/icons/icon-chickenalt.png")),
-              Expanded(child: Text("${pet.hunger}/100")),
+              Expanded(child: Text("${pet!.hunger}/100")),
             ],
           ),
           SizedBox(height: 40,),

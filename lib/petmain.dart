@@ -15,7 +15,7 @@ import 'run_game_screen.dart';
 // 화면 상단 구성
 class Mainarea extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   const Mainarea({
@@ -44,7 +44,7 @@ class _MainareaState extends State<Mainarea> {
   @override
   Widget build(BuildContext context) {
     final String placeAsset = (widget.user.setting['placeID'] ?? '') as String;
-    final String petAsset = widget.pet.image;
+    final String petAsset = widget.pet!.image;
 
     return Column(
       children: [
@@ -65,13 +65,13 @@ class _MainareaState extends State<Mainarea> {
 
               // 즉시 반영
               setState(() {
-                widget.pet.image = result.image;
-                widget.pet.name = result.name;
-                widget.pet.hunger = result.hunger;
-                widget.pet.happy = result.happy;
-                widget.pet.level = result.level;
-                widget.pet.currentExp = result.currentExp;
-                widget.pet.styleID = result.styleID;
+                widget.pet!.image = result.image;
+                widget.pet!.name = result.name;
+                widget.pet!.hunger = result.hunger;
+                widget.pet!.happy = result.happy;
+                widget.pet!.level = result.level;
+                widget.pet!.currentExp = result.currentExp;
+                widget.pet!.styleID = result.styleID;
               });
             },
             child: AspectRatio(
@@ -135,7 +135,7 @@ class _MainareaState extends State<Mainarea> {
 
 class Petmain extends StatefulWidget {
   final void Function(int) onNext;
-  final Pets pet;
+  final Pets? pet;
   final Users user;
   final int pageType;
   final bool soundEffectsOn;
@@ -165,8 +165,7 @@ class _PetmainState extends State<Petmain> {
   void didUpdateWidget(covariant Petmain oldWidget) {
     super.didUpdateWidget(oldWidget);
     // nowPet 값이 바뀌거나(상위 스트림 갱신) 현재 이미지가 비어있으면 다시 로드
-    if (oldWidget.user.nowPet != widget.user.nowPet ||
-        (widget.pet.image == null || widget.pet.image!.isEmpty)) {
+    if (oldWidget.user.nowPet != widget.user.nowPet || widget.pet!.image.isEmpty) {
       _fetchPetIfNeeded();
     }
   }
@@ -176,7 +175,7 @@ class _PetmainState extends State<Petmain> {
     if (uid == null) return;
 
     final petId =
-    (widget.user.nowPet is String && widget.user.nowPet.isNotEmpty)
+    widget.user.nowPet.isNotEmpty
         ? widget.user.nowPet
         : 'dragon';
 
@@ -195,13 +194,13 @@ class _PetmainState extends State<Petmain> {
         final data = snap.data() as Map<String, dynamic>;
         final loaded = Pets.fromMap(data);
         setState(() {
-          widget.pet.image = loaded.image;
-          widget.pet.name = loaded.name;
-          widget.pet.hunger = loaded.hunger;
-          widget.pet.happy = loaded.happy;
-          widget.pet.level = loaded.level;
-          widget.pet.currentExp = loaded.currentExp;
-          widget.pet.styleID = loaded.styleID;
+          widget.pet!.image = loaded.image;
+          widget.pet!.name = loaded.name;
+          widget.pet!.hunger = loaded.hunger;
+          widget.pet!.happy = loaded.happy;
+          widget.pet!.level = loaded.level;
+          widget.pet!.currentExp = loaded.currentExp;
+          widget.pet!.styleID = loaded.styleID;
         });
       }
     } finally {
@@ -212,7 +211,7 @@ class _PetmainState extends State<Petmain> {
   @override
   Widget build(BuildContext context) {
     final String placeAsset = (widget.user.setting?['placeID'] ?? '') as String;
-    final String petAsset = widget.pet.image ?? '';
+    final String petAsset = widget.pet!.image ?? '';
 
     return Scaffold(
       appBar: AppBar(),
@@ -282,8 +281,7 @@ class _PetmainState extends State<Petmain> {
                                     return;
                                   }
                                   final petId =
-                                  (widget.user.nowPet is String &&
-                                      widget.user.nowPet.isNotEmpty)
+                                  widget.user.nowPet.isNotEmpty
                                       ? widget.user.nowPet
                                       : 'dragon';
 
@@ -343,8 +341,7 @@ class _PetmainState extends State<Petmain> {
                                     return;
                                   }
                                   final petId =
-                                  (widget.user.nowPet is String &&
-                                      widget.user.nowPet.isNotEmpty)
+                                  widget.user.nowPet.isNotEmpty
                                       ? widget.user.nowPet
                                       : 'dragon';
 
