@@ -198,17 +198,46 @@ class RootState extends State<Root> {
                   }
                 }
 
-                return MyHomePage(
-                  title: 'Virtual Pet',
-                  user: loadedUser,
-                  currentIndex: _currentIndex,   // 🔸 상위에서 관리
-                  setIndex: _setIndex,           // 🔸 콜백
-                  onDarkModeChanged: toggleDarkMode,
-                  onPushChanged: togglePushNotification,
-                  onSortingChanged: toggleSortingMethod,
-                  onSoundEffectsChanged: toggleSoundEffects,
-                  onPointsAdded: _onPointsAdded,
+                final nowPetId = loadedUser.nowPet;
+                final petDocRef = userDocRef.collection("Pets").doc(nowPetId);
+                print("pet id is ${nowPetId}");
+                
+                return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: petDocRef.snapshots(),
+                  builder: (context, petSnap) {
+                    if (!petSnap.hasData) {
+                      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                    }
+
+                    final petData = petSnap.data!.data();
+                    Pets pet = Pets.fromMap(petData!);
+
+                    return MyHomePage(
+                      title: "Virtual Pet",
+                      user: user,
+                      pet: pet,
+                      currentIndex: _currentIndex,   // 🔸 상위에서 관리
+                      setIndex: _setIndex,           // 🔸 콜백
+                      onDarkModeChanged: toggleDarkMode,
+                      onPushChanged: togglePushNotification,
+                      onSortingChanged: toggleSortingMethod,
+                      onSoundEffectsChanged: toggleSoundEffects,
+                      onPointsAdded: _onPointsAdded,
+                    );
+                  },
                 );
+
+                // return MyHomePage(
+                //   title: 'Virtual Pet',
+                //   user: loadedUser,
+                //   currentIndex: _currentIndex,   // 🔸 상위에서 관리
+                //   setIndex: _setIndex,           // 🔸 콜백
+                //   onDarkModeChanged: toggleDarkMode,
+                //   onPushChanged: togglePushNotification,
+                //   onSortingChanged: toggleSortingMethod,
+                //   onSoundEffectsChanged: toggleSoundEffects,
+                //   onPointsAdded: _onPointsAdded,
+                // );
               },
             );
           }
@@ -222,6 +251,7 @@ class RootState extends State<Root> {
 
 class MyHomePage extends StatefulWidget {
   final Users user;
+  final Pets pet;
   final int currentIndex;              // 🔸 외부에서 전달
   final void Function(int) setIndex;   // 🔸 외부 콜백
 
@@ -234,6 +264,7 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({
     required this.title,
     required this.user,
+    required this.pet,
     required this.currentIndex,
     required this.setIndex,
     required this.onDarkModeChanged,
@@ -251,15 +282,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Pets pet = Pets(
-    image: "",
-    name: "",
-    hunger: 0,
-    happy: 0,
-    level: 0,
-    currentExp: 0,
-    styleID: "",
-  );
+  // Pets pet = Pets(
+  //   image: "",
+  //   name: "",
+  //   hunger: 0,
+  //   happy: 0,
+  //   level: 0,
+  //   currentExp: 0,
+  //   styleID: "",
+  // );
 
   @override
   void initState() {
@@ -268,45 +299,45 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> initAsync() async {
-    await loadPets();
+    // await loadPets();
     await BgmManager.preload('bgm2.wav');
     await BgmManager.preload('bgm1.mp3');
   }
 
-  Future<void> loadPets() async {
-    final String fallbackUid = 'HiHgtVpIvdyCZVtiFCOc';
-    final String uid = FirebaseAuth.instance.currentUser?.uid ?? fallbackUid;
+  // Future<void> loadPets() async {
+  //   final String fallbackUid = 'HiHgtVpIvdyCZVtiFCOc';
+  //   final String uid = FirebaseAuth.instance.currentUser?.uid ?? fallbackUid;
 
-    final String petId =
-    (widget.user.nowPet.isNotEmpty)
-        ? widget.user.nowPet
-        : 'default';
+  //   final String petId =
+  //   (widget.user.nowPet.isNotEmpty)
+  //       ? widget.user.nowPet
+  //       : 'default';
 
-    final petDoc = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(uid)
-        .collection('pets')
-        .doc(petId)
-        .get();
+  //   final petDoc = await FirebaseFirestore.instance
+  //       .collection('Users')
+  //       .doc(uid)
+  //       .collection('pets')
+  //       .doc(petId)
+  //       .get();
 
-    final Pets loadedItems2;
-    if (petDoc.exists) {
-      final data = petDoc.data() as Map<String, dynamic>;
-      loadedItems2 = Pets.fromMap(data);
-    } else {
-      loadedItems2 = Pets(
-        image: "",
-        name: "",
-        hunger: 0,
-        happy: 0,
-        level: 100,
-        currentExp: 0,
-        styleID: "",
-      );
-    }
+  //   final Pets loadedItems2;
+  //   if (petDoc.exists) {
+  //     final data = petDoc.data() as Map<String, dynamic>;
+  //     loadedItems2 = Pets.fromMap(data);
+  //   } else {
+  //     loadedItems2 = Pets(
+  //       image: "",
+  //       name: "",
+  //       hunger: 0,
+  //       happy: 0,
+  //       level: 100,
+  //       currentExp: 0,
+  //       styleID: "",
+  //     );
+  //   }
 
-    setState(() => pet = loadedItems2);
-  }
+  //   setState(() => pet = loadedItems2);
+  // }
 
   Map<String, List<Task>> dailyTaskMap = {};
   DateTime selectedDate = DateTime.now();
@@ -321,12 +352,12 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget currentWidget;
 
 
-    print("pet in myhomepage: ${pet.toMap()}");
+    print("pet in myhomepage: ${widget.pet.toMap()}");
     switch (idx) {
       case 0:
         currentWidget = Petmain(
           onNext: goNext,
-          pet: pet,
+          pet: widget.pet,
           user: widget.user,
           pageType: 0,
           soundEffectsOn: widget.user.setting['sound'] ?? true,
@@ -334,7 +365,7 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 1:
         currentWidget =
-            ItemCategory(onNext: goNext, pet: pet, user: widget.user, pageType: 1);
+            ItemCategory(onNext: goNext, pet: widget.pet, user: widget.user, pageType: 1);
         break;
       case 2:
         currentWidget = PetChoose(onNext: goNext);
@@ -375,7 +406,7 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 5:
         currentWidget =
-            ShopCategory(onNext: goNext, pet: pet, user: widget.user, pageType: 1);
+            ShopCategory(onNext: goNext, pet: widget.pet, user: widget.user, pageType: 1);
         break;
       case 6:
         currentWidget = SettingsPage(
