@@ -42,8 +42,13 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         
         const newHunger = Math.max(0, petHunger - 2);
         const newHappy = Math.max(0, petHappy - 2);
-        const newExp = Math.max(0, petExp - 2);
         let updates: any = { hunger: newHunger, happy: newHappy , currentExp: newExp};
+
+	if (newHunger === 0) {
+	  const lostHappy = (petHunger === 0) ? 2 : (newHunger - petHunger);
+	  const newExp = Math.max(0, petExp - lostHappy);
+	  updates.currentExp = newExp;
+	}
         
         
         await petRef.set(updates, { merge: true });
