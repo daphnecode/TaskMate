@@ -14,6 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
+import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,7 @@ class Root extends StatefulWidget {
 class RootState extends State<Root> {
   // 🔸 탭 인덱스를 상위에서 관리
   int _currentIndex = 0;
+  StreamSubscription<User?>? _authSub;
 
   Users user = Users(
     currentPoint: 0,
@@ -54,14 +56,34 @@ class RootState extends State<Root> {
   void initState() {
     super.initState();
     loadUser();
+
+    _authSub = FirebaseAuth.instance.authStateChanges().listen((u) {
+      // 로그인 직후에도 여기로 들어옴
+      loadUser();
+    });
   }
 
   Future<void> loadUser() async {
-    final String fallbackUid = 'HiHgtVpIvdyCZVtiFCOc';
-    final String uid = FirebaseAuth.instance.currentUser?.uid ?? fallbackUid;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      // 로그인 안 된 상태 → 임시 기본값
+      setState(() {
+        user = Users(
+          currentPoint: 0,
+          gotPoint: 0,
+          nowPet: "",
+          setting: {},
+          statistics: {},
+        );
+        isLoading = false;
+      });
+      return;
+    }
 
-    final doc1 =
-    await FirebaseFirestore.instance.collection('Users').doc(uid).get();
+    final doc1 = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .get();
 
     setState(() {
       if (doc1.exists) {
@@ -205,7 +227,7 @@ class RootState extends State<Root> {
                 }
                 final petDocRef = FirebaseFirestore.instance.collection('Users').doc(uid).collection("pets").doc(nowPetId);
                 print(nowPetId);
-                
+
                 return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   stream: petDocRef.snapshots(),
                   builder: (context, petSnap) {
@@ -214,7 +236,7 @@ class RootState extends State<Root> {
                     }
 
                     final petData = petSnap.data!.data();
-                    final pet = petData != null ? Pets.fromMap(petData) : null; 
+                    final pet = petData != null ? Pets.fromMap(petData) : null;
 
                     if (petData == null) {
                       return Center(child: Text("펫 정보가 없습니다."));

@@ -1,3 +1,4 @@
+// lib/login_page.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
     final snap = await usersDoc.get().timeout(const Duration(seconds: 10));
 
     if (!snap.exists) {
-      // 신규 계정 → 기본 필드 세팅
+      // ✅ 신규 계정 → 기본 필드 세팅 (최초 1회)
       await usersDoc.set({
         'email': user.email,
         'provider': provider, // 'password' | 'anonymous'
@@ -61,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
       // 누락 필드만 보완(중복 안전)
       await ensureUserStructureSafe(user.uid);
     } else {
-      // 기존 계정 → 덮어쓰기 금지. 메타만 갱신.
+      // ✅ 기존 계정 → 덮어쓰기 금지(숫자 필드 절대 건드리지 않음). 메타만 갱신.
       await usersDoc.set({
         'email': user.email,
         'provider': provider,
@@ -108,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
 
-    // dailyTasks/today(빈 시드 – 선택)
+    // dailyTasks/yyyy-mm-dd (선택 시드)
     final todayId = DateTime.now().toIso8601String().substring(0, 10);
     final daily = userRef.collection('dailyTasks').doc(todayId);
     if (!(await daily.get()).exists) {
@@ -119,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
 
-    // log/first (환영 메시지 – 선택)
+    // log/first (선택)
     final logFirst = userRef.collection('log').doc('first');
     if (!(await logFirst.get()).exists) {
       await logFirst.set({
@@ -128,8 +129,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
 
-
-    // 기존 문서면 갱신하지 않음.
+    // stats/summary (없을 때만)
     final statsSummary = userRef.collection('stats').doc('summary');
     if (!(await statsSummary.get()).exists) {
       await statsSummary.set({
