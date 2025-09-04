@@ -112,6 +112,15 @@ class _PlannerMainState extends State<PlannerMain> {
       // 비로그인 상태면 데이터 로딩만 건너뜀
       return;
     }
+    
+    // 🔹 streak 보정 (KST 자정 이후 전날 제출 없으면 streak=0)
+    Future.microtask(() async {
+      try {
+        await resetStreakIfNeededKST(userId!);
+      } catch (e) {
+        debugPrint('resetStreakIfNeededKST error: $e');
+      }
+    });
 
     // dailyTasks → planner 동기화 후 오늘 리스트 로드
     syncDailyToPlanner(userId!, dateKey).then((_) {

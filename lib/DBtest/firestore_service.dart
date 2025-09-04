@@ -313,3 +313,46 @@ Future<void> userSavePlaceDB(String userID, String placeID) async {
         },
       );
 }
+
+/// ==========================
+/// KST 자정 보정: 전날 제출이 없으면 streakDays=0으로
+/// ==========================
+Future<void> resetStreakIfNeededKST(String userId) async {
+  final summaryRef = firestore
+      .collection('Users')
+      .doc(userId)
+      .collection('stats')
+      .doc('summary');
+
+  // KST 오늘/어제 날짜 문자열 (YYYY-MM-DD)
+  String kstDateStr([DateTime? d]) {
+    final nowUtc = (d ?? DateTime.now()).toUtc();
+    final kst = nowUtc.add(const Duration(hours: 9));
+    final y = kst.year.toString().padLeft(4, '0');
+    final m = kst.month.toString().padLeft(2, '0');
+    final day = kst.day.toString().padLeft(2, '0');
+    return '$y-$m-$day';
+  }
+
+  final kstNow = DateTime.now().toUtc().add(const Duration(hours: 9));
+  final todayStr = kstDateStr(kstNow);
+  final yesterdayStr = kstDateStr(kstNow.subtract(const Duration(days: 1)));
+
+  await firestore.runTransaction((tx) async {
+    final snap = await tx.get(summaryRef);
+    if (!snap.exists) return;
+
+    final data = snap.data() ?? {};
+    final String? last = data['lastUpdatedDateStr'];
+    final int streak = (data['streakDays'] ?? 0) is int
+        ? (data['streakDays'] ?? 0) as int
+        : int.tryParse('${data['streakDays']}') ?? 0;
+
+    // 전날 제출이 없고, 오늘 제출도 아직 없으면 → 0으로 리셋
+    final shouldReset = streak > 0 && last != yesterdayStr && last != todayStr;
+
+    if (shouldReset) {
+      tx.set(summaryRef, {'streakDays': 0}, SetOptions(merge: true));
+    }
+  });
+}
