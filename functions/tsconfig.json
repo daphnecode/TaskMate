@@ -4,6 +4,7 @@
     "moduleResolution": "node",
     "target": "es2022",
     "outDir": "lib",
+    "rootDir": "src",
     "sourceMap": true,
     "noImplicitReturns": true,
     "esModuleInterop": true,
