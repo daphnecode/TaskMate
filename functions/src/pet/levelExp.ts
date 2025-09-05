@@ -113,7 +113,7 @@ export const petLevelTable: PetLevel[] = [
 export function getLevelExp(level: number): number {
   if (level < 1) return 0;
   if (level > petLevelTable.length) {
-    return petLevelTable[petLevelTable.length - 1].totalExp;
+    return petLevelTable[petLevelTable.length - 1].expToNext;
   }
-  return petLevelTable[level - 1].totalExp;
+  return petLevelTable[level - 1].expToNext;
 }

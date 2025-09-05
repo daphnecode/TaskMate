@@ -6,7 +6,7 @@ import { getLevelExp } from "./levelExp";
 // 매일 새벽 0시 (UTC 기준) 실행
 export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia/Seoul"}, 
   async (event) => {
-    console.log("매일 펫 상태 감소 작업 시작");
+    console.log("펫 상태 감소 작업 시작");
 
     try {
       // 1. 모든 Users 불러오기
@@ -84,7 +84,7 @@ export const updateStatus = onSchedule({schedule: "0 */1 * * *", timeZone: "Asia
         await petRef.set(updates, { merge: true });
         
 
-        console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updateStatus);        
+        console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updates); 
       }
 
       console.log("모든 유저의 펫 상태 감소 완료 ✅");
