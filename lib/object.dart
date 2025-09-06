@@ -8,18 +8,16 @@ class Item {
   final int price;
   final String itemText;
 
-  Item(
-    {
-      required this.icon, 
-      required this.category,
-      required this.name, 
-      required this.hunger,
-      required this.happy,
-      required this.count, 
-      required this.price,
-      required this.itemText,
-    }
-  );
+  Item({
+    required this.icon,
+    required this.category,
+    required this.name,
+    required this.hunger,
+    required this.happy,
+    required this.count,
+    required this.price,
+    required this.itemText,
+  });
 
   Map<String, dynamic> toMap() => {
     'icon': icon,
@@ -44,7 +42,6 @@ class Item {
       itemText: map['itemText'],
     );
   }
-  
 }
 
 class Pets {
@@ -56,17 +53,15 @@ class Pets {
   double currentExp;
   String styleID;
 
-  Pets(
-    {
-      required this.image, 
-      required this.name,
-      required this.hunger,
-      required this.happy,
-      required this.level,
-      required this.currentExp,
-      required this.styleID,
-    }
-  );
+  Pets({
+    required this.image,
+    required this.name,
+    required this.hunger,
+    required this.happy,
+    required this.level,
+    required this.currentExp,
+    required this.styleID,
+  });
 
   factory Pets.fromMap(Map<String, dynamic> map) {
     return Pets(
@@ -79,7 +74,7 @@ class Pets {
       styleID: map['styleID'],
     );
   }
-  
+
   Map<String, dynamic> toMap() => {
     'image': image,
     'name': name,
@@ -94,8 +89,8 @@ class Pets {
 // Pet 레벨 정보 클래스
 class PetLevel {
   final int level;
-  final int expToNext;  // 다음 레벨까지 필요한 경험치
-  final int totalExp;   // 누적 경험치
+  final int expToNext; // 다음 레벨까지 필요한 경험치
+  final int totalExp; // 누적 경험치
 
   const PetLevel({
     required this.level,
@@ -110,17 +105,14 @@ class Users {
   String nowPet;
   Map<String, dynamic> setting;
   Map<String, dynamic> statistics;
-  
 
-  Users(
-    {
-      required this.currentPoint,
-      required this.gotPoint,
-      required this.nowPet,
-      required this.setting,
-      required this.statistics,
-    }
-  );
+  Users({
+    required this.currentPoint,
+    required this.gotPoint,
+    required this.nowPet,
+    required this.setting,
+    required this.statistics,
+  });
 
   factory Users.fromMap(Map<String, dynamic> map) {
     return Users(
@@ -132,18 +124,18 @@ class Users {
         'listSort': "사전 순",
         'placeID': "assets/images/prairie.png",
         'push': map['setting']['push'],
-        'sound': map['setting']['sound']
+        'sound': map['setting']['sound'],
       },
       statistics: {
-        'doCount': map['statistics']['doCount'], 
-        'dayCount': map['statistics']['dayCount'], 
-        'feedCount': map['statistics']['feedCount'], 
-        'actionCount': map['statistics']['actionCount'], 
-        'weekcheck': map['statistics']['week-check'], 
-        'weektask': map['statistics']['week-task'], 
-        'clearCount': map['statistics']['clearCount'], 
-        'distance': map['statistics']['distance']
-      }
+        'doCount': map['statistics']['doCount'],
+        'dayCount': map['statistics']['dayCount'],
+        'feedCount': map['statistics']['feedCount'],
+        'actionCount': map['statistics']['actionCount'],
+        'weekcheck': map['statistics']['week-check'],
+        'weektask': map['statistics']['week-task'],
+        'clearCount': map['statistics']['clearCount'],
+        'distance': map['statistics']['distance'],
+      },
     );
   }
 
@@ -152,7 +144,7 @@ class Users {
     'gotPoint': gotPoint,
     'nowPet': nowPet,
     'setting': setting,
-    'statistics': statistics
+    'statistics': statistics,
   };
 }
 

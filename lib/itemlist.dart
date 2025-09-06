@@ -28,6 +28,7 @@ String nameChange(String name) {
 }
 
 class ItemlistPage1 extends StatefulWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -35,13 +36,15 @@ class ItemlistPage1 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage1({
+    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
     required this.pageType,
     required this.isUseItem,
     required this.inventory,
-    super.key});
+    super.key,
+  });
 
   @override
   State<ItemlistPage1> createState() => _ItemlistPage1State();
@@ -59,12 +62,18 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
               flex: 1,
-              child:Container(
+              child: Container(
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.all(8.0),
                 color: Colors.blue,
@@ -72,11 +81,17 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-list-alt.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("창고 - 음식",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "창고 - 음식",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
@@ -109,13 +124,25 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Expanded(child: Text("포만도 +${item.hunger}", style: TextStyle(fontSize: 16),)),
-                                    Expanded(child: Text("행복도 +${item.happy}", style: TextStyle(fontSize: 16),)),
+                                    Expanded(
+                                      child: Text(
+                                        "포만도 +${item.hunger}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        "행복도 +${item.happy}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text(item.itemText,
-                                    style: TextStyle(fontSize: 16)),
+                                Text(
+                                  item.itemText,
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ],
                             ),
                             actions: [
@@ -128,17 +155,22 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                               TextButton(
                                 child: Text('사용'),
                                 onPressed: () async {
-                                  if(item.count > 0) {
+                                  if (item.count > 0) {
                                     setState(() {
                                       item.count--;
                                       widget.pet!.hunger += item.hunger;
                                       widget.pet!.happy += item.happy;
                                     });
                                     // ✅ 현재 로그인한 사용자 uid 사용
-                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    final uid =
+                                        FirebaseAuth.instance.currentUser?.uid;
                                     if (uid != null) {
                                       await itemSaveDB(uid, item.name, item);
-                                      await petSaveDB(uid, widget.user.nowPet, widget.pet);
+                                      await petSaveDB(
+                                        uid,
+                                        widget.user.nowPet,
+                                        widget.pet,
+                                      );
                                     }
                                   }
                                   Navigator.pop(context);
@@ -148,9 +180,17 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                           ),
                         );
                       },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(
+                        context,
+                        item.icon,
+                        width: 30,
+                        height: 30,
+                      ),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
+                      trailing: Text(
+                        '${item.count}개',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     );
                   },
                 ),
@@ -165,7 +205,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -193,8 +232,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
           ),
         ),
       );
-    }
-    else {
+    } else {
       return Scaffold(
         appBar: AppBar(),
         body: Column(
@@ -203,7 +241,13 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
@@ -216,17 +260,28 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-store.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("상점 - 음식",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "상점 - 음식",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                     Expanded(
                       child: Container(
                         alignment: Alignment.centerRight,
-                        child: Text("${widget.user.currentPoint}pt",
-                          style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                        child: Text(
+                          "${widget.user.currentPoint}pt",
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.yellowAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -261,13 +316,25 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Expanded(child: Text("포만도 +${item.hunger}", style: TextStyle(fontSize: 16),)),
-                                    Expanded(child: Text("행복도 +${item.happy}", style: TextStyle(fontSize: 16),)),
+                                    Expanded(
+                                      child: Text(
+                                        "포만도 +${item.hunger}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        "행복도 +${item.happy}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text('가격은 ${item.price}pt입니다.',
-                                    style: TextStyle(fontSize: 16)),
+                                Text(
+                                  '가격은 ${item.price}pt입니다.',
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ],
                             ),
                             actions: [
@@ -284,10 +351,14 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                       item.count++;
                                     });
                                     // ✅ 현재 로그인한 사용자 uid 사용
-                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    final uid =
+                                        FirebaseAuth.instance.currentUser?.uid;
                                     if (uid != null) {
                                       await itemSaveDB(uid, item.name, item);
-                                      await userSavePointDB(uid, widget.user.currentPoint);
+                                      await userSavePointDB(
+                                        uid,
+                                        widget.user.currentPoint,
+                                      );
                                     }
                                   }
                                   Navigator.pop(context);
@@ -297,9 +368,17 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                           ),
                         );
                       },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(
+                        context,
+                        item.icon,
+                        width: 30,
+                        height: 30,
+                      ),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                      trailing: Text(
+                        '${item.price}pt',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     );
                   },
                 ),
@@ -314,7 +393,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -347,6 +425,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 }
 
 class ItemlistPage2 extends StatefulWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -354,13 +433,15 @@ class ItemlistPage2 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage2({
+    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
     required this.pageType,
     required this.isUseItem,
     required this.inventory,
-    super.key});
+    super.key,
+  });
 
   @override
   State<ItemlistPage2> createState() => _ItemlistPage2State();
@@ -378,7 +459,13 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
@@ -391,11 +478,17 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-list-alt.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("창고 - 장난감",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "창고 - 장난감",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
@@ -428,12 +521,19 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Expanded(child: Text("행복도 +${item.happy}", style: TextStyle(fontSize: 16),)),
+                                    Expanded(
+                                      child: Text(
+                                        "행복도 +${item.happy}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text(item.itemText,
-                                    style: TextStyle(fontSize: 16)),
+                                Text(
+                                  item.itemText,
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ],
                             ),
                             actions: [
@@ -444,16 +544,21 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                               TextButton(
                                 child: Text('사용'),
                                 onPressed: () async {
-                                  if(item.count > 0) {
+                                  if (item.count > 0) {
                                     setState(() {
                                       item.count--;
                                       widget.pet!.happy += item.happy;
                                     });
                                     // ✅ 현재 로그인한 사용자 uid 사용
-                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    final uid =
+                                        FirebaseAuth.instance.currentUser?.uid;
                                     if (uid != null) {
                                       await itemSaveDB(uid, item.name, item);
-                                      await petSaveDB(uid, widget.user.nowPet, widget.pet);
+                                      await petSaveDB(
+                                        uid,
+                                        widget.user.nowPet,
+                                        widget.pet,
+                                      );
                                     }
                                   }
                                   Navigator.pop(context);
@@ -463,9 +568,17 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                           ),
                         );
                       },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(
+                        context,
+                        item.icon,
+                        width: 30,
+                        height: 30,
+                      ),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.count}개', style: TextStyle(fontSize: 16)),
+                      trailing: Text(
+                        '${item.count}개',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     );
                   },
                 ),
@@ -480,7 +593,6 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -517,7 +629,13 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
@@ -530,17 +648,28 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-store.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("상점 - 장난감",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "상점 - 장난감",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                     Expanded(
                       child: Container(
                         alignment: Alignment.centerRight,
-                        child: Text("${widget.user.currentPoint}pt",
-                          style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                        child: Text(
+                          "${widget.user.currentPoint}pt",
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.yellowAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -575,12 +704,19 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                 SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Expanded(child: Text("행복도 +${item.happy}", style: TextStyle(fontSize: 16),)),
+                                    Expanded(
+                                      child: Text(
+                                        "행복도 +${item.happy}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 SizedBox(height: 10),
-                                Text('가격은 ${item.price}pt입니다.',
-                                    style: TextStyle(fontSize: 16)),
+                                Text(
+                                  '가격은 ${item.price}pt입니다.',
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ],
                             ),
                             actions: [
@@ -597,10 +733,14 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                       item.count++;
                                     });
                                     // ✅ 현재 로그인한 사용자 uid 사용
-                                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                                    final uid =
+                                        FirebaseAuth.instance.currentUser?.uid;
                                     if (uid != null) {
                                       await itemSaveDB(uid, item.name, item);
-                                      await userSavePointDB(uid, widget.user.currentPoint);
+                                      await userSavePointDB(
+                                        uid,
+                                        widget.user.currentPoint,
+                                      );
                                     }
                                   }
                                   Navigator.pop(context);
@@ -610,9 +750,17 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                           ),
                         );
                       },
-                      leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                      leading: getThemedIcon(
+                        context,
+                        item.icon,
+                        width: 30,
+                        height: 30,
+                      ),
                       title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                      trailing: Text(
+                        '${item.price}pt',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     );
                   },
                 ),
@@ -627,7 +775,6 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -660,6 +807,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 }
 
 class ItemlistPage3 extends StatefulWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -667,13 +815,15 @@ class ItemlistPage3 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage3({
+    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
     required this.pageType,
     required this.isUseItem,
     required this.inventory,
-    super.key});
+    super.key,
+  });
 
   @override
   State<ItemlistPage3> createState() => _ItemlistPage3State();
@@ -695,7 +845,13 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
@@ -708,11 +864,17 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-list-alt.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("창고 - 배경",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "창고 - 배경",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
@@ -727,12 +889,13 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   itemCount: widget.inventory.length,
                   itemBuilder: (context, index) {
                     final item = widget.inventory[index];
-                    final isHighlighted = item.name == nameChange(widget.user.setting['placeID']);
+                    final isHighlighted =
+                        item.name == nameChange(widget.user.setting['placeID']);
                     return Container(
                       color: isHighlighted
                           ? (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey
-                          : Colors.yellow)
+                                ? Colors.grey
+                                : Colors.yellow)
                           : Colors.transparent,
                       child: ListTile(
                         onTap: () {
@@ -751,8 +914,10 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text(item.itemText,
-                                        style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      item.itemText,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ],
                                 ),
                                 actions: [
@@ -764,12 +929,19 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                     child: Text('사용'),
                                     onPressed: () async {
                                       setState(() {
-                                        widget.user.setting['placeID'] = "assets/images/${item.name}.png";
+                                        widget.user.setting['placeID'] =
+                                            "assets/images/${item.name}.png";
                                       });
                                       // ✅ 현재 로그인한 사용자 uid 사용
-                                      final uid = FirebaseAuth.instance.currentUser?.uid;
+                                      final uid = FirebaseAuth
+                                          .instance
+                                          .currentUser
+                                          ?.uid;
                                       if (uid != null) {
-                                        await userSavePlaceDB(uid, widget.user.setting['placeID']);
+                                        await userSavePlaceDB(
+                                          uid,
+                                          widget.user.setting['placeID'],
+                                        );
                                       }
                                       Navigator.pop(context);
                                     },
@@ -779,7 +951,12 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                             );
                           }
                         },
-                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        leading: getThemedIcon(
+                          context,
+                          item.icon,
+                          width: 30,
+                          height: 30,
+                        ),
                         title: Text(item.name, style: TextStyle(fontSize: 18)),
                       ),
                     );
@@ -796,7 +973,6 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -833,7 +1009,13 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
@@ -846,17 +1028,28 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-store.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("상점 - 배경",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "상점 - 배경",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                     Expanded(
                       child: Container(
                         alignment: Alignment.centerRight,
-                        child: Text("${widget.user.currentPoint}pt",
-                          style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                        child: Text(
+                          "${widget.user.currentPoint}pt",
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.yellowAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -878,8 +1071,8 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                     return Container(
                       color: check
                           ? (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey
-                          : Colors.red)
+                                ? Colors.grey
+                                : Colors.red)
                           : Colors.transparent,
                       child: ListTile(
                         onTap: () {
@@ -898,8 +1091,10 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text('가격은 ${item.price}pt입니다.',
-                                        style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      '가격은 ${item.price}pt입니다.',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ],
                                 ),
                                 actions: [
@@ -910,15 +1105,27 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                   TextButton(
                                     child: Text('구매'),
                                     onPressed: () async {
-                                      if (item.price < widget.user.currentPoint) {
+                                      if (item.price <
+                                          widget.user.currentPoint) {
                                         setState(() {
-                                          widget.user.currentPoint -= item.price;
+                                          widget.user.currentPoint -=
+                                              item.price;
                                         });
                                         // ✅ 현재 로그인한 사용자 uid 사용
-                                        final uid = FirebaseAuth.instance.currentUser?.uid;
+                                        final uid = FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid;
                                         if (uid != null) {
-                                          await itemSaveDB(uid, item.name, item);
-                                          await userSavePointDB(uid, widget.user.currentPoint);
+                                          await itemSaveDB(
+                                            uid,
+                                            item.name,
+                                            item,
+                                          );
+                                          await userSavePointDB(
+                                            uid,
+                                            widget.user.currentPoint,
+                                          );
                                         }
                                       }
                                       Navigator.pop(context);
@@ -929,9 +1136,17 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                             );
                           }
                         },
-                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        leading: getThemedIcon(
+                          context,
+                          item.icon,
+                          width: 30,
+                          height: 30,
+                        ),
                         title: Text(item.name, style: TextStyle(fontSize: 18)),
-                        trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                        trailing: Text(
+                          '${item.price}pt',
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
                     );
                   },
@@ -947,7 +1162,6 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -976,11 +1190,11 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
         ),
       );
     }
-
   }
 }
 
 class ItemlistPage4 extends StatefulWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -988,13 +1202,15 @@ class ItemlistPage4 extends StatefulWidget {
   final bool isUseItem;
   final List<Item> inventory;
   const ItemlistPage4({
+    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
     required this.pageType,
     required this.isUseItem,
     required this.inventory,
-    super.key});
+    super.key,
+  });
 
   @override
   State<ItemlistPage4> createState() => _ItemlistPage4State();
@@ -1014,7 +1230,13 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
@@ -1027,11 +1249,17 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-list-alt.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("창고 - 스타일",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "창고 - 스타일",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
@@ -1051,12 +1279,12 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                     return Container(
                       color: isHighlighted
                           ? (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey
-                          : Colors.yellow)
+                                ? Colors.grey
+                                : Colors.yellow)
                           : Colors.transparent,
                       child: ListTile(
                         onTap: () {
-                          if(!isHighlighted) {
+                          if (!isHighlighted) {
                             showDialog(
                               context: context,
                               builder: (_) => AlertDialog(
@@ -1071,8 +1299,10 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text(item.itemText,
-                                        style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      item.itemText,
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ],
                                 ),
                                 actions: [
@@ -1087,7 +1317,10 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                         usedItem = item.name;
                                       });
                                       // ✅ 현재 로그인한 사용자 uid 사용
-                                      final uid = FirebaseAuth.instance.currentUser?.uid;
+                                      final uid = FirebaseAuth
+                                          .instance
+                                          .currentUser
+                                          ?.uid;
                                       if (uid != null) {
                                         await itemSaveDB(uid, item.name, item);
                                       }
@@ -1099,9 +1332,17 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                             );
                           }
                         },
-                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        leading: getThemedIcon(
+                          context,
+                          item.icon,
+                          width: 30,
+                          height: 30,
+                        ),
                         title: Text(item.name, style: TextStyle(fontSize: 18)),
-                        trailing: Text('${item.count}', style: TextStyle(fontSize: 16)),
+                        trailing: Text(
+                          '${item.count}',
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
                     );
                   },
@@ -1117,7 +1358,6 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -1154,7 +1394,13 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               flex: 6,
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+                child: Mainarea(
+                  updatePet: widget.updatePet,
+                  onNext: widget.onNext,
+                  pet: widget.pet,
+                  user: widget.user,
+                  pageType: widget.pageType,
+                ),
               ),
             ),
             Expanded(
@@ -1167,17 +1413,28 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                   children: [
                     Image.asset(
                       "assets/icons/icon-store.png",
-                      width: 30, height: 30,
+                      width: 30,
+                      height: 30,
                     ),
-                    SizedBox(width: 10.0,),
-                    Text("상점 - 스타일",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                    SizedBox(width: 10.0),
+                    Text(
+                      "상점 - 스타일",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
                     ),
                     Expanded(
                       child: Container(
                         alignment: Alignment.centerRight,
-                        child: Text("${widget.user.currentPoint}pt",
-                          style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                        child: Text(
+                          "${widget.user.currentPoint}pt",
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.yellowAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -1198,8 +1455,8 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                     return Container(
                       color: check
                           ? (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey
-                          : Colors.red)
+                                ? Colors.grey
+                                : Colors.red)
                           : Colors.transparent,
                       child: ListTile(
                         onTap: () {
@@ -1218,8 +1475,10 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                       height: 100,
                                     ),
                                     SizedBox(height: 10),
-                                    Text('가격은 ${item.price}pt입니다.',
-                                        style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      '가격은 ${item.price}pt입니다.',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                   ],
                                 ),
                                 actions: [
@@ -1230,15 +1489,27 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                   TextButton(
                                     child: Text('구매'),
                                     onPressed: () async {
-                                      if (item.price < widget.user.currentPoint) {
+                                      if (item.price <
+                                          widget.user.currentPoint) {
                                         setState(() {
-                                          widget.user.currentPoint -= item.price;
+                                          widget.user.currentPoint -=
+                                              item.price;
                                         });
                                         // ✅ 현재 로그인한 사용자 uid 사용
-                                        final uid = FirebaseAuth.instance.currentUser?.uid;
+                                        final uid = FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid;
                                         if (uid != null) {
-                                          await itemSaveDB(uid, item.name, item);
-                                          await userSavePointDB(uid, widget.user.currentPoint);
+                                          await itemSaveDB(
+                                            uid,
+                                            item.name,
+                                            item,
+                                          );
+                                          await userSavePointDB(
+                                            uid,
+                                            widget.user.currentPoint,
+                                          );
                                         }
                                       }
                                       Navigator.pop(context);
@@ -1249,9 +1520,17 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                             );
                           }
                         },
-                        leading: getThemedIcon(context, item.icon, width: 30, height: 30),
+                        leading: getThemedIcon(
+                          context,
+                          item.icon,
+                          width: 30,
+                          height: 30,
+                        ),
                         title: Text(item.name, style: TextStyle(fontSize: 18)),
-                        trailing: Text('${item.price}pt', style: TextStyle(fontSize: 16)),
+                        trailing: Text(
+                          '${item.price}pt',
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
                     );
                   },
@@ -1267,7 +1546,6 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 IconButton(
                   icon: const Icon(Icons.calendar_month),
                   onPressed: () {
@@ -1300,11 +1578,19 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 }
 
 class ItemCategory extends StatefulWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
-  const ItemCategory({required this.onNext,required this.pet, required this.user, required this.pageType, super.key});
+  const ItemCategory({
+    required this.updatePet,
+    required this.onNext,
+    required this.pet,
+    required this.user,
+    required this.pageType,
+    super.key,
+  });
 
   @override
   State<ItemCategory> createState() => _ItemCategoryState();
@@ -1325,7 +1611,9 @@ class _ItemCategoryState extends State<ItemCategory> {
     // ✅ 현재 로그인한 사용자 uid 사용
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
-      setState(() { inventory = []; });
+      setState(() {
+        inventory = [];
+      });
       return;
     }
 
@@ -1360,13 +1648,19 @@ class _ItemCategoryState extends State<ItemCategory> {
             flex: 6,
             child: Container(
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+              child: Mainarea(
+                updatePet: widget.updatePet,
+                onNext: widget.onNext,
+                pet: widget.pet,
+                user: widget.user,
+                pageType: widget.pageType,
+              ),
               // MainArea()로 변경
             ),
           ),
           Expanded(
             flex: 1,
-            child:Container(
+            child: Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(8.0),
               color: Colors.blue,
@@ -1374,11 +1668,17 @@ class _ItemCategoryState extends State<ItemCategory> {
                 children: [
                   Image.asset(
                     "assets/icons/icon-list-alt.png",
-                    width: 30, height: 30,
+                    width: 30,
+                    height: 30,
                   ),
-                  SizedBox(width: 10.0,),
-                  Text("창고",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  SizedBox(width: 10.0),
+                  Text(
+                    "창고",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ],
               ),
@@ -1399,17 +1699,18 @@ class _ItemCategoryState extends State<ItemCategory> {
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ItemlistPage1(
-                                      onNext: widget.onNext,
-                                      pet: widget.pet,
-                                      user: widget.user,
-                                      pageType: 2,
-                                      isUseItem: true,
-                                      inventory: getItemsByCategory(1),
-                                    ),
-                                  )
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ItemlistPage1(
+                                    updatePet: widget.updatePet,
+                                    onNext: widget.onNext,
+                                    pet: widget.pet,
+                                    user: widget.user,
+                                    pageType: 2,
+                                    isUseItem: true,
+                                    inventory: getItemsByCategory(1),
+                                  ),
+                                ),
                               ).then((value) {
                                 setState(() {});
                               });
@@ -1419,13 +1720,14 @@ class _ItemCategoryState extends State<ItemCategory> {
                             ),
                             child: Center(
                               child: Image.asset(
-                                  "assets/icons/icon-chicken.png",
-                                  width: 30, height: 30
+                                "assets/icons/icon-chicken.png",
+                                width: 30,
+                                height: 30,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(width: 10.0,),
+                        SizedBox(width: 10.0),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
@@ -1433,6 +1735,7 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage2(
+                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1448,17 +1751,19 @@ class _ItemCategoryState extends State<ItemCategory> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[100],
                             ),
-                            child: Center(child: Image.asset(
+                            child: Center(
+                              child: Image.asset(
                                 "assets/icons/icon-teddybear.png",
-                                width: 30, height: 30
-                            ),
+                                width: 30,
+                                height: 30,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 10.0,),
+                  SizedBox(height: 10.0),
                   Expanded(
                     child: Row(
                       children: [
@@ -1468,7 +1773,9 @@ class _ItemCategoryState extends State<ItemCategory> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ItemlistPage3(onNext: widget.onNext,
+                                  builder: (context) => ItemlistPage3(
+                                    updatePet: widget.updatePet,
+                                    onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
                                     pageType: 2,
@@ -1477,8 +1784,7 @@ class _ItemCategoryState extends State<ItemCategory> {
                                   ),
                                 ),
                               ).then((value) {
-                                setState(() {
-                                });
+                                setState(() {});
                               });
                             },
                             style: ElevatedButton.styleFrom(
@@ -1486,20 +1792,23 @@ class _ItemCategoryState extends State<ItemCategory> {
                             ),
                             child: Center(
                               child: Image.asset(
-                                  "assets/icons/icon-mountains.png",
-                                  width: 30, height: 30
+                                "assets/icons/icon-mountains.png",
+                                width: 30,
+                                height: 30,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 10.0,),
+                        SizedBox(height: 10.0),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ItemlistPage4(onNext: widget.onNext,
+                                  builder: (context) => ItemlistPage4(
+                                    updatePet: widget.updatePet,
+                                    onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
                                     pageType: 2,
@@ -1514,10 +1823,12 @@ class _ItemCategoryState extends State<ItemCategory> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[100],
                             ),
-                            child: Center(child: Image.asset(
+                            child: Center(
+                              child: Image.asset(
                                 "assets/icons/icon-pivotx.png",
-                                width: 30, height: 30
-                            ),
+                                width: 30,
+                                height: 30,
+                              ),
                             ),
                           ),
                         ),
@@ -1538,7 +1849,6 @@ class _ItemCategoryState extends State<ItemCategory> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               IconButton(
                 icon: const Icon(Icons.calendar_month),
                 onPressed: () {
@@ -1548,7 +1858,8 @@ class _ItemCategoryState extends State<ItemCategory> {
 
               IconButton(
                 icon: Icon(Icons.home),
-                onPressed: () {widget.onNext(0);
+                onPressed: () {
+                  widget.onNext(0);
                 },
               ),
               IconButton(
@@ -1567,11 +1878,19 @@ class _ItemCategoryState extends State<ItemCategory> {
 }
 
 class ShopCategory extends StatefulWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
-  const ShopCategory({required this.onNext, required this.pet, required this.user,  required this.pageType, super.key});
+  const ShopCategory({
+    required this.updatePet,
+    required this.onNext,
+    required this.pet,
+    required this.user,
+    required this.pageType,
+    super.key,
+  });
 
   @override
   State<ShopCategory> createState() => _ShopCategoryState();
@@ -1619,7 +1938,13 @@ class _ShopCategoryState extends State<ShopCategory> {
             flex: 6,
             child: Container(
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: Mainarea(onNext: widget.onNext, pet: widget.pet, user: widget.user, pageType: widget.pageType,),
+              child: Mainarea(
+                updatePet: widget.updatePet,
+                onNext: widget.onNext,
+                pet: widget.pet,
+                user: widget.user,
+                pageType: widget.pageType,
+              ),
               // MainArea()로 변경
             ),
           ),
@@ -1633,17 +1958,28 @@ class _ShopCategoryState extends State<ShopCategory> {
                 children: [
                   Image.asset(
                     "assets/icons/icon-store.png",
-                    width: 30, height: 30,
+                    width: 30,
+                    height: 30,
                   ),
-                  SizedBox(width: 10.0,),
-                  Text("상점",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                  SizedBox(width: 10.0),
+                  Text(
+                    "상점",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: Text("${widget.user.currentPoint}pt",
-                        style: TextStyle(fontSize: 24, color: Colors.yellowAccent, fontWeight: FontWeight.bold),
+                      child: Text(
+                        "${widget.user.currentPoint}pt",
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.yellowAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -1669,6 +2005,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage1(
+                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1686,13 +2023,14 @@ class _ShopCategoryState extends State<ShopCategory> {
                             ),
                             child: Center(
                               child: Image.asset(
-                                  "assets/icons/icon-chicken.png",
-                                  width: 30, height: 30
+                                "assets/icons/icon-chicken.png",
+                                width: 30,
+                                height: 30,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(width: 10.0,),
+                        SizedBox(width: 10.0),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
@@ -1700,6 +2038,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage2(
+                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1715,17 +2054,19 @@ class _ShopCategoryState extends State<ShopCategory> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[100],
                             ),
-                            child: Center(child: Image.asset(
+                            child: Center(
+                              child: Image.asset(
                                 "assets/icons/icon-teddybear.png",
-                                width: 30, height: 30
-                            ),
+                                width: 30,
+                                height: 30,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 10.0,),
+                  SizedBox(height: 10.0),
                   Expanded(
                     child: Row(
                       children: [
@@ -1736,6 +2077,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage3(
+                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1753,13 +2095,14 @@ class _ShopCategoryState extends State<ShopCategory> {
                             ),
                             child: Center(
                               child: Image.asset(
-                                  "assets/icons/icon-mountains.png",
-                                  width: 30, height: 30
+                                "assets/icons/icon-mountains.png",
+                                width: 30,
+                                height: 30,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(width: 10.0,),
+                        SizedBox(width: 10.0),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
@@ -1767,6 +2110,7 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage4(
+                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1782,10 +2126,12 @@ class _ShopCategoryState extends State<ShopCategory> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[100],
                             ),
-                            child: Center(child: Image.asset(
+                            child: Center(
+                              child: Image.asset(
                                 "assets/icons/icon-pivotx.png",
-                                width: 30, height: 30
-                            ),
+                                width: 30,
+                                height: 30,
+                              ),
                             ),
                           ),
                         ),
@@ -1806,7 +2152,6 @@ class _ShopCategoryState extends State<ShopCategory> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               IconButton(
                 icon: const Icon(Icons.calendar_month),
                 onPressed: () {

@@ -18,9 +18,7 @@ import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const Root());
 }
 
@@ -108,10 +106,9 @@ class RootState extends State<Root> {
     });
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(uid)
-        .set({'setting': {key: value}}, SetOptions(merge: true));
+    await FirebaseFirestore.instance.collection('Users').doc(uid).set({
+      'setting': {key: value},
+    }, SetOptions(merge: true));
   }
 
   void toggleDarkMode(bool v) => _setUserSetting('darkMode', v);
@@ -144,20 +141,23 @@ class RootState extends State<Root> {
         iconTheme: const IconThemeData(color: Colors.white),
         bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey[900]),
       ),
-      themeMode:
-      (user.setting['darkMode'] == true) ? ThemeMode.dark : ThemeMode.light,
+      themeMode: (user.setting['darkMode'] == true)
+          ? ThemeMode.dark
+          : ThemeMode.light,
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
-                body: Center(child: CircularProgressIndicator()));
+              body: Center(child: CircularProgressIndicator()),
+            );
           }
 
           if (snapshot.hasData && snapshot.data != null) {
             final String uid = snapshot.data!.uid;
-            final userDocRef =
-            FirebaseFirestore.instance.collection('Users').doc(uid);
+            final userDocRef = FirebaseFirestore.instance
+                .collection('Users')
+                .doc(uid);
 
             // Users/{uid} 변경 시에도 MyHomePage는 유지, props만 업데이트
             return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -165,8 +165,7 @@ class RootState extends State<Root> {
               builder: (context, uSnap) {
                 if (uSnap.hasError) {
                   return Scaffold(
-                    body: Center(
-                        child: Text('Firestore 오류: ${uSnap.error}')),
+                    body: Center(child: Text('Firestore 오류: ${uSnap.error}')),
                   );
                 }
 
@@ -199,7 +198,7 @@ class RootState extends State<Root> {
                       raw['setting']['listSort'] ?? 'default';
                   raw['setting']['sound'] = raw['setting']['sound'] ?? true;
                   raw['statistics'] =
-                  (raw['statistics'] is Map<String, dynamic>)
+                      (raw['statistics'] is Map<String, dynamic>)
                       ? Map<String, dynamic>.from(raw['statistics'])
                       : <String, dynamic>{};
                   try {
@@ -220,54 +219,53 @@ class RootState extends State<Root> {
                   }
                 }
 
-                print("user is ${loadedUser.toMap()}");
-                final nowPetId = loadedUser.nowPet ?? "";
+                final nowPetId = loadedUser.nowPet;
                 if (nowPetId.isEmpty) {
                   return Center(child: CircularProgressIndicator());
                 }
-                final petDocRef = FirebaseFirestore.instance.collection('Users').doc(uid).collection("pets").doc(nowPetId);
-                print(nowPetId);
+                final petDocRef = FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(uid)
+                    .collection("pets")
+                    .doc(nowPetId);
 
                 return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                   stream: petDocRef.snapshots(),
                   builder: (context, petSnap) {
                     if (!petSnap.hasData) {
-                      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                      return const Scaffold(
+                        body: Center(child: CircularProgressIndicator()),
+                      );
                     }
 
                     final petData = petSnap.data!.data();
-                    final pet = petData != null ? Pets.fromMap(petData) : null;
+                    var pet = petData != null ? Pets.fromMap(petData) : null;
 
                     if (petData == null) {
                       return Center(child: Text("펫 정보가 없습니다."));
+                    }
+
+                    void updatePet(Pets newPet) {
+                      setState(() {
+                        pet = newPet; // 새로운 객체로 교체
+                      });
                     }
 
                     return MyHomePage(
                       title: "Virtual Pet",
                       user: user,
                       pet: pet,
-                      currentIndex: _currentIndex,   // 🔸 상위에서 관리
-                      setIndex: _setIndex,           // 🔸 콜백
+                      currentIndex: _currentIndex, // 🔸 상위에서 관리
+                      setIndex: _setIndex, // 🔸 콜백
                       onDarkModeChanged: toggleDarkMode,
                       onPushChanged: togglePushNotification,
                       onSortingChanged: toggleSortingMethod,
                       onSoundEffectsChanged: toggleSoundEffects,
                       onPointsAdded: _onPointsAdded,
+                      updatePet: updatePet,
                     );
                   },
                 );
-
-                // return MyHomePage(
-                //   title: 'Virtual Pet',
-                //   user: loadedUser,
-                //   currentIndex: _currentIndex,   // 🔸 상위에서 관리
-                //   setIndex: _setIndex,           // 🔸 콜백
-                //   onDarkModeChanged: toggleDarkMode,
-                //   onPushChanged: togglePushNotification,
-                //   onSortingChanged: toggleSortingMethod,
-                //   onSoundEffectsChanged: toggleSoundEffects,
-                //   onPointsAdded: _onPointsAdded,
-                // );
               },
             );
           }
@@ -282,14 +280,15 @@ class RootState extends State<Root> {
 class MyHomePage extends StatefulWidget {
   final Users user;
   final Pets? pet;
-  final int currentIndex;              // 🔸 외부에서 전달
-  final void Function(int) setIndex;   // 🔸 외부 콜백
+  final int currentIndex; // 🔸 외부에서 전달
+  final void Function(int) setIndex; // 🔸 외부 콜백
 
   final Function(bool) onDarkModeChanged;
   final Function(bool) onPushChanged;
   final Function(String) onSortingChanged;
   final Function(bool) onSoundEffectsChanged;
   final Function(int) onPointsAdded;
+  final Function(Pets) updatePet;
 
   const MyHomePage({
     required this.title,
@@ -302,6 +301,7 @@ class MyHomePage extends StatefulWidget {
     required this.onSortingChanged,
     required this.onSoundEffectsChanged,
     required this.onPointsAdded,
+    required this.updatePet,
     super.key,
   });
 
@@ -312,16 +312,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // Pets pet = Pets(
-  //   image: "",
-  //   name: "",
-  //   hunger: 0,
-  //   happy: 0,
-  //   level: 0,
-  //   currentExp: 0,
-  //   styleID: "",
-  // );
-
   @override
   void initState() {
     super.initState();
@@ -329,45 +319,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> initAsync() async {
-    // await loadPets();
     await BgmManager.preload('bgm2.wav');
     await BgmManager.preload('bgm1.mp3');
   }
-
-  // Future<void> loadPets() async {
-  //   final String fallbackUid = 'HiHgtVpIvdyCZVtiFCOc';
-  //   final String uid = FirebaseAuth.instance.currentUser?.uid ?? fallbackUid;
-
-  //   final String petId =
-  //   (widget.user.nowPet.isNotEmpty)
-  //       ? widget.user.nowPet
-  //       : 'default';
-
-  //   final petDoc = await FirebaseFirestore.instance
-  //       .collection('Users')
-  //       .doc(uid)
-  //       .collection('pets')
-  //       .doc(petId)
-  //       .get();
-
-  //   final Pets loadedItems2;
-  //   if (petDoc.exists) {
-  //     final data = petDoc.data() as Map<String, dynamic>;
-  //     loadedItems2 = Pets.fromMap(data);
-  //   } else {
-  //     loadedItems2 = Pets(
-  //       image: "",
-  //       name: "",
-  //       hunger: 0,
-  //       happy: 0,
-  //       level: 100,
-  //       currentExp: 0,
-  //       styleID: "",
-  //     );
-  //   }
-
-  //   setState(() => pet = loadedItems2);
-  // }
 
   Map<String, List<Task>> dailyTaskMap = {};
   DateTime selectedDate = DateTime.now();
@@ -381,11 +335,11 @@ class _MyHomePageState extends State<MyHomePage> {
     final idx = widget.currentIndex; // 🔸 로컬 state 대신 props 사용
     Widget currentWidget;
 
-
-    print("pet in myhomepage: ${widget.pet!.toMap()}");
     switch (idx) {
       case 0:
+        print("pet in myhomepage: ${widget.pet!.toMap()}");
         currentWidget = Petmain(
+          updatePet: widget.updatePet,
           onNext: goNext,
           pet: widget.pet,
           user: widget.user,
@@ -394,11 +348,16 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 1:
-        currentWidget =
-            ItemCategory(onNext: goNext, pet: widget.pet, user: widget.user, pageType: 1);
+        currentWidget = ItemCategory(
+          updatePet: widget.updatePet,
+          onNext: goNext,
+          pet: widget.pet,
+          user: widget.user,
+          pageType: 1,
+        );
         break;
       case 2:
-        currentWidget = PetChoose(onNext: goNext);
+        currentWidget = PetChoose(updatePet: widget.updatePet, onNext: goNext);
         break;
       case 3:
         currentWidget = PlannerMain(
@@ -435,8 +394,13 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 5:
-        currentWidget =
-            ShopCategory(onNext: goNext, pet: widget.pet, user: widget.user, pageType: 1);
+        currentWidget = ShopCategory(
+          updatePet: widget.updatePet,
+          onNext: goNext,
+          pet: widget.pet,
+          user: widget.user,
+          pageType: 1,
+        );
         break;
       case 6:
         currentWidget = SettingsPage(

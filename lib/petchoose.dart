@@ -44,14 +44,14 @@ class _Subarea1State extends State<Subarea1> {
     final Pets loaded = petDoc.exists
         ? Pets.fromMap(petDoc.data() as Map<String, dynamic>)
         : Pets(
-      image: "",
-      name: "",
-      hunger: 0,
-      happy: 0,
-      level: 0,
-      currentExp: 0,
-      styleID: "",
-    );
+            image: "",
+            name: "",
+            hunger: 0,
+            happy: 0,
+            level: 0,
+            currentExp: 0,
+            styleID: "",
+          );
 
     // 현재 선택 펫 저장
     await userRef.update({'nowPet': currentPet});
@@ -69,11 +69,9 @@ class _Subarea1State extends State<Subarea1> {
             onPressed: () async {
               final pet = await loadPet("dragon"); // ✅ Pets 객체 획득
               if (!mounted) return;
-              Navigator.pop(context, pet);          // ✅ Pets로 pop
+              Navigator.pop(context, pet); // ✅ Pets로 pop
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[100],
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red[100]),
             child: Center(
               child: Image.asset(
                 "assets/images/dragon.png",
@@ -92,9 +90,7 @@ class _Subarea1State extends State<Subarea1> {
               if (!mounted) return;
               Navigator.pop(context, pet);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[100],
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green[100]),
             child: Center(
               child: Image.asset(
                 "assets/images/unicon.png",
@@ -114,9 +110,7 @@ class _Subarea1State extends State<Subarea1> {
               if (!mounted) return;
               Navigator.pop(context, pet);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue[100],
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100]),
             child: Center(
               child: Image.asset(
                 "assets/images/unicon.png",
@@ -133,8 +127,9 @@ class _Subarea1State extends State<Subarea1> {
 }
 
 class PetChoose extends StatelessWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
-  const PetChoose({required this.onNext, super.key});
+  const PetChoose({required this.updatePet, required this.onNext, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -181,10 +176,7 @@ class PetChoose extends StatelessWidget {
                   onNext(0);
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () {},
-              ),
+              IconButton(icon: const Icon(Icons.settings), onPressed: () {}),
             ],
           ),
         ),

@@ -14,11 +14,13 @@ import 'run_game_screen.dart';
 
 // 화면 상단 구성
 class Mainarea extends StatefulWidget {
+  final Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const Mainarea({
+    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -37,8 +39,14 @@ class _MainareaState extends State<Mainarea> {
     // 미리 이미지 로딩
     precacheImage(const AssetImage('assets/icons/icon-heart.png'), context);
     precacheImage(const AssetImage('assets/icons/icon-heartW.png'), context);
-    precacheImage(const AssetImage('assets/icons/icon-chickenalt.png'), context);
-    precacheImage(const AssetImage('assets/icons/icon-chickenaltW.png'), context);
+    precacheImage(
+      const AssetImage('assets/icons/icon-chickenalt.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/icons/icon-chickenaltW.png'),
+      context,
+    );
   }
 
   @override
@@ -59,7 +67,12 @@ class _MainareaState extends State<Mainarea> {
               // 펫 선택 화면 → Pets 객체 반환
               final result = await Navigator.push<Pets>(
                 context,
-                MaterialPageRoute(builder: (_) => PetChoose(onNext: widget.onNext)),
+                MaterialPageRoute(
+                  builder: (_) => PetChoose(
+                    updatePet: widget.updatePet,
+                    onNext: widget.onNext,
+                  ),
+                ),
               );
               if (!mounted || result == null) return;
 
@@ -117,12 +130,7 @@ class _MainareaState extends State<Mainarea> {
                     );
                   }
 
-                  return Stack(
-                    children: [
-                      background,
-                      petWidget,
-                    ],
-                  );
+                  return Stack(children: [background, petWidget]);
                 },
               ),
             ),
@@ -134,12 +142,14 @@ class _MainareaState extends State<Mainarea> {
 }
 
 class Petmain extends StatefulWidget {
+  final void Function(Pets) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   final bool soundEffectsOn;
   const Petmain({
+    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -165,7 +175,8 @@ class _PetmainState extends State<Petmain> {
   void didUpdateWidget(covariant Petmain oldWidget) {
     super.didUpdateWidget(oldWidget);
     // nowPet 값이 바뀌거나(상위 스트림 갱신) 현재 이미지가 비어있으면 다시 로드
-    if (oldWidget.user.nowPet != widget.user.nowPet || widget.pet!.image.isEmpty) {
+    if (oldWidget.user.nowPet != widget.user.nowPet ||
+        widget.pet!.image.isEmpty) {
       _fetchPetIfNeeded();
     }
   }
@@ -174,10 +185,7 @@ class _PetmainState extends State<Petmain> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final petId =
-    widget.user.nowPet.isNotEmpty
-        ? widget.user.nowPet
-        : 'dragon';
+    final petId = widget.user.nowPet.isNotEmpty ? widget.user.nowPet : 'dragon';
 
     setState(() => _loadingPet = true);
     try {
@@ -210,9 +218,6 @@ class _PetmainState extends State<Petmain> {
 
   @override
   Widget build(BuildContext context) {
-    final String placeAsset = (widget.user.setting?['placeID'] ?? '') as String;
-    final String petAsset = widget.pet!.image ?? '';
-
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -224,11 +229,12 @@ class _PetmainState extends State<Petmain> {
               child: _loadingPet
                   ? const Center(child: CircularProgressIndicator())
                   : Mainarea(
-                onNext: widget.onNext,
-                pet: widget.pet,
-                user: widget.user,
-                pageType: widget.pageType,
-              ),
+                      updatePet: widget.updatePet,
+                      onNext: widget.onNext,
+                      pet: widget.pet,
+                      user: widget.user,
+                      pageType: widget.pageType,
+                    ),
             ),
           ),
           // 화면 하단 구성
@@ -273,15 +279,17 @@ class _PetmainState extends State<Petmain> {
                             children: [
                               ElevatedButton(
                                 onPressed: () async {
-                                  final uid = FirebaseAuth.instance.currentUser?.uid;
+                                  final uid =
+                                      FirebaseAuth.instance.currentUser?.uid;
                                   if (uid == null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('로그인이 필요합니다.')),
+                                      const SnackBar(
+                                        content: Text('로그인이 필요합니다.'),
+                                      ),
                                     );
                                     return;
                                   }
-                                  final petId =
-                                  widget.user.nowPet.isNotEmpty
+                                  final petId = widget.user.nowPet.isNotEmpty
                                       ? widget.user.nowPet
                                       : 'dragon';
 
@@ -310,7 +318,10 @@ class _PetmainState extends State<Petmain> {
                                 child: const Center(
                                   child: Text(
                                     "청소",
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -320,7 +331,9 @@ class _PetmainState extends State<Petmain> {
                                 child: CircleAvatar(
                                   backgroundColor: Colors.blueAccent,
                                   radius: 35,
-                                  child: ImageAssetIcon("assets/icons/icon-paintbrush.png"),
+                                  child: ImageAssetIcon(
+                                    "assets/icons/icon-paintbrush.png",
+                                  ),
                                 ),
                               ),
                             ],
@@ -333,15 +346,17 @@ class _PetmainState extends State<Petmain> {
                             children: [
                               ElevatedButton(
                                 onPressed: () async {
-                                  final uid = FirebaseAuth.instance.currentUser?.uid;
+                                  final uid =
+                                      FirebaseAuth.instance.currentUser?.uid;
                                   if (uid == null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('로그인이 필요합니다.')),
+                                      const SnackBar(
+                                        content: Text('로그인이 필요합니다.'),
+                                      ),
                                     );
                                     return;
                                   }
-                                  final petId =
-                                  widget.user.nowPet.isNotEmpty
+                                  final petId = widget.user.nowPet.isNotEmpty
                                       ? widget.user.nowPet
                                       : 'dragon';
 
@@ -370,7 +385,10 @@ class _PetmainState extends State<Petmain> {
                                 child: const Center(
                                   child: Text(
                                     "놀이",
-                                    style: TextStyle(fontSize: 16, color: Colors.black),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -380,7 +398,9 @@ class _PetmainState extends State<Petmain> {
                                 child: CircleAvatar(
                                   backgroundColor: Colors.blueAccent,
                                   radius: 35,
-                                  child: ImageAssetIcon("assets/icons/icon-raceflag.png"),
+                                  child: ImageAssetIcon(
+                                    "assets/icons/icon-raceflag.png",
+                                  ),
                                 ),
                               ),
                             ],
