@@ -28,7 +28,7 @@ String nameChange(String name) {
 }
 
 class ItemlistPage1 extends StatefulWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -63,6 +63,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -242,6 +243,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -425,7 +427,7 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 }
 
 class ItemlistPage2 extends StatefulWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -460,6 +462,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -630,6 +633,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -807,7 +811,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 }
 
 class ItemlistPage3 extends StatefulWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -846,6 +850,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -1010,6 +1015,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -1194,7 +1200,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 }
 
 class ItemlistPage4 extends StatefulWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -1231,6 +1237,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -1395,6 +1402,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Mainarea(
+                  key: ValueKey(widget.pet!.name),
                   updatePet: widget.updatePet,
                   onNext: widget.onNext,
                   pet: widget.pet,
@@ -1578,7 +1586,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 }
 
 class ItemCategory extends StatefulWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -1649,6 +1657,7 @@ class _ItemCategoryState extends State<ItemCategory> {
             child: Container(
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
+                key: ValueKey(widget.pet!.name),
                 updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
@@ -1878,7 +1887,7 @@ class _ItemCategoryState extends State<ItemCategory> {
 }
 
 class ShopCategory extends StatefulWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -1939,6 +1948,7 @@ class _ShopCategoryState extends State<ShopCategory> {
             child: Container(
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
+                key: ValueKey(widget.pet!.name),
                 updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,

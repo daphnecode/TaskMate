@@ -127,11 +127,6 @@ class RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
-      );
-    }
     return MaterialApp(
       title: 'TaskMate',
       theme: ThemeData.light().copyWith(
@@ -141,9 +136,7 @@ class RootState extends State<Root> {
         iconTheme: const IconThemeData(color: Colors.white),
         bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey[900]),
       ),
-      themeMode: (user.setting['darkMode'] == true)
-          ? ThemeMode.dark
-          : ThemeMode.light,
+      themeMode: ThemeMode.light, // 나중에 user.setting['darkMode']로 변경 가능
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -153,124 +146,69 @@ class RootState extends State<Root> {
             );
           }
 
-          if (snapshot.hasData && snapshot.data != null) {
-            final String uid = snapshot.data!.uid;
-            final userDocRef = FirebaseFirestore.instance
-                .collection('Users')
-                .doc(uid);
-
-            // Users/{uid} 변경 시에도 MyHomePage는 유지, props만 업데이트
-            return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              stream: userDocRef.snapshots(),
-              builder: (context, uSnap) {
-                if (uSnap.hasError) {
-                  return Scaffold(
-                    body: Center(child: Text('Firestore 오류: ${uSnap.error}')),
-                  );
-                }
-
-                Users loadedUser;
-                if (!uSnap.hasData || !(uSnap.data?.exists ?? false)) {
-                  loadedUser = Users.fromMap({
-                    'currentPoint': 0,
-                    'gotPoint': 0,
-                    'nowPet': '',
-                    'setting': {
-                      'darkMode': false,
-                      'push': false,
-                      'listSort': 'default',
-                      'sound': true,
-                    },
-                    'statistics': {},
-                  });
-                } else {
-                  final raw = Map<String, dynamic>.from(uSnap.data!.data()!);
-                  raw['currentPoint'] = (raw['currentPoint'] ?? 0) as int;
-                  raw['gotPoint'] = (raw['gotPoint'] ?? 0) as int;
-                  raw['nowPet'] = (raw['nowPet'] ?? '') as String;
-                  raw['setting'] = (raw['setting'] is Map<String, dynamic>)
-                      ? Map<String, dynamic>.from(raw['setting'])
-                      : <String, dynamic>{};
-                  raw['setting']['darkMode'] =
-                      raw['setting']['darkMode'] ?? false;
-                  raw['setting']['push'] = raw['setting']['push'] ?? false;
-                  raw['setting']['listSort'] =
-                      raw['setting']['listSort'] ?? 'default';
-                  raw['setting']['sound'] = raw['setting']['sound'] ?? true;
-                  raw['statistics'] =
-                      (raw['statistics'] is Map<String, dynamic>)
-                      ? Map<String, dynamic>.from(raw['statistics'])
-                      : <String, dynamic>{};
-                  try {
-                    loadedUser = Users.fromMap(raw);
-                  } catch (_) {
-                    loadedUser = Users(
-                      currentPoint: 0,
-                      gotPoint: 0,
-                      nowPet: '',
-                      setting: {
-                        'darkMode': true,
-                        'push': false,
-                        'listSort': 'default',
-                        'sound': true,
-                      },
-                      statistics: {},
-                    );
-                  }
-                }
-
-                final nowPetId = loadedUser.nowPet;
-                if (nowPetId.isEmpty) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                final petDocRef = FirebaseFirestore.instance
-                    .collection('Users')
-                    .doc(uid)
-                    .collection("pets")
-                    .doc(nowPetId);
-
-                return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: petDocRef.snapshots(),
-                  builder: (context, petSnap) {
-                    if (!petSnap.hasData) {
-                      return const Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
-                      );
-                    }
-
-                    final petData = petSnap.data!.data();
-                    var pet = petData != null ? Pets.fromMap(petData) : null;
-
-                    if (petData == null) {
-                      return Center(child: Text("펫 정보가 없습니다."));
-                    }
-
-                    void updatePet(Pets newPet) {
-                      setState(() {
-                        pet = newPet; // 새로운 객체로 교체
-                      });
-                    }
-
-                    return MyHomePage(
-                      title: "Virtual Pet",
-                      user: user,
-                      pet: pet,
-                      currentIndex: _currentIndex, // 🔸 상위에서 관리
-                      setIndex: _setIndex, // 🔸 콜백
-                      onDarkModeChanged: toggleDarkMode,
-                      onPushChanged: togglePushNotification,
-                      onSortingChanged: toggleSortingMethod,
-                      onSoundEffectsChanged: toggleSoundEffects,
-                      onPointsAdded: _onPointsAdded,
-                      updatePet: updatePet,
-                    );
-                  },
-                );
-              },
-            );
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const LoginPage();
           }
 
-          return const LoginPage();
+          final uid = snapshot.data!.uid;
+          final userDocRef = FirebaseFirestore.instance
+              .collection('Users')
+              .doc(uid);
+
+          return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: userDocRef.snapshots(),
+            builder: (context, uSnap) {
+              if (!uSnap.hasData || !(uSnap.data?.exists ?? false)) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              final raw = Map<String, dynamic>.from(uSnap.data!.data()!);
+              final loadedUser = Users.fromMap(raw);
+              final nowPetId = loadedUser.nowPet;
+
+              if (nowPetId.isEmpty) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              final petDocRef = userDocRef.collection('pets').doc(nowPetId);
+
+              return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: petDocRef.snapshots(),
+                builder: (context, petSnap) {
+                  if (!petSnap.hasData || petSnap.data!.data() == null) {
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  final petData = petSnap.data!.data()!;
+                  final pet = Pets.fromMap(petData);
+
+                  void updatePet(String newPet) async {
+                    await userDocRef.update({'nowPet': newPet});
+                  }
+
+                  return MyHomePage(
+                    title: "Virtual Pet",
+                    user: loadedUser,
+                    pet: pet,
+                    currentIndex: _currentIndex,
+                    setIndex: _setIndex,
+                    onDarkModeChanged: toggleDarkMode,
+                    onPushChanged: togglePushNotification,
+                    onSortingChanged: toggleSortingMethod,
+                    onSoundEffectsChanged: toggleSoundEffects,
+                    onPointsAdded: _onPointsAdded,
+                    updatePet: updatePet,
+                  );
+                },
+              );
+            },
+          );
         },
       ),
     );
@@ -288,7 +226,7 @@ class MyHomePage extends StatefulWidget {
   final Function(String) onSortingChanged;
   final Function(bool) onSoundEffectsChanged;
   final Function(int) onPointsAdded;
-  final Function(Pets) updatePet;
+  final Function(String) updatePet;
 
   const MyHomePage({
     required this.title,

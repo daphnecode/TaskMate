@@ -14,7 +14,7 @@ import 'run_game_screen.dart';
 
 // 화면 상단 구성
 class Mainarea extends StatefulWidget {
-  final Function(Pets) updatePet;
+  final Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -65,7 +65,7 @@ class _MainareaState extends State<Mainarea> {
           child: GestureDetector(
             onLongPress: () async {
               // 펫 선택 화면 → Pets 객체 반환
-              final result = await Navigator.push<Pets>(
+              final result = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(
                   builder: (_) => PetChoose(
@@ -77,15 +77,7 @@ class _MainareaState extends State<Mainarea> {
               if (!mounted || result == null) return;
 
               // 즉시 반영
-              setState(() {
-                widget.pet!.image = result.image;
-                widget.pet!.name = result.name;
-                widget.pet!.hunger = result.hunger;
-                widget.pet!.happy = result.happy;
-                widget.pet!.level = result.level;
-                widget.pet!.currentExp = result.currentExp;
-                widget.pet!.styleID = result.styleID;
-              });
+              widget.updatePet(result);
             },
             child: AspectRatio(
               aspectRatio: 1 / 1,
@@ -122,6 +114,7 @@ class _MainareaState extends State<Mainarea> {
                       left: w * 0.5,
                       top: h * 0.6,
                       child: Image.asset(
+                        key: ValueKey(widget.pet!.name),
                         petAsset,
                         fit: BoxFit.cover,
                         height: h * 0.2,
@@ -142,7 +135,7 @@ class _MainareaState extends State<Mainarea> {
 }
 
 class Petmain extends StatefulWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
@@ -229,6 +222,7 @@ class _PetmainState extends State<Petmain> {
               child: _loadingPet
                   ? const Center(child: CircularProgressIndicator())
                   : Mainarea(
+                      key: ValueKey(widget.pet!.name),
                       updatePet: widget.updatePet,
                       onNext: widget.onNext,
                       pet: widget.pet,

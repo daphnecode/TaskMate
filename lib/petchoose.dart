@@ -67,9 +67,7 @@ class _Subarea1State extends State<Subarea1> {
         Expanded(
           child: ElevatedButton(
             onPressed: () async {
-              final pet = await loadPet("dragon"); // ✅ Pets 객체 획득
-              if (!mounted) return;
-              Navigator.pop(context, pet); // ✅ Pets로 pop
+              Navigator.pop(context, "dragon"); // ✅ Pets로 pop
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red[100]),
             child: Center(
@@ -86,9 +84,7 @@ class _Subarea1State extends State<Subarea1> {
         Expanded(
           child: ElevatedButton(
             onPressed: () async {
-              final pet = await loadPet("unicon");
-              if (!mounted) return;
-              Navigator.pop(context, pet);
+              Navigator.pop(context, "unicon");
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green[100]),
             child: Center(
@@ -106,9 +102,8 @@ class _Subarea1State extends State<Subarea1> {
           child: ElevatedButton(
             onPressed: () async {
               // 필요하면 다른 펫 ID로 교체
-              final pet = await loadPet("unicon");
-              if (!mounted) return;
-              Navigator.pop(context, pet);
+
+              Navigator.pop(context, "unicon");
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100]),
             child: Center(
@@ -127,7 +122,7 @@ class _Subarea1State extends State<Subarea1> {
 }
 
 class PetChoose extends StatelessWidget {
-  final void Function(Pets) updatePet;
+  final void Function(String) updatePet;
   final void Function(int) onNext;
   const PetChoose({required this.updatePet, required this.onNext, super.key});
 
