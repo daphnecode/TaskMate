@@ -136,7 +136,9 @@ class RootState extends State<Root> {
         iconTheme: const IconThemeData(color: Colors.white),
         bottomAppBarTheme: BottomAppBarTheme(color: Colors.grey[900]),
       ),
-      themeMode: ThemeMode.light, // 나중에 user.setting['darkMode']로 변경 가능
+      themeMode: (user.setting['darkMode'] == true)
+          ? ThemeMode.dark
+          : ThemeMode.light, // 나중에 user.setting['darkMode']로 변경 가능
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
