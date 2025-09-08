@@ -252,19 +252,33 @@ class _PlannerMainState extends State<PlannerMain> {
                             final functions = FirebaseFunctions.instanceFor(
                               region: kFunctionsRegion,
                             );
-                            final callable = functions.httpsCallable('submitRewardAN3');
+
+                            final rewardFn = functions.httpsCallable('submitRewardAN3'); // 포인트 지급 함수
+                            final expFn    = functions.httpsCallable('submitPetExpAN3');// EXP/레벨업 함수
 
                             if (earned > 0) {
                               // UI 즉시 반영
                               widget.onPointsAdded?.call(earned);
+
                               try {
-                                await callable.call({
+                                // 1) 포인트 지급 (기존 그대로)
+                                await rewardFn.call({
                                   'uid': uid,
                                   'earned': earned,
                                   'dateKey': dateKey,
                                 });
+
+                                // 2) 펫 EXP/레벨업 (신규 추가)
+                                final resp = await expFn.call({
+                                  'uid': uid,
+                                  'earned': earned,
+                                  'dateKey': dateKey, // logV2 idempotency용
+                                });
+                                // 웹(Chrome) 테스트면 F12 Console에서 확인 가능
+                                
+                                print('submitPetExpAN3 resp.data = ${resp.data}');
                               } catch (e) {
-                                // 실패 시 롤백
+                                // 실패 시 UI 롤백
                                 widget.onPointsAdded?.call(-earned);
                                 rethrow;
                               }

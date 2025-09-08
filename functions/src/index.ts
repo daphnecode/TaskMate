@@ -118,3 +118,4 @@ export const onTaskSubmitted = onDocumentWritten(
 // 다른 함수들 export
 export * from "./submitReward";
 exports.updateStatus = updateStatus; 
+export { submitPetExpAN3 } from "./submitPetExp";
