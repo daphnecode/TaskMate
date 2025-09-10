@@ -362,8 +362,8 @@ class _PetmainState extends State<Petmain> {
                                           Navigator.pop(context);
                                           widget.onNext(index);
                                         },
+					pet: widget.pet,
                                         soundEffectsOn: widget.soundEffectsOn,
-                                        pet: widget.pet,
                                         uid: uid, // ✅ 하드코딩 제거
                                         petId: petId,
                                       ),
