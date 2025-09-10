@@ -3,15 +3,15 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Users/{uid} 및 모든 하위 컬렉션
-    match /Users/{userId}/{document=**} {
+    match /Users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow get, update, delete: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      
-      // list는 항상 금지 (전체 유저 데이터 노출 방지)
-      allow list: if false;
     }
 
+    // 유저 하위 문서/컬렉션
+    match /Users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow list: if false;
+    }
     // 공용 아이템
     match /Items/{itemId} {
       allow read: if true;
