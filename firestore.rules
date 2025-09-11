@@ -13,7 +13,7 @@ service cloud.firestore {
       allow list: if false;
     }
     // 공용 아이템
-    match /Items/{itemId} {
+    match /aLLitems/{itemId} {
       allow read: if true;
       allow write: if false;
     }

@@ -67,8 +67,8 @@ test('타인 하위컬렉션 쓰기 거부 (Users/xyz789/pets/p1)', async () => 
 test('Items는 누구나 읽기 허용', async () => {
   const unauth = testEnv.unauthenticatedContext();
   const db = unauth.firestore();
-  await seed('Items/item123', { type: 'potion' });
-  await assertSucceeds(getDoc(doc(db, 'Items/item123')));
+  await seed('aLLitems/item123', { type: 'potion' });
+  await assertSucceeds(getDoc(doc(db, 'aLLitems/item123')));
 });
 
 test('Items 쓰기는 거부', async () => {
