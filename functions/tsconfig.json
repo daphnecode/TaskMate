@@ -10,8 +10,7 @@
     "strict": true,
     "target": "es2017",
     "skipLibCheck": true,
-    "types": ["node"],
-    "moduleResolution": "node"
+    "types": ["node"]
   },
   "compileOnSave": true,
   "include": [

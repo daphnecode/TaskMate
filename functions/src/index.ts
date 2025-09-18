@@ -150,6 +150,7 @@ export const onTaskSubmitted = onDocumentWritten(
 
 // 다른 함수들 export (불필요 임포트 없이 재-export)
 export * from "./submitReward";
+export {getInventory} from "./item/itemload";
 export {updateStatus} from "./pet/updateStatus";
 export {submitPetExpAN3} from "./submitPetEXP";
 
