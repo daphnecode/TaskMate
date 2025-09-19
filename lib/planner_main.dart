@@ -7,6 +7,8 @@ import 'DBtest/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'DBtest/api_service.dart';
+
 
 // 위젯
 import 'package:taskmate/widgets/date_badge.dart';
@@ -142,11 +144,17 @@ class _PlannerMainState extends State<PlannerMain> {
         .set({'visited': true}, SetOptions(merge: true));
 
     // 반복 리스트 로드
-    fetchRepeatTasks(userId!).then((repeatTasks) {
+    fetchRepeatList().then((rows) {
       if (!mounted) return;
       setState(() {
-        repeatTaskList = repeatTasks;
+        repeatTaskList = rows.map((e) => Task(
+          text: e['text'] ?? '',
+          point: (e['point'] ?? 0) as int,
+          isChecked: e['isChecked'] ?? false,
+        )).toList();
       });
+    }).catchError((e) {
+      
     });
   }
 
