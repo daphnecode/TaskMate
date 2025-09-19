@@ -1,15 +1,14 @@
-import * as admin from "firebase-admin";
 import express from "express";
+import { getAuth } from "firebase-admin/auth";
+import { db } from "../firebase.js";
 
-const db = admin.firestore();
 const router = express.Router();
 
-/** Authorization: Bearer <idToken> 검증 */
 async function verifyToken(req: express.Request) {
   const h = req.headers.authorization || "";
   if (!h.startsWith("Bearer ")) throw new Error("No ID token provided");
   const token = h.substring("Bearer ".length);
-  return admin.auth().verifyIdToken(token);
+  return getAuth().verifyIdToken(token);
 }
 
 /** 반복 리스트 문서 참조: Users/{uid}/repeatTasks/default */
@@ -40,7 +39,7 @@ router.get("/read/:userId", async (req, res) => {
 
     // 토큰의 uid와 파라미터 uid가 다르면 거부
     if (uidFromToken !== uidFromParam) {
-      return res.status(403).json({ success: false, message: "Forbidden" });
+      return res.status(403).json({success: false, message: "Forbidden"});
     }
 
     const snap = await refRepeat(uidFromParam).get();
@@ -73,7 +72,7 @@ router.get("/read/:userId", async (req, res) => {
     console.error(e);
     return res
       .status(401)
-      .json({ success: false, message: e?.message || "Unauthorized" });
+      .json({success: false, message: e?.message || "Unauthorized"});
   }
 });
 

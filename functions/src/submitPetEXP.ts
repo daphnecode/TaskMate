@@ -1,8 +1,8 @@
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
-import { db } from "./firebase";
-import { getLevelExp } from "./pet/levelExp";
+import { db } from "./firebase.js";
+import { getLevelExp } from "./pet/levelExp.js";
 
 /**
  * 펫 EXP/레벨업 전용 (포인트는 변경하지 않음)
@@ -18,7 +18,7 @@ export const submitPetExpAN3 = onCall(
     const dateKey = String(req.data.dateKey);
     const force = !!req.data.force;
 
-    const out: any = { ok: true, steps: [] as string[] };
+    const out: any = {ok: true, steps: [] as string[]};
 
     try {
       if (!uid || !Number.isFinite(earned) || !dateKey) {
@@ -36,7 +36,7 @@ export const submitPetExpAN3 = onCall(
       const userRef = db.collection("Users").doc(uid);
       const logRef = userRef.collection("logV2").doc(dateKey); // 기존 log와 분리
 
-      await db.runTransaction(async (tx) => {
+      await db.runTransaction(async (tx: FirebaseFirestore.Transaction) => {
         // 1) 중복 방지
         const logSnap = await tx.get(logRef);
         const already = logSnap.exists && logSnap.data()?.expRewarded === true;
@@ -67,7 +67,7 @@ nowPet=${nowPet ?? "null"}`);
 
         let lvl = Number(petSnap.data()?.level ?? 1);
         let exp = Number(petSnap.data()?.currentExp ?? 0);
-        const before = { lvl, exp };
+        const before = {lvl, exp};
 
         exp += earned;
 
@@ -82,7 +82,7 @@ nowPet=${nowPet ?? "null"}`);
         }
 
         // 문서가 없어도 merge:true로 생성/갱신
-        tx.set(petRef, { level: lvl, currentExp: exp }, { merge: true });
+        tx.set(petRef, {level: lvl, currentExp: exp}, {merge: true});
         out.steps.push(`pet updated: before=${JSON.stringify(before)} 
 after={"lvl":${lvl},"exp":${exp},"ups":${ups}}`);
 
@@ -95,7 +95,7 @@ after={"lvl":${lvl},"exp":${exp},"ups":${ups}}`);
             rewardedBy: "submitPetExpAN3",
             rewardedAt: admin.firestore.FieldValue.serverTimestamp(),
           },
-          { merge: true },
+          {merge: true},
         );
         out.steps.push("logV2 marked expRewarded");
       });

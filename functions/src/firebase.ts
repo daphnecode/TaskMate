@@ -1,8 +1,8 @@
-import * as admin from "firebase-admin";
+import { getApps, initializeApp } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
-// 이미 초기화되어 있는지 체크
-if (!admin.apps.length) {
-  admin.initializeApp();
+if (getApps().length === 0) {
+  initializeApp();
 }
 
-export const db = admin.firestore();
+export const db = getFirestore();

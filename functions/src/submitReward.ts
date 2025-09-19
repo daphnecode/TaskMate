@@ -1,12 +1,13 @@
+// functions/src/submitReward.ts
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-import { db } from "./firebase";
+import { db } from "./firebase.js";
+import { FieldValue, type Transaction } from "firebase-admin/firestore";
 
 /**
- * 보상 지급 (아시아 리전 고정)
- * - Users/{uid} 가 없을 수 있으므로 먼저 set(merge:true)로 보장
+ * 보상 지급 (asia-northeast3)
+ * - Users/{uid} 보장(set merge)
  * - currentPoint, gotPoint 증가
- * - Users/{uid}/log/{dateKey} 에 rewarded 기록
+ * - Users/{uid}/log/{dateKey}에 rewarded 기록 (중복 방지)
  */
 export const submitRewardAN3 = onCall(
   { region: "asia-northeast3" },
@@ -16,17 +17,14 @@ export const submitRewardAN3 = onCall(
     const dateKey = String(req.data.dateKey);
 
     if (!uid || !Number.isFinite(earned) || !dateKey) {
-      throw new HttpsError(
-        "invalid-argument",
-        "uid, earned, dateKey are required",
-      );
+      throw new HttpsError("invalid-argument", "uid, earned, dateKey are required");
     }
     if (earned <= 0) return { ok: true, skipped: true };
 
     const userRef = db.collection("Users").doc(uid);
     const logRef = userRef.collection("log").doc(dateKey);
 
-    await db.runTransaction(async (tx) => {
+    await db.runTransaction(async (tx: Transaction) => {
       const logSnap = await tx.get(logRef);
       const already = logSnap.exists && logSnap.data()?.rewarded === true;
       if (already) return;
@@ -38,10 +36,10 @@ export const submitRewardAN3 = onCall(
       tx.set(
         userRef,
         {
-          currentPoint: admin.firestore.FieldValue.increment(earned),
-          gotPoint: admin.firestore.FieldValue.increment(earned),
+          currentPoint: FieldValue.increment(earned),
+          gotPoint: FieldValue.increment(earned),
         },
-        { merge: true },
+        { merge: true }
       );
 
       // 로그 표식
@@ -51,12 +49,12 @@ export const submitRewardAN3 = onCall(
           rewarded: true,
           earnedPoints: earned,
           rewardedBy: "submitRewardAN3",
-          rewardedAt: admin.firestore.FieldValue.serverTimestamp(),
+          rewardedAt: FieldValue.serverTimestamp(),
         },
-        { merge: true },
+        { merge: true }
       );
     });
 
     return { ok: true };
-  },
+  }
 );

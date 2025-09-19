@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions/v2/https";
-import { db } from "../firebase";
+import {db} from "../firebase.js";
 
 // ✅ inventory 조회 API
 export const getInventory = functions.onRequest(async (req, res) => {

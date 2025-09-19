@@ -3,17 +3,21 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore";
 // v2 HTTPS onRequest
 import { onRequest } from "firebase-functions/v2/https";
 
-import admin from "firebase-admin";
 import express from "express";
 import cors from "cors";
 
-import { db } from "./firebase";
-import repeatRouter from "./planner/repeat_function";
+// ️ 모듈식 Firestore 유틸/타입
+import { Timestamp } from "firebase-admin/firestore";
+import type {
+  Transaction,
+  UpdateData,
+  DocumentData,
+} from "firebase-admin/firestore";
 
-// Admin init (중복 방지)
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
+import { db } from "./firebase.js";
+import repeatRouter from "./planner/repeat_function.js";
+
+// ❌ admin 초기화 블록 전부 제거 (firebase.ts에서 이미 처리함)
 
 // KST YYYY-MM-DD
 function kstDateStr(date = new Date()): string {
@@ -43,6 +47,7 @@ export const onTaskSubmitted = onDocumentWritten(
       .doc(userId)
       .collection("stats")
       .doc("summary");
+
     const logRef = db
       .collection("Users")
       .doc(userId)
@@ -51,7 +56,7 @@ export const onTaskSubmitted = onDocumentWritten(
 
     const todayStr = kstDateStr();
 
-    await db.runTransaction(async (tx) => {
+    await db.runTransaction(async (tx: Transaction) => {
       const [statsSnap, logSnap] = await Promise.all([
         tx.get(statsRef),
         tx.get(logRef),
@@ -104,17 +109,16 @@ export const onTaskSubmitted = onDocumentWritten(
 
       const baseStatsUpdate: Record<string, unknown> = {
         totalCompleted: newTotalCompleted,
-        lastUpdated: admin.firestore.Timestamp.now(),
+        lastUpdated: Timestamp.now(),
         lastUpdatedDateStr: lastUpdatedDateStr ?? todayStr,
       };
 
-      const statsUpdate: FirebaseFirestore.UpdateData<FirebaseFirestore.DocumentData> =
-        {
-          ...baseStatsUpdate,
-          ...(shouldUpdateStreak
-            ? { streakDays: newStreak, lastUpdatedDateStr: todayStr }
-            : {}),
-        };
+      const statsUpdate: UpdateData<DocumentData> = {
+        ...baseStatsUpdate,
+        ...(shouldUpdateStreak
+          ? { streakDays: newStreak, lastUpdatedDateStr: todayStr }
+          : {}),
+      };
 
       tx.set(statsRef, statsUpdate, { merge: true });
 
@@ -142,7 +146,7 @@ app.use("/repeatList", repeatRouter);
 
 export const api = onRequest({ region: "asia-northeast3" }, app);
 
-// 기존 export 유지
-export * from "./submitReward";
-export { updateStatus } from "./pet/updateStatus";
-export { submitPetExpAN3 } from "./submitPetEXP";
+// 기존 export 유지 (ESM 로컬 모듈은 .js 필수)
+export * from "./submitReward.js";
+export { updateStatus } from "./pet/updateStatus.js";
+export { submitPetExpAN3 } from "./submitPetEXP.js";

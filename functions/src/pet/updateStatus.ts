@@ -1,7 +1,7 @@
 // src/index.ts
-import { onSchedule } from "firebase-functions/v2/scheduler";
-import { db } from "../firebase";
-import { getLevelExp } from "./levelExp";
+import {onSchedule} from "firebase-functions/v2/scheduler";
+import { db } from "../firebase.js";
+import { getLevelExp } from "./levelExp.js";
 
 // 매일 새벽 0시 (UTC 기준) 실행
 export const updateStatus = onSchedule(
@@ -87,7 +87,7 @@ export const updateStatus = onSchedule(
           updates.currentExp = newExp;
         }
 
-        await petRef.set(updates, { merge: true });
+        await petRef.set(updates, {merge: true});
 
         console.log(`유저 ${userId}의 펫 ${nowPetId} 상태 갱신됨:`, updates);
       }
