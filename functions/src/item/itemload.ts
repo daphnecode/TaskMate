@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions/v2/https";
-import {db} from "../firebase";
+import { db } from "../firebase";
 
 // ✅ inventory 조회 API
 export const getInventory = functions.onRequest(async (req, res) => {
@@ -22,7 +22,6 @@ export const getInventory = functions.onRequest(async (req, res) => {
       });
       return;
     }
-
 
     // ✅ Path Params & Query Params
     const userId = req.path.split("/").pop(); // /inventory/read/{userID}
@@ -72,4 +71,3 @@ export const getInventory = functions.onRequest(async (req, res) => {
     return;
   }
 });
-

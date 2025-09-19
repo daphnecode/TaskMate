@@ -36,12 +36,18 @@ export const onTaskSubmitted = onDocumentWritten(
     if (!afterSubmitted) return;
 
     const afterCompleted = Number(after.completedCount || 0);
-    const afterCredited  = Number(after.creditedCompleted || 0);
+    const afterCredited = Number(after.creditedCompleted || 0);
 
-    const statsRef = db.collection("Users").doc(userId)
-      .collection("stats").doc("summary");
-    const logRef = db.collection("Users").doc(userId)
-      .collection("log").doc(event.params.logId);
+    const statsRef = db
+      .collection("Users")
+      .doc(userId)
+      .collection("stats")
+      .doc("summary");
+    const logRef = db
+      .collection("Users")
+      .doc(userId)
+      .collection("log")
+      .doc(event.params.logId);
 
     const todayStr = kstDateStr();
 
@@ -65,11 +71,15 @@ export const onTaskSubmitted = onDocumentWritten(
       let delta = Math.max(0, afterCompleted - afterCredited);
 
       if (delta === 0 && afterCompleted > 0) {
-        const neverUpdatedStats = !statsSnap.exists || lastUpdatedDateStr === null;
-        const neverCreditedInLog = !logSnap.exists || !("creditedCompleted" in (logSnap.data() || {}));
+        const neverUpdatedStats =
+          !statsSnap.exists || lastUpdatedDateStr === null;
+        const neverCreditedInLog =
+          !logSnap.exists || !("creditedCompleted" in (logSnap.data() || {}));
         if (neverUpdatedStats && neverCreditedInLog) {
           delta = afterCompleted;
-          console.log(`[bootstrap] user=${userId}, log=${event.params.logId}, force delta=${delta}`);
+          console.log(
+            `[bootstrap] user=${userId}, log=${event.params.logId}, force delta=${delta}`,
+          );
         }
       }
 
@@ -83,7 +93,9 @@ export const onTaskSubmitted = onDocumentWritten(
       } else if (lastUpdatedDateStr !== todayStr) {
         const last = new Date(lastUpdatedDateStr);
         const today = new Date(todayStr);
-        const diffDays = Math.round((today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+        const diffDays = Math.round(
+          (today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24),
+        );
         newStreak = diffDays === 1 ? streakDays + 1 : 1;
         shouldUpdateStreak = true;
       }
@@ -96,18 +108,25 @@ export const onTaskSubmitted = onDocumentWritten(
         lastUpdatedDateStr: lastUpdatedDateStr ?? todayStr,
       };
 
-      const statsUpdate: FirebaseFirestore.UpdateData<FirebaseFirestore.DocumentData> = {
-        ...baseStatsUpdate,
-        ...(shouldUpdateStreak ? { streakDays: newStreak, lastUpdatedDateStr: todayStr } : {}),
-      };
+      const statsUpdate: FirebaseFirestore.UpdateData<FirebaseFirestore.DocumentData> =
+        {
+          ...baseStatsUpdate,
+          ...(shouldUpdateStreak
+            ? { streakDays: newStreak, lastUpdatedDateStr: todayStr }
+            : {}),
+        };
 
       tx.set(statsRef, statsUpdate, { merge: true });
 
       if (delta > 0 || afterCredited === 0) {
-        tx.set(logRef, { creditedCompleted: afterCredited + delta }, { merge: true });
+        tx.set(
+          logRef,
+          { creditedCompleted: afterCredited + delta },
+          { merge: true },
+        );
       }
     });
-  }
+  },
 );
 
 // ===== Express 앱 (v2 onRequest) =====

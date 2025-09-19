@@ -14,7 +14,11 @@ async function verifyToken(req: express.Request) {
 
 /** 반복 리스트 문서 참조: Users/{uid}/repeatTasks/default */
 function refRepeat(uid: string) {
-  return db.collection("Users").doc(uid).collection("repeatTasks").doc("default");
+  return db
+    .collection("Users")
+    .doc(uid)
+    .collection("repeatTasks")
+    .doc("default");
 }
 
 /**
