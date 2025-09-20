@@ -6,7 +6,6 @@ import 'itemlist.dart';
 import 'petmain.dart';
 import 'petchoose.dart';
 import 'DBtest/task.dart';
-import 'DBtest/task_data.dart';
 import 'object.dart';
 import 'settingspage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -252,6 +251,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  List<Task> repeatTaskList = [];
+  List<Task> todayTaskList = [];
+
   @override
   void initState() {
     super.initState();

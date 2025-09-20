@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'DBtest/task.dart';
-import 'package:taskmate/DBtest/task_data.dart';
 import 'planner_edit.dart';
 import 'statistics.dart';
 import 'DBtest/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'DBtest/api_service.dart';
+import 'package:taskmate/DBtest/api_service.dart' as api;
 
 
 // 위젯
@@ -43,6 +42,9 @@ class _PlannerMainState extends State<PlannerMain> {
   bool showFullToday = false;
   bool _isSubmitted = false;
   bool _submitting = false;
+
+  List<Task> repeatTaskList = [];
+  List<Task> todayTaskList = [];
 
   // 로그인 전에도 안전하도록 nullable 처리
   String? userId;
@@ -80,10 +82,14 @@ class _PlannerMainState extends State<PlannerMain> {
   }
 
   void _autoSave() {
-    if (userId == null) return; // 로그인 전 안전 가드
+    if (userId == null) return;
     final dateKey = _dateKey(selectedDate);
     updateTasksToFirestore(userId!, dateKey, todayTaskList);
-    updateRepeatTasks(userId!, repeatTaskList);
+
+    // (반복 리스트)  API로 저장
+    api.saveRepeatList(repeatTaskList).catchError((e) {
+      debugPrint('repeatList save error: $e');
+    });
   }
 
   DateTime getKstNow() {
@@ -93,10 +99,10 @@ class _PlannerMainState extends State<PlannerMain> {
   int _calcEarnedPointsForToday() {
     int sum = 0;
     for (final t in todayTaskList) {
-      if (t.isChecked) sum += (t.point ?? 0);
+      if (t.isChecked) sum += (t.point ?? 0).toInt();
     }
     for (final t in repeatTaskList) {
-      if (t.isChecked) sum += (t.point ?? 0);
+      if (t.isChecked) sum += (t.point ?? 0).toInt();
     }
     return sum;
   }
@@ -144,20 +150,23 @@ class _PlannerMainState extends State<PlannerMain> {
         .set({'visited': true}, SetOptions(merge: true));
 
     // 반복 리스트 로드
-    fetchRepeatList().then((rows) {
+    api.fetchRepeatList().then((rows) {
       if (!mounted) return;
       setState(() {
-        repeatTaskList = rows.map((e) => Task(
-          text: e['text'] ?? '',
-          point: (e['point'] ?? 0) as int,
-          isChecked: e['isChecked'] ?? false,
-        )).toList();
+        repeatTaskList = rows.map((e) =>
+            Task(
+              text: e['text'] ?? '',
+              point: (e['point'] ?? 0) is int
+                  ? (e['point'] ?? 0) as int
+                  : (e['point'] ?? 0).toInt(),
+              isChecked: e['isChecked'] ?? false,
+            )).toList();
       });
+      debugPrint('[API] repeat loaded: ${repeatTaskList.length}');
     }).catchError((e) {
       
     });
   }
-
   @override
   Widget build(BuildContext context) {
     selectedDate = getKstNow();
