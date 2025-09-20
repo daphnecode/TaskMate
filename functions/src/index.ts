@@ -1,3 +1,4 @@
+// functions/src/index.ts
 // v2 Firestore trigger
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 // v2 HTTPS onRequest
@@ -6,20 +7,33 @@ import { onRequest } from "firebase-functions/v2/https";
 import express from "express";
 import cors from "cors";
 
-// ️ 모듈식 Firestore 유틸/타입
+// 모듈식 Firestore 유틸/타입
 import { Timestamp } from "firebase-admin/firestore";
-import type {
-  Transaction,
-  UpdateData,
-  DocumentData,
-} from "firebase-admin/firestore";
+import type { Transaction, UpdateData, DocumentData } from "firebase-admin/firestore";
 
 import { db } from "./firebase.js";
 import repeatRouter from "./planner/repeat_function.js";
 
-// ❌ admin 초기화 블록 전부 제거 (firebase.ts에서 이미 처리함)
+// ===== Express 앱 (v2 onRequest) =====
+const app = express();
 
-// KST YYYY-MM-DD
+// ✅ CORS는 제일 먼저 + 프리플라이트 허용
+app.use(cors({ origin: true, credentials: true }));
+app.options(/.*/, cors({ origin: true, credentials: true }));
+
+// 바디 파서
+app.use(express.json());
+
+// 라우터 마운트
+// - /repeatList/...  (예: /repeatList/read/:userId, /repeatList/save/:userId, /repeatList/add/:userId)
+// - /dailyList/...   (노션 스펙 호환: /dailyList/add/:userId)
+app.use("/repeatList", repeatRouter);
+app.use("/dailyList", repeatRouter);
+
+// Cloud Functions v2 onRequest
+export const api = onRequest({ region: "asia-northeast3" }, app);
+
+// ===== Firestore 트리거 =====
 function kstDateStr(date = new Date()): string {
   const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
   const y = kst.getUTCFullYear();
@@ -28,123 +42,78 @@ function kstDateStr(date = new Date()): string {
   return `${y}-${m}-${d}`;
 }
 
-// ===== Firestore 트리거 =====
-export const onTaskSubmitted = onDocumentWritten(
-  "Users/{userId}/log/{logId}",
-  async (event) => {
-    const userId = event.params.userId;
-    const after = event.data?.after.exists ? event.data?.after.data() : null;
-    if (!after) return;
+export const onTaskSubmitted = onDocumentWritten("Users/{userId}/log/{logId}", async (event) => {
+  const userId = event.params.userId;
+  const after = event.data?.after.exists ? event.data?.after.data() : null;
+  if (!after) return;
 
-    const afterSubmitted = Boolean(after.submitted);
-    if (!afterSubmitted) return;
+  if (!Boolean(after.submitted)) return;
 
-    const afterCompleted = Number(after.completedCount || 0);
-    const afterCredited = Number(after.creditedCompleted || 0);
+  const afterCompleted = Number(after.completedCount || 0);
+  const afterCredited = Number(after.creditedCompleted || 0);
 
-    const statsRef = db
-      .collection("Users")
-      .doc(userId)
-      .collection("stats")
-      .doc("summary");
+  const statsRef = db.collection("Users").doc(userId).collection("stats").doc("summary");
+  const logRef = db.collection("Users").doc(userId).collection("log").doc(event.params.logId);
 
-    const logRef = db
-      .collection("Users")
-      .doc(userId)
-      .collection("log")
-      .doc(event.params.logId);
+  const todayStr = kstDateStr();
 
-    const todayStr = kstDateStr();
+  await db.runTransaction(async (tx: Transaction) => {
+    const [statsSnap, logSnap] = await Promise.all([tx.get(statsRef), tx.get(logRef)]);
 
-    await db.runTransaction(async (tx: Transaction) => {
-      const [statsSnap, logSnap] = await Promise.all([
-        tx.get(statsRef),
-        tx.get(logRef),
-      ]);
+    let totalCompleted = 0;
+    let streakDays = 0;
+    let lastUpdatedDateStr: string | null = null;
 
-      let totalCompleted = 0;
-      let streakDays = 0;
-      let lastUpdatedDateStr: string | null = null;
+    if (statsSnap.exists) {
+      const s = statsSnap.data()!;
+      totalCompleted = Number(s.totalCompleted || 0);
+      streakDays = Number(s.streakDays || 0);
+      lastUpdatedDateStr = (s.lastUpdatedDateStr as string) || null;
+    }
 
-      if (statsSnap.exists) {
-        const s = statsSnap.data()!;
-        totalCompleted = Number(s.totalCompleted || 0);
-        streakDays = Number(s.streakDays || 0);
-        lastUpdatedDateStr = (s.lastUpdatedDateStr as string) || null;
+    let delta = Math.max(0, afterCompleted - afterCredited);
+    if (delta === 0 && afterCompleted > 0) {
+      const neverUpdatedStats = !statsSnap.exists || lastUpdatedDateStr === null;
+      const neverCreditedInLog = !logSnap.exists || !("creditedCompleted" in (logSnap.data() || {}));
+      if (neverUpdatedStats && neverCreditedInLog) {
+        delta = afterCompleted;
       }
+    }
 
-      let delta = Math.max(0, afterCompleted - afterCredited);
+    let newStreak = streakDays;
+    let shouldUpdateStreak = false;
 
-      if (delta === 0 && afterCompleted > 0) {
-        const neverUpdatedStats =
-          !statsSnap.exists || lastUpdatedDateStr === null;
-        const neverCreditedInLog =
-          !logSnap.exists || !("creditedCompleted" in (logSnap.data() || {}));
-        if (neverUpdatedStats && neverCreditedInLog) {
-          delta = afterCompleted;
-          console.log(
-            `[bootstrap] user=${userId}, log=${event.params.logId}, force delta=${delta}`,
-          );
-        }
-      }
+    if (lastUpdatedDateStr === null) {
+      newStreak = 1;
+      shouldUpdateStreak = true;
+    } else if (lastUpdatedDateStr !== todayStr) {
+      const last = new Date(lastUpdatedDateStr);
+      const today = new Date(todayStr);
+      const diffDays = Math.round((today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+      newStreak = diffDays === 1 ? streakDays + 1 : 1;
+      shouldUpdateStreak = true;
+    }
 
-      // streak 계산
-      let newStreak = streakDays;
-      let shouldUpdateStreak = false;
+    const newTotalCompleted = totalCompleted + delta;
 
-      if (lastUpdatedDateStr === null) {
-        newStreak = 1;
-        shouldUpdateStreak = true;
-      } else if (lastUpdatedDateStr !== todayStr) {
-        const last = new Date(lastUpdatedDateStr);
-        const today = new Date(todayStr);
-        const diffDays = Math.round(
-          (today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24),
-        );
-        newStreak = diffDays === 1 ? streakDays + 1 : 1;
-        shouldUpdateStreak = true;
-      }
+    const baseStatsUpdate: Record<string, unknown> = {
+      totalCompleted: newTotalCompleted,
+      lastUpdated: Timestamp.now(),
+      lastUpdatedDateStr: lastUpdatedDateStr ?? todayStr,
+    };
 
-      const newTotalCompleted = totalCompleted + delta;
+    const statsUpdate: UpdateData<DocumentData> = {
+      ...baseStatsUpdate,
+      ...(shouldUpdateStreak ? { streakDays: newStreak, lastUpdatedDateStr: todayStr } : {}),
+    };
 
-      const baseStatsUpdate: Record<string, unknown> = {
-        totalCompleted: newTotalCompleted,
-        lastUpdated: Timestamp.now(),
-        lastUpdatedDateStr: lastUpdatedDateStr ?? todayStr,
-      };
+    tx.set(statsRef, statsUpdate, { merge: true });
 
-      const statsUpdate: UpdateData<DocumentData> = {
-        ...baseStatsUpdate,
-        ...(shouldUpdateStreak
-          ? { streakDays: newStreak, lastUpdatedDateStr: todayStr }
-          : {}),
-      };
-
-      tx.set(statsRef, statsUpdate, { merge: true });
-
-      if (delta > 0 || afterCredited === 0) {
-        tx.set(
-          logRef,
-          { creditedCompleted: afterCredited + delta },
-          { merge: true },
-        );
-      }
-    });
-  },
-);
-
-// ===== Express 앱 (v2 onRequest) =====
-const app = express();
-app.use(cors({ origin: true }));
-app.use(express.json());
-
-// 라우터 마운트
-app.use("/repeatList", repeatRouter);
-
-// 필요 시 다른 라우터도 추가 가능
-// app.use("/dailyList", dailyRouter);
-
-export const api = onRequest({ region: "asia-northeast3" }, app);
+    if (delta > 0 || afterCredited === 0) {
+      tx.set(logRef, { creditedCompleted: afterCredited + delta }, { merge: true });
+    }
+  });
+});
 
 // 기존 export 유지 (ESM 로컬 모듈은 .js 필수)
 export * from "./submitReward.js";

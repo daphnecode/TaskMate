@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'DBtest/task.dart';
 import 'daily_edit.dart';
 import 'DBtest/firestore_service.dart';
+import 'dart:async';
+import 'package:taskmate/DBtest/api_service.dart' as api;
 
 // 위젯
 import 'package:taskmate/widgets/repeat_edit_box.dart';
@@ -53,6 +55,26 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
   bool showFullRepeat = false;
   bool showFullToday = false;
 
+  Timer? _saveRepeatDebounce;
+
+  void _saveRepeatDebounced(List<Task> list) {
+    _saveRepeatDebounce?.cancel();
+    _saveRepeatDebounce = Timer(const Duration(milliseconds: 400), () async {
+      try {
+        await api.saveRepeatList(list); // 🔸 POST /repeatList/save/:uid
+        
+      } catch (e) {
+        
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _saveRepeatDebounce?.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -81,6 +103,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       if (type == 0) {
         // type == 0 : 반복 리스트
         repeatTaskList = newTasks;
+        _saveRepeatDebounced(repeatTaskList);
       } else if (type == 1) {
         // type == 1 : 일일 리스트
         todayTaskList = newTasks;
@@ -93,6 +116,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     final key = _dateKey(selectedDate);
     await updateTasksToFirestore(userId, key, todayTaskList);
     await saveDailyTasks(userId, key, todayTaskList);
+    await api.saveRepeatList(repeatTaskList);
   }
 
   /// 저장 후 페이지 이동

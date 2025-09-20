@@ -55,3 +55,29 @@ Future<void> saveRepeatList(List<Task> tasks) async {
     throw Exception("repeatList save failed: ${r.statusCode} ${r.body}");
   }
 }
+
+// 노션 스펙 호환: 할 일 추가
+Future<Map<String, dynamic>> addDailyLikeTask({
+  required String text,
+  required int point,
+  bool checked = false,
+}) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final url = Uri.parse("$baseUrl/dailyList/add/$uid");
+  final r = await http.post(
+    url,
+    headers: await _authHeaders(),
+    body: jsonEncode({
+      "todoText": text,
+      "todoCheck": checked,
+      "todoPoint": point,
+    }),
+  );
+  // 상태 확인 로그
+  
+  print('[API] add status=${r.statusCode} body=${r.body}');
+  if (r.statusCode != 200) {
+    throw Exception("add failed: ${r.statusCode} ${r.body}");
+  }
+  return jsonDecode(r.body) as Map<String, dynamic>;
+}
