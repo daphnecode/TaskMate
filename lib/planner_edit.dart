@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'DBtest/task.dart';
 import 'daily_edit.dart';
-import 'DBtest/firestore_service.dart';
 import 'dart:async';
 import 'package:taskmate/DBtest/api_service.dart' as api;
 
@@ -39,8 +38,7 @@ class PlannerEditPage extends StatefulWidget {
 }
 
 class _PlannerEditPageState extends State<PlannerEditPage> {
-  // ❌ 기존: final String userId = "HiHgtVpIvdyCZVtiFCOc";
-  // ✅ 변경: 로그인한 사용자 uid로 런타임에 초기화
+  // ✅ 로그인한 사용자 uid로 런타임 초기화
   late final String userId;
 
   String _dateKey(DateTime date) {
@@ -56,6 +54,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
   bool showFullToday = false;
 
   Timer? _saveRepeatDebounce;
+  Timer? _saveTodayDebounce;
 
   void _saveRepeatDebounced(List<Task> list) {
     _saveRepeatDebounce?.cancel();
@@ -69,9 +68,23 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     });
   }
 
+  void _saveTodayDebounced() {
+    _saveTodayDebounce?.cancel();
+    _saveTodayDebounce = Timer(const Duration(milliseconds: 400), () async {
+      try {
+        final key = _dateKey(selectedDate);
+        await api.savePlanner(key, todayTaskList); // ⬅️ /planner/save 호출
+        debugPrint('[API] planner saved: ${todayTaskList.length}');
+      } catch (e) {
+        debugPrint('[API] planner save error: $e');
+      }
+    });
+  }
+
   @override
   void dispose() {
     _saveRepeatDebounce?.cancel();
+    _saveTodayDebounce?.cancel();
     super.dispose();
   }
 
@@ -82,8 +95,6 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     // ✅ 로그인한 사용자 uid 고정
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
-      // 이 화면은 로그인 후에만 들어오므로 거의 발생하지 않지만 방어 로직
-      // uid가 없으면 그냥 뒤로 보내버림
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) Navigator.of(context).pop();
       });
@@ -101,22 +112,32 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
   void updateTasks(int type, List<Task> newTasks) {
     setState(() {
       if (type == 0) {
-        // type == 0 : 반복 리스트
+        // 반복 리스트
         repeatTaskList = newTasks;
         _saveRepeatDebounced(repeatTaskList);
       } else if (type == 1) {
-        // type == 1 : 일일 리스트
+        // 일일(오늘) 리스트
         todayTaskList = newTasks;
+        _saveTodayDebounced();
       }
     });
   }
 
-  /// 🔹 planner + dailyTasks 동시 저장
+  /// 🔹 (API만) planner + repeat 동시 저장
   Future<void> saveCurrentTasks() async {
     final key = _dateKey(selectedDate);
-    await updateTasksToFirestore(userId, key, todayTaskList);
-    await saveDailyTasks(userId, key, todayTaskList);
-    await api.saveRepeatList(repeatTaskList);
+    try {
+      await Future.wait([
+        api.saveRepeatList(repeatTaskList),
+        api.savePlanner(key, todayTaskList),
+      ]);
+    } catch (e) {
+      
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('저장 실패: $e')),
+      );
+    }
   }
 
   /// 저장 후 페이지 이동
@@ -128,7 +149,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     widget.onDailyMapChanged(newMap);
     widget.onUpdateTasks(repeatTaskList, todayTaskList);
 
-    await saveCurrentTasks(); // 공통 저장
+    await saveCurrentTasks(); // 공통 저장(API)
 
     if (target == 0) {
       widget.onNext(0); // 홈
@@ -144,7 +165,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
         IconButton(
           icon: const Icon(Icons.calendar_today),
           onPressed: () async {
-            // 🔹 현재 데이터 저장
+            // 🔹 현재 데이터 저장(API)
             await saveCurrentTasks();
 
             final key = _dateKey(selectedDate);
@@ -204,8 +225,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             children: [
               RepeatEditBox(
                 taskList: repeatTaskList,
-                onTaskListUpdated: (updated) =>
-                    updateTasks(0, updated),
+                onTaskListUpdated: (updated) => updateTasks(0, updated),
                 onExpand: () {
                   setState(() {
                     showFullRepeat = true;
@@ -214,8 +234,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
               ),
               TodayEditBox(
                 taskList: todayTaskList,
-                onTaskListUpdated: (updated) =>
-                    updateTasks(1, updated),
+                onTaskListUpdated: (updated) => updateTasks(1, updated),
                 onExpand: () {
                   setState(() {
                     showFullToday = true;

@@ -1,12 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'DBtest/task.dart'; // Task 클래스 정의된 파일
-import 'DBtest/firestore_service.dart';
-
-// 위젯
-import 'package:taskmate/widgets/today_edit_box.dart';
-
+import 'DBtest/task.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:taskmate/DBtest/api_service.dart' as api;
+import 'package:taskmate/widgets/today_edit_box.dart';
 
 class DailyTaskEditPage extends StatefulWidget {
   final Map<String, List<Task>> dailyTaskMap;
@@ -27,18 +25,43 @@ class DailyTaskEditPage extends StatefulWidget {
 class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
   DateTime _selectedDate = DateTime.now();
   Map<String, List<Task>> _dailyTaskMap = {};
-
-  // ❌ 기존: final String userId = "HiHgtVpIvdyCZVtiFCOc";
-  // ✅ 변경: 로그인 사용자 uid로 런타임 초기화
   late final String userId;
 
-  // Firestore에서 해당 날짜 할 일 불러오기
+  Timer? _saveDailyDebounce;
+
+  String _dateKey(DateTime d) =>
+      "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+
+  DateTime getKstNow() => DateTime.now().toUtc().add(const Duration(hours: 9));
+
   Future<void> _loadTasksForDate(DateTime date) async {
     final key = _dateKey(date);
-    final tasks = await fetchDailyTasks(userId, key); // 🔹 Firestore에서 불러오기
-    if (!mounted) return;
-    setState(() {
-      _dailyTaskMap[key] = tasks;
+    try {
+      final list = await api.fetchDaily(key); // ✅ 서버에서 읽기
+      if (!mounted) return;
+      setState(() {
+        _dailyTaskMap[key] = list;
+      });
+    } catch (e) {
+      
+      
+      if (!mounted) return;
+      setState(() {
+        _dailyTaskMap[key] = _dailyTaskMap[key] ?? [];
+      });
+    }
+  }
+
+  void _saveDailyDebounced(String key, List<Task> list) {
+    _saveDailyDebounce?.cancel();
+    _saveDailyDebounce = Timer(const Duration(milliseconds: 400), () async {
+      try {
+        await api.saveDaily(key, list);     // ✅ dailyTasks 저장
+        await api.savePlanner(key, list);   // ✅ planner에도 동기화(원하지 않으면 제거)
+      } catch (e) {
+        
+        
+      }
     });
   }
 
@@ -47,28 +70,15 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     setState(() {
       _dailyTaskMap[key] = updatedList;
     });
-    await saveDailyTasks(userId, key, updatedList); // Firestore 저장
-    await updateTasksToFirestore(userId, key, _dailyTaskMap[key] ?? []); // planner 컬렉션에 반영
+    _saveDailyDebounced(key, updatedList); // ✅ 디바운스로 서버 저장
     widget.onUpdateDailyTaskMap(_dailyTaskMap);
-  }
-
-  DateTime getKstNow() {
-    return DateTime.now().toUtc().add(const Duration(hours: 9)); // 한국 시간 변환
-  }
-
-  // 날짜 키 문자열 (예: 2025-06-27)
-  String _dateKey(DateTime date) {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
   @override
   void initState() {
     super.initState();
-
-    // ✅ 로그인된 사용자 uid 고정
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
-      // 로그인 전 진입 방지 (상위에서 가드하므로 거의 안옴)
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) Navigator.of(context).pop();
       });
@@ -76,13 +86,24 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     }
     userId = uid;
 
-    _selectedDate = getKstNow();
+    _selectedDate = widget.selectedDate;
     _dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
-    _loadTasksForDate(_selectedDate); // 앱 첫 로드시 Firestore 데이터 불러오기
+
+    // 첫 로드: 서버에서 해당 날짜 불러오기
+    _loadTasksForDate(_selectedDate);
+  }
+
+  @override
+  void dispose() {
+    _saveDailyDebounce?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final key = _dateKey(_selectedDate);
+    final list = _dailyTaskMap[key] ?? [];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('일일 리스트 편집'),
@@ -90,26 +111,23 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () async {
-              final key = _dateKey(_selectedDate);
-              final tasks = _dailyTaskMap[key] ?? [];
-
-              // dailyTasks에 저장
-              await saveDailyTasks(userId, key, tasks);
-              // planner에도 저장
-              await updateTasksToFirestore(userId, key, tasks);
-
+              try {
+                await api.saveDaily(key, list);
+                await api.savePlanner(key, list); // 동기화 원치 않으면 제거 가능
+              } catch (e) {
+                
+                
+              }
               if (!mounted) return;
-
               widget.onUpdateDailyTaskMap(_dailyTaskMap);
               Navigator.pop(context, _dailyTaskMap);
             },
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 📅 달력
             TableCalendar(
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2030, 12, 31),
@@ -119,27 +137,15 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
                 setState(() {
                   _selectedDate = selectedDay;
                 });
-                await _loadTasksForDate(selectedDay); // 날짜 변경 시 Firestore 데이터 로드
+                await _loadTasksForDate(selectedDay);
               },
-              calendarStyle: const CalendarStyle(
-                todayDecoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  shape: BoxShape.circle,
-                ),
-                selectedDecoration: BoxDecoration(
-                  color: Colors.black,
-                  shape: BoxShape.circle,
-                ),
-              ),
             ),
             const SizedBox(height: 16),
-
-            // 일일 리스트 편집 박스
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TodayEditBox(
-                taskList: _dailyTaskMap[_dateKey(_selectedDate)] ?? [],
-                onTaskListUpdated: _updateTaskList,
+                taskList: list,
+                onTaskListUpdated: _updateTaskList, // ✅ 변경 → 서버 저장
                 selectedDate: _selectedDate,
                 onExpand: () {},
               ),
