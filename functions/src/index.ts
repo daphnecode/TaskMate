@@ -15,6 +15,7 @@ import { db } from "./firebase.js";
 import repeatRouter from "./planner/repeat_function.js";
 import plannerRouter from "./planner/planner_function.js";
 import dailyRouter from "./planner/daily_function.js";
+import petRouter from "./pet/petload.js";
 
 // ===== Express 앱 (v2 onRequest) =====
 const app = express();
@@ -33,6 +34,8 @@ app.use(express.json());
 app.use("/daily", dailyRouter);
 app.use("/planner", plannerRouter);
 app.use("/repeatList", repeatRouter);
+
+app.use("/users", petRouter);
 
 // Cloud Functions v2 onRequest
 export const api = onRequest({ region: "asia-northeast3" }, app);
