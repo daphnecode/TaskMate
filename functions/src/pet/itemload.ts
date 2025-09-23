@@ -1,73 +1,153 @@
-import * as functions from "firebase-functions/v2/https";
+import express from "express";
+import { getAuth } from "firebase-admin/auth";
 import {db} from "../firebase.js";
+import { Item } from "../types/api.js";
 
-// ✅ inventory 조회 API
-export const getInventory = functions.onRequest(async (req, res) => {
+const router = express.Router();
+
+async function verifyToken(req: express.Request) {
+  const h = req.headers.authorization || "";
+  if (!h.startsWith("Bearer ")) throw new Error("No ID token provided");
+  const token = h.substring("Bearer ".length);
+  return getAuth().verifyIdToken(token);
+}
+function refInventory(uid: string) {
+  return db.collection("Users").doc(uid).collection("items") as FirebaseFirestore.CollectionReference<Item>;
+}
+function refItem(uid: string, itemName: string) {
+  return db.collection("Users").doc(uid).collection("items").doc(itemName) as FirebaseFirestore.DocumentReference<Item>;
+}
+function refUser(uid: string) {
+  return db.collection("Users").doc(uid);
+}
+
+router.get("/:userId/items", async (req, res) => {
   try {
-    // ✅ Method check
-    if (req.method !== "GET") {
-      res.status(405).json({
-        success: false,
-        message: "Only GET method is allowed",
+    // 1. Firebase Token 인증
+    const decoded = await verifyToken(req);
+    const { userId: uid } = req.params;
+    const itemCategory = req.query.itemCategory as string | undefined;
+
+    if (decoded.uid !== uid) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+    
+    const colRef = refInventory(uid); // CollectionReference
+    let query: FirebaseFirestore.Query<Item> = colRef;
+
+    if (itemCategory) {
+      query = colRef.where("category", "==", itemCategory); // Query로 변경
+    }
+
+    // 2. Firestore 참조 (예시 함수 - 직접 구현 필요)
+    const snap = await query.get();
+    if (snap.empty) {
+      return res.json({
+        success: true,
+        message: "inventory read complete",
+        data: [],
       });
-      return;
     }
 
-    // ✅ Firebase ID Token 인증
-    const idToken = req.headers.authorization?.split("Bearer ")[1];
-    if (!idToken) {
-      res.status(401).json({
-        success: false,
-        message: "Missing Authorization Header",
-      });
-      return;
-    }
+    // 3. 데이터 정규화
+    const inventory = snap.docs.map((doc) => {
+      const d = doc.data() as Item; // 🔑 QueryDocumentSnapshot<DocumentData> → data() OK
+      return {
+        icon: d.icon,
+        category: d.category,
+        itemName: d.itemName,
+        hunger: d.hunger,
+        happy: d.happy,
+        count: d.count,
+        price: d.price,
+        itemText: d.itemText
+      };
+    });
 
-    // ✅ Path Params & Query Params
-    const userId = req.path.split("/").pop(); // /inventory/read/{userID}
-    const itemCategoryParam = req.query.itemCategory as string | undefined;
-
-    if (!userId) {
-      res.status(400).json({
-        success: false,
-        message: "Missing userID in path",
-      });
-      return;
-    }
-
-    // ✅ Firestore에서 inventory 조회
-    let itemCategory: number | undefined;
-    if (itemCategoryParam) {
-      itemCategory = parseInt(itemCategoryParam, 10);
-    }
-
-    // 3. Firestore 쿼리
-    let query: FirebaseFirestore.Query = db
-      .collection("Users")
-      .doc(userId)
-      .collection("items");
-
-    if (itemCategory !== undefined) {
-      query = query.where("itemCategory", "==", itemCategory);
-    }
-
-    const snapshot = await query.get();
-
-    const data = snapshot.docs.map((doc) => doc.data());
-
-    res.status(200).json({
+    // 4. 성공 응답
+    return res.json({
       success: true,
       message: "inventory read complete",
-      data,
+      data: inventory,
     });
-    return;
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({
+
+  } catch (e: any) {
+    console.error(e);
+    return res.status(401).json({
       success: false,
-      message: "Internal server error",
-      error: error.message,
+      message: e?.message || "Unauthorized",
     });
-    return;
   }
 });
+
+// ---------------------------
+// PATCH /users/:userId/items/:itemName
+// 특정 아이템 사용 (수량 감소)
+router.patch("/:userId/items/:itemName", async (req, res) => {
+  try {
+    const decoded = await verifyToken(req);
+    const { userId: uid, itemName } = req.params;
+    const { itemCount } = req.body;
+
+    if (decoded.uid !== uid) return res.status(403).json({ success: false, message: "Forbidden" });
+    if (typeof itemCount !== "number" || itemCount <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid itemCount" });
+    }
+
+    const itemRef = refItem(uid, itemName); // 이전에 정의한 refItem 사용
+    const snap = await itemRef.get();
+
+    if (!snap.exists) {
+      return res.status(404).json({ success: false, message: "Item not found" });
+    }
+
+    const currentCount = snap.data()!.count;
+    if (currentCount < itemCount) {
+      return res.status(400).json({ success: false, message: "Not enough items" });
+    }
+
+    const newCount = currentCount - itemCount;
+    await itemRef.update({ count: newCount });
+
+    return res.json({
+      success: true,
+      message: "inventory use complete",
+      itemName,
+      itemCount: newCount,
+    });
+
+  } catch (e: any) {
+    console.error(e);
+    return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
+  }
+});
+
+router.patch("/:userId/items/set", async (req, res) => {
+  try {
+    const decoded = await verifyToken(req);
+    const { userId: uid } = req.params;
+    const { placeID } = req.body;
+
+    if (decoded.uid !== uid) return res.status(403).json({ success: false, message: "Forbidden" });
+
+    const newPlaceID = placeID || "default";
+    
+
+    // placeID 업데이트
+    await refUser(uid).update({
+      "setting.placeID": newPlaceID,
+    });
+
+    return res.json({
+      success: true,
+      message: "inventory place use complete",
+      placeID,
+    });
+
+  } catch (e: any) {
+    console.error(e);
+    return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
+  }
+});
+
+export default router;

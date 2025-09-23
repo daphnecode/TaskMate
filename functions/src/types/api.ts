@@ -8,6 +8,17 @@ export interface Pet {
   styleID: string;
 }
 
+export interface Item {
+  icon: string;
+  category: number;
+  itemName: string;
+  hunger: number;
+  happy: number;
+  count: number;
+  price: number;
+  itemText: string;
+}
+
 
 export interface ApiResponse<T> {
   success: boolean;
