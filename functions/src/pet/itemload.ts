@@ -87,12 +87,8 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
     const { userId: uid, itemName } = req.params;
-    const { itemCount } = req.body;
 
     if (decoded.uid !== uid) return res.status(403).json({ success: false, message: "Forbidden" });
-    if (typeof itemCount !== "number" || itemCount <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid itemCount" });
-    }
 
     const itemRef = refItem(uid, itemName); // 이전에 정의한 refItem 사용
     const snap = await itemRef.get();
@@ -102,11 +98,8 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
     }
 
     const currentCount = snap.data()!.count;
-    if (currentCount < itemCount) {
-      return res.status(400).json({ success: false, message: "Not enough items" });
-    }
 
-    const newCount = currentCount - itemCount;
+    const newCount = (currentCount > 0) ? currentCount - 1 : 0;
     await itemRef.update({ count: newCount });
 
     return res.json({

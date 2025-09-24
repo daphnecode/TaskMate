@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'DBtest/firestore_service.dart';
+import 'DBtest/api_service.dart';
 import 'petmain.dart';
 import 'object.dart';
 import 'package:taskmate/utils/icon_utis.dart';
@@ -166,7 +167,8 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                     final uid =
                                         FirebaseAuth.instance.currentUser?.uid;
                                     if (uid != null) {
-                                      await itemSaveDB(uid, item.name, item);
+                                      // await itemSaveDB(uid, item.name, item);
+                                      await useItem(item.name);
                                       await petSaveDB(
                                         uid,
                                         widget.user.nowPet,
@@ -556,7 +558,7 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
                                     final uid =
                                         FirebaseAuth.instance.currentUser?.uid;
                                     if (uid != null) {
-                                      await itemSaveDB(uid, item.name, item);
+                                      await useItem(item.name);
                                       await petSaveDB(
                                         uid,
                                         widget.user.nowPet,

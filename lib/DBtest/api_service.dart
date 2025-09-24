@@ -1,19 +1,17 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:taskmate/DBtest/task.dart';  // ✅ Task.toJson() 사용하려면 필요
+import 'package:taskmate/DBtest/task.dart'; // ✅ Task.toJson() 사용하려면 필요
 
 // ️ 실제 프로젝트 ID로 교체
-const String baseUrl = "BASE_URL";
+const String baseUrl =
+    "BASE_URL";
 
 Future<Map<String, String>> _authHeaders() async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) throw Exception("로그인 필요");
   final token = await user.getIdToken();
-  return {
-    "Authorization": "Bearer $token",
-    "Content-Type": "application/json",
-  };
+  return {"Authorization": "Bearer $token", "Content-Type": "application/json"};
 }
 
 // 반복 리스트 읽기 (서버 API → List<Map>)
@@ -25,10 +23,13 @@ Future<List<Map<String, dynamic>>> fetchRepeatList() async {
   if (r.statusCode == 401) {
     // 토큰 강제갱신 후 1회 재시도
     final token = await FirebaseAuth.instance.currentUser!.getIdToken(true);
-    final r2 = await http.get(url, headers: {
-      "Authorization": "Bearer $token",
-      "Content-Type": "application/json",
-    });
+    final r2 = await http.get(
+      url,
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
     if (r2.statusCode != 200) {
       throw Exception("repeatList read failed: ${r2.statusCode} ${r2.body}");
     }
@@ -57,9 +58,7 @@ Future<void> saveRepeatList(List<Task> tasks) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/repeatList/save/$uid");
   final headers = await _authHeaders();
-  final body = jsonEncode({
-    "tasks": tasks.map((t) => t.toJson()).toList(),
-  });
+  final body = jsonEncode({"tasks": tasks.map((t) => t.toJson()).toList()});
 
   final r = await http.post(url, headers: headers, body: body);
   if (r.statusCode != 200) {
@@ -105,27 +104,25 @@ Future<Map<String, dynamic>> readPlanner(String dateKey) async {
   final List<Task> tasks = (obj["todayTasks"] as List)
       .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
       .toList();
-  return {
-    "tasks": tasks,
-    "submitted": obj["submitted"] ?? false,
-  };
+  return {"tasks": tasks, "submitted": obj["submitted"] ?? false};
 }
 
 Future<void> savePlanner(String dateKey, List<Task> tasks) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/planner/save/$uid/$dateKey");
-  final body = jsonEncode({
-    "tasks": tasks.map((t) => t.toJson()).toList(),
-  });
+  final body = jsonEncode({"tasks": tasks.map((t) => t.toJson()).toList()});
   final r = await http.post(url, headers: await _authHeaders(), body: body);
   if (r.statusCode != 200) {
     throw Exception("planner save failed: ${r.statusCode} ${r.body}");
   }
 }
 
-
-Future<void> updatePlannerItem(String dateKey, String todoId,
-    {String? text, int? point}) async {
+Future<void> updatePlannerItem(
+  String dateKey,
+  String todoId, {
+  String? text,
+  int? point,
+}) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/planner/update/$uid/$dateKey/$todoId");
   final body = jsonEncode({
@@ -156,6 +153,7 @@ Future<void> deletePlannerItem(String dateKey, String todoId) async {
     throw Exception("planner delete failed: ${r.statusCode} ${r.body}");
   }
 }
+
 // ---------- dailyTasks (특정 날짜의 일일 목록) ----------
 Future<List<Task>> fetchDaily(String dateKey) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -181,8 +179,12 @@ Future<void> saveDaily(String dateKey, List<Task> tasks) async {
   }
 }
 
-Future<void> updateDailyItem(String dateKey, String todoId,
-    {String? text, int? point}) async {
+Future<void> updateDailyItem(
+  String dateKey,
+  String todoId, {
+  String? text,
+  int? point,
+}) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/daily/update/$uid/$dateKey/$todoId");
   final body = jsonEncode({
@@ -211,5 +213,32 @@ Future<void> deleteDailyItem(String dateKey, String todoId) async {
   final r = await http.delete(url, headers: await _authHeaders());
   if (r.statusCode != 200) {
     throw Exception("daily delete failed: ${r.statusCode} ${r.body}");
+  }
+}
+
+Future<void> useItem(String itemName) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception("User not logged in");
+    final idToken = await user.getIdToken();
+    final url = Uri.parse("$baseUrl/users/$uid/items/$itemName");
+    final response = await http.patch(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $idToken",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(
+        "Failed to update inventory: ${response.statusCode}, ${response.body}",
+      );
+    }
+  } catch (e) {
+    throw Exception("Error updating inventory: $e");
   }
 }

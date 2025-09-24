@@ -16,6 +16,7 @@ import repeatRouter from "./planner/repeat_function.js";
 import plannerRouter from "./planner/planner_function.js";
 import dailyRouter from "./planner/daily_function.js";
 import petRouter from "./pet/petload.js";
+import itemRouter from "./pet/itemload.js";
 
 // ===== Express 앱 (v2 onRequest) =====
 const app = express();
@@ -36,6 +37,7 @@ app.use("/planner", plannerRouter);
 app.use("/repeatList", repeatRouter);
 
 app.use("/users", petRouter);
+app.use("/users", itemRouter);
 
 // Cloud Functions v2 onRequest
 export const api = onRequest({ region: "asia-northeast3" }, app);

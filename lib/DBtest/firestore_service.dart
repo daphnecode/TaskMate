@@ -81,13 +81,16 @@ Future<Map<String, dynamic>> fetchTasks(String userId, String dateKey) async {
     'todayTasks': (data['todayTasks'] as List)
         .map((t) => Task.fromJson(Map<String, dynamic>.from(t)))
         .toList(),
-    'submitted': data['submitted'] ?? false
+    'submitted': data['submitted'] ?? false,
   };
 }
 
 /// Firestore에 문서가 없으면 로컬 기본값으로 생성
 Future<void> initializeTasksIfNotExist(
-    String userId, String dateKey, List<Task> defaultToday) async {
+  String userId,
+  String dateKey,
+  List<Task> defaultToday,
+) async {
   final plannerRef = firestore
       .collection('Users')
       .doc(userId)
@@ -119,7 +122,10 @@ Future<void> initializeTasksIfNotExist(
 
 /// Firestore에 현재 체크리스트 저장
 Future<void> updateTasksToFirestore(
-    String userId, String dateKey, List<Task> todayTasks) async {
+  String userId,
+  String dateKey,
+  List<Task> todayTasks,
+) async {
   final docRef = firestore
       .collection('Users')
       .doc(userId)
@@ -133,7 +139,11 @@ Future<void> updateTasksToFirestore(
 
 /// 제출 처리 (체크, 포인트, submitted 업데이트 + log 기록)
 Future<void> submitTasksToFirestore(
-    String userId, String dateKey, List<Task> todayTasks, List<Task> repeatTasks) async {
+  String userId,
+  String dateKey,
+  List<Task> todayTasks,
+  List<Task> repeatTasks,
+) async {
   final plannerRef = firestore
       .collection('Users')
       .doc(userId)
@@ -196,15 +206,19 @@ Future<List<Task>> fetchDailyTasks(String userId, String dateKey) async {
       .toList();
 }
 
-Future<void> saveDailyTasks(String userId, String dateKey, List<Task> tasks) async {
+Future<void> saveDailyTasks(
+  String userId,
+  String dateKey,
+  List<Task> tasks,
+) async {
   await firestore
       .collection('Users')
       .doc(userId)
       .collection('dailyTasks')
       .doc(dateKey)
       .set({
-    'tasks': tasks.map((t) => t.toJson()).toList(),
-  }, SetOptions(merge: true));
+        'tasks': tasks.map((t) => t.toJson()).toList(),
+      }, SetOptions(merge: true));
 }
 
 /// ==========================
@@ -249,19 +263,13 @@ Future<void> itemSaveDB(String userID, String itemID, Item target) async {
       .doc(userID)
       .collection('items')
       .doc(itemID);
-  
+
   DocumentSnapshot tmpDoc = await refDoc.get();
-  
+
   if (tmpDoc.exists) {
-    await refDoc.update(
-      {
-        'count': target.count
-      }
-    );
+    await refDoc.update({'count': target.count});
   } else {
-    await refDoc.set(
-      target.toMap()
-    );
+    await refDoc.set(target.toMap());
   }
 }
 
@@ -271,12 +279,7 @@ Future<void> petSaveDB(String userID, String petID, Pets? pet) async {
       .doc(userID)
       .collection('pets')
       .doc(petID)
-      .update(
-        {
-          'hunger': pet!.hunger,
-          'happy': pet.happy,
-        },
-      );
+      .update({'hunger': pet!.hunger, 'happy': pet.happy});
 }
 
 Future<void> petSaveStyleDB(String userID, String petID, String styleID) async {
@@ -285,33 +288,19 @@ Future<void> petSaveStyleDB(String userID, String petID, String styleID) async {
       .doc(userID)
       .collection('pets')
       .doc(petID)
-      .update(
-        {
-          'styleID': styleID
-        },
-      );
+      .update({'styleID': styleID});
 }
 
 Future<void> userSavePointDB(String userID, int point) async {
-  await FirebaseFirestore.instance
-      .collection('Users')
-      .doc(userID)
-      .update(
-        {
-          'currentPoint': point
-        },
-      );
+  await FirebaseFirestore.instance.collection('Users').doc(userID).update({
+    'currentPoint': point,
+  });
 }
 
 Future<void> userSavePlaceDB(String userID, String placeID) async {
-  await FirebaseFirestore.instance
-      .collection('Users')
-      .doc(userID)
-      .update(
-        {
-          'placeID': placeID
-        },
-      );
+  await FirebaseFirestore.instance.collection('Users').doc(userID).update({
+    'placeID': placeID,
+  });
 }
 
 /// ==========================
