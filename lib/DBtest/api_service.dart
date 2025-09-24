@@ -219,26 +219,36 @@ Future<void> deleteDailyItem(String dateKey, String todoId) async {
 Future<void> useItem(String itemName) async {
   try {
     final uid = FirebaseAuth.instance.currentUser!.uid;
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) throw Exception("User not logged in");
-    final idToken = await user.getIdToken();
     final url = Uri.parse("$baseUrl/users/$uid/items/$itemName");
-    final response = await http.patch(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $idToken",
-      },
-    );
+    final r = await http.patch(url, headers: await _authHeaders());
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
     } else {
-      throw Exception(
-        "Failed to update inventory: ${response.statusCode}, ${response.body}",
-      );
+      throw Exception("Failed to update inventory: ${r.statusCode}, ${r.body}");
     }
   } catch (e) {
     throw Exception("Error updating inventory: $e");
+  }
+}
+
+Future<void> usePlaceItem(String itemName) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/users/$uid/items/$itemName/set");
+    final newPlace = "assets/images/$itemName.png";
+    final r = await http.patch(
+      url,
+      headers: await _authHeaders(),
+      body: json.encode({"placeID": newPlace}),
+    );
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception("Failed to update place: ${r.statusCode}, ${r.body}");
+    }
+  } catch (e) {
+    throw Exception("Error updating place: $e");
   }
 }

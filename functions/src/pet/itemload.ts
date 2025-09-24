@@ -115,7 +115,7 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
   }
 });
 
-router.patch("/:userId/items/set", async (req, res) => {
+router.patch("/:userId/items/:itemName/set", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
     const { userId: uid } = req.params;

@@ -945,10 +945,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
                                           .currentUser
                                           ?.uid;
                                       if (uid != null) {
-                                        await userSavePlaceDB(
-                                          uid,
-                                          widget.user.setting['placeID'],
-                                        );
+                                        await usePlaceItem(item.name);
                                       }
                                       Navigator.pop(context);
                                     },
