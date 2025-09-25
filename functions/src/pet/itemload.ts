@@ -21,6 +21,7 @@ function refUser(uid: string) {
   return db.collection("Users").doc(uid);
 }
 
+
 router.get("/:userId/items", async (req, res) => {
   try {
     // 1. Firebase Token 인증
@@ -80,9 +81,7 @@ router.get("/:userId/items", async (req, res) => {
   }
 });
 
-// ---------------------------
-// PATCH /users/:userId/items/:itemName
-// 특정 아이템 사용 (수량 감소)
+
 router.patch("/:userId/items/:itemName", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
@@ -115,6 +114,8 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
   }
 });
 
+
+
 router.patch("/:userId/items/:itemName/set", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
@@ -142,5 +143,53 @@ router.patch("/:userId/items/:itemName/set", async (req, res) => {
     return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
   }
 });
+
+
+// ✅ style item 사용 API
+router.patch("/:userId/items/:itemName/style", async (req, res) => {
+  try {
+    const decoded = await verifyToken(req);
+    const { userId: uid } = req.params;
+    const { styleID } = req.body;
+
+    if (decoded.uid !== uid) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+
+    if (!styleID || typeof styleID !== "string") {
+      return res.status(400).json({ success: false, message: "Invalid styleID" });
+    }
+
+    // 1️⃣ 유저 문서 참조
+    const userRef = refUser(uid); 
+    const userSnap = await userRef.get();
+
+    if (!userSnap.exists) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // 2️⃣ nowPet 가져오기
+    const nowPet = userSnap.data()?.nowPet;
+    if (!nowPet) {
+      return res.status(400).json({ success: false, message: "nowPet not set" });
+    }
+
+    // 3️⃣ pets/{nowPet} 문서 업데이트
+    // const petRef = await refPets(uid);
+    // await petRef.doc(nowPet).update({ styleID });
+    await db.collection("Users").doc(uid).collection("pets").doc(nowPet).update({ styleID });
+
+    return res.json({
+      success: true,
+      message: "inventory style use complete",
+      styleID,
+    });
+
+  } catch (e: any) {
+    console.error(e);
+    return res.status(500).json({ success: false, message: e.message || "Server error" });
+  }
+});
+
 
 export default router;

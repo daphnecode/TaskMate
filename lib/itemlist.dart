@@ -1328,7 +1328,8 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                           .currentUser
                                           ?.uid;
                                       if (uid != null) {
-                                        await itemSaveDB(uid, item.name, item);
+                                        // await itemSaveDB(uid, item.name, item);
+					await useStyleItem(item.name);
                                       }
                                       Navigator.pop(context);
                                     },

@@ -252,3 +252,23 @@ Future<void> usePlaceItem(String itemName) async {
     throw Exception("Error updating place: $e");
   }
 }
+
+Future<void> useStyleItem(String itemName) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/users/$uid/items/$itemName/style");
+    final r = await http.patch(
+      url,
+      headers: await _authHeaders(),
+      body: json.encode({"styleID":itemName}),
+    );
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception("Failed to update style: ${r.statusCode}, ${r.body}");
+    }
+  } catch (e) {
+    throw Exception("Error updating style: $e");
+  }
+}
