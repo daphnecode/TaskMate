@@ -57,7 +57,6 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     _saveDailyDebounce = Timer(const Duration(milliseconds: 400), () async {
       try {
         await api.saveDaily(key, list);     // ✅ dailyTasks 저장
-        await api.savePlanner(key, list);   // ✅ planner에도 동기화(원하지 않으면 제거)
       } catch (e) {
         
         
@@ -89,6 +88,10 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     _selectedDate = widget.selectedDate;
     _dailyTaskMap = Map<String, List<Task>>.from(widget.dailyTaskMap);
 
+    // ✅ 로컬에 키가 없으면 빈 배열 먼저 넣어두기 (깜빡임/널 방지)
+    final k = _dateKey(_selectedDate);
+    _dailyTaskMap[k] = _dailyTaskMap[k] ?? [];
+
     // 첫 로드: 서버에서 해당 날짜 불러오기
     _loadTasksForDate(_selectedDate);
   }
@@ -113,7 +116,6 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
             onPressed: () async {
               try {
                 await api.saveDaily(key, list);
-                await api.savePlanner(key, list); // 동기화 원치 않으면 제거 가능
               } catch (e) {
                 
                 
@@ -136,6 +138,8 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
               onDaySelected: (selectedDay, focusedDay) async {
                 setState(() {
                   _selectedDate = selectedDay;
+                  final k = _dateKey(selectedDay);
+                  _dailyTaskMap[k] = _dailyTaskMap[k] ?? []; // ✅ 로컬 임시 보강
                 });
                 await _loadTasksForDate(selectedDay);
               },

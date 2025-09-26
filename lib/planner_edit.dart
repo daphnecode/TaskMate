@@ -73,10 +73,10 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     _saveTodayDebounce = Timer(const Duration(milliseconds: 400), () async {
       try {
         final key = _dateKey(selectedDate);
-        await api.savePlanner(key, todayTaskList); // ⬅️ /planner/save 호출
-        debugPrint('[API] planner saved: ${todayTaskList.length}');
+        await api.saveDaily(key, todayTaskList); // ⬅️ dailyTasks에 저장
+        
       } catch (e) {
-        debugPrint('[API] planner save error: $e');
+        
       }
     });
   }
@@ -129,10 +129,10 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     try {
       await Future.wait([
         api.saveRepeatList(repeatTaskList),
-        api.savePlanner(key, todayTaskList),
+        api.saveDaily(key, todayTaskList),
       ]);
     } catch (e) {
-      
+      debugPrint('[API] saveCurrentTasks (repeat+daily) error: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('저장 실패: $e')),

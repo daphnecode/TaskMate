@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'DBtest/task.dart';
 import 'planner_edit.dart';
 import 'statistics.dart';
-import 'DBtest/firestore_service.dart'; // resetStreakIfNeededKST, submitTasksToFirestore 등 사용
+import 'DBtest/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:taskmate/DBtest/api_service.dart' as api;
 
-// 위젯
 import 'package:taskmate/widgets/date_badge.dart';
 import 'package:taskmate/widgets/repeat_task_box.dart';
 import 'package:taskmate/widgets/today_task_box.dart';
 
-/// 🔧 Functions 리전 (배포한 리전에 맞게 수정)
 const String kFunctionsRegion = 'asia-northeast3';
 
 class PlannerMain extends StatefulWidget {
@@ -45,16 +43,12 @@ class _PlannerMainState extends State<PlannerMain> {
   List<Task> repeatTaskList = [];
   List<Task> todayTaskList = [];
 
-  // 로그인 전에도 안전하도록 nullable 처리
   String? userId;
 
-  String _dateKey(DateTime date) {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-  }
+  String _dateKey(DateTime date) =>
+      "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
-  DateTime getKstNow() {
-    return DateTime.now().toUtc().add(const Duration(hours: 9));
-  }
+  DateTime getKstNow() => DateTime.now().toUtc().add(const Duration(hours: 9));
 
   int _calcEarnedPointsForToday() {
     int sum = 0;
@@ -67,12 +61,12 @@ class _PlannerMainState extends State<PlannerMain> {
     return sum;
   }
 
-  ///  체크 토글개별 API 호출(실패 시 롤백)
   Future<void> toggleCheck(List<Task> tasklist, int index) async {
+    if (_isSubmitted) return; // 안전가드
+
     final old = tasklist[index];
     final newVal = !old.isChecked;
 
-    // 1) UI 먼저 토글
     setState(() {
       tasklist[index] = old.copyWith(isChecked: newVal);
     });
@@ -81,14 +75,11 @@ class _PlannerMainState extends State<PlannerMain> {
 
     try {
       if (identical(tasklist, todayTaskList)) {
-        // 오늘 리스트 체크
-        await api.checkPlannerItem(dateKey, index.toString(), newVal);
+        await api.checkDailyItem(dateKey, index.toString(), newVal);
       } else if (identical(tasklist, repeatTaskList)) {
-        // 반복 리스트 체크 (api_service.dart에 checkRepeatItem 필요)
         await api.checkRepeatItem(index.toString(), newVal);
       }
     } catch (e) {
-      // 실패 시 롤백
       if (!mounted) return;
       setState(() {
         tasklist[index] = old;
@@ -99,7 +90,6 @@ class _PlannerMainState extends State<PlannerMain> {
     }
   }
 
-  /// 편집모드 토글 (로컬 UI 전용)
   void toggleEditingMode(List<Task> taskList) {
     final anyEditing = taskList.any((task) => task.isEditing);
     setState(() {
@@ -109,8 +99,9 @@ class _PlannerMainState extends State<PlannerMain> {
     });
   }
 
-  /// ✅ 포인트 수정: 낙관적 업데이트 + API 저장(실패 시 롤백)
   Future<void> updatePoint(List<Task> taskList, int index, int newPoint) async {
+    if (_isSubmitted && identical(taskList, todayTaskList)) return; // 제출 후 잠금
+
     final old = taskList[index];
 
     setState(() {
@@ -121,15 +112,12 @@ class _PlannerMainState extends State<PlannerMain> {
 
     try {
       if (identical(taskList, todayTaskList)) {
-        // 오늘 리스트 항목 포인트 변경 → 개별 PATCH
-        await api.updatePlannerItem(dateKey, index.toString(), point: newPoint);
+        await api.updateDailyItem(dateKey, index.toString(), point: newPoint);
       } else if (identical(taskList, repeatTaskList)) {
-        // 반복 리스트 포인트 변경 → 간단히 전체 저장 (필요시 update API로 분리 가능)
         await api.saveRepeatList(repeatTaskList);
       }
     } catch (e) {
       if (!mounted) return;
-      // 실패 시 롤백
       setState(() {
         taskList[index] = old;
       });
@@ -139,12 +127,11 @@ class _PlannerMainState extends State<PlannerMain> {
     }
   }
 
-  /// 편집화면에서 돌아올 때 두 리스트를 API로 동시 저장 (중복 저장 줄임)
   Future<void> _saveBothLists() async {
     final dateKey = _dateKey(selectedDate);
     try {
       await Future.wait([
-        api.savePlanner(dateKey, todayTaskList),
+        api.saveDaily(dateKey, todayTaskList),
         api.saveRepeatList(repeatTaskList),
       ]);
     } catch (e) {
@@ -165,11 +152,9 @@ class _PlannerMainState extends State<PlannerMain> {
     final dateKey = _dateKey(selectedDate);
 
     if (userId == null) {
-      // 비로그인 상태면 데이터 로딩만 건너뜀
       return;
     }
 
-    // 🔹 streak 보정 (KST 자정 이후 전날 제출 없으면 streak=0)
     Future.microtask(() async {
       try {
         await resetStreakIfNeededKST(userId!);
@@ -178,22 +163,18 @@ class _PlannerMainState extends State<PlannerMain> {
       }
     });
 
-    // (선택) dailyTasks → planner 1회 동기화 유지
-    syncDailyToPlanner(userId!, dateKey).then((_) async {
-      // 오늘 리스트 API로 로드
-      try {
-        final res = await api.readPlanner(dateKey);
-        if (!mounted) return;
-        setState(() {
-          todayTaskList = (res['tasks'] as List<Task>);
-          _isSubmitted = (res['submitted'] as bool?) ?? false;
-        });
-      } catch (e) {
-        debugPrint('[API] planner read error: $e');
-      }
+    // ✅ 오늘 리스트를 submitted 포함해서 로드
+    api.readDailyWithMeta(dateKey).then((res) {
+      if (!mounted) return;
+      setState(() {
+        todayTaskList = res.tasks;
+        _isSubmitted = res.submitted; // 서버 제출 상태 반영
+      });
+    }).catchError((e) {
+      
     });
 
-    // 방문 로그 기록 (직접 Firestore)
+    // 방문 로그
     firestore
         .collection('Users')
         .doc(userId!)
@@ -201,7 +182,7 @@ class _PlannerMainState extends State<PlannerMain> {
         .doc(dateKey)
         .set({'visited': true}, SetOptions(merge: true));
 
-    // 반복 리스트 로드 (API)
+    // 반복 리스트 로드
     api.fetchRepeatList().then((rows) {
       if (!mounted) return;
       setState(() {
@@ -215,7 +196,6 @@ class _PlannerMainState extends State<PlannerMain> {
         ))
             .toList();
       });
-      debugPrint('[API] repeat loaded: ${repeatTaskList.length}');
     }).catchError((e) {
       
     });
@@ -223,7 +203,6 @@ class _PlannerMainState extends State<PlannerMain> {
 
   @override
   Widget build(BuildContext context) {
-    // 실시간 KST 날짜(자정 지나면 dateKey도 바뀌게)
     selectedDate = getKstNow();
 
     if (isEditMode) {
@@ -245,7 +224,6 @@ class _PlannerMainState extends State<PlannerMain> {
 
             isEditMode = false;
           });
-          // 편집 후에는 API로 한 번만 저장 (중복 저장 줄이기)
           await _saveBothLists();
         },
         onBackToMain: () {
@@ -287,7 +265,6 @@ class _PlannerMainState extends State<PlannerMain> {
             onPressed: () {
               if (_submitting) return;
 
-              // 로그인 확인
               final uid = userId ?? FirebaseAuth.instance.currentUser?.uid;
               if (uid == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -310,7 +287,6 @@ class _PlannerMainState extends State<PlannerMain> {
                           setState(() => _submitting = true);
 
                           try {
-                            // 플래너 제출 (log/stat 갱신은 기존 트리거/함수 로직 사용)
                             await submitTasksToFirestore(
                               uid,
                               dateKey,
@@ -318,41 +294,36 @@ class _PlannerMainState extends State<PlannerMain> {
                               repeatTaskList,
                             );
 
-                            // 이번에 얻을 포인트 합계
                             final earned = _calcEarnedPointsForToday();
-
-                            // ✅ Functions 리전 명시
                             final functions = FirebaseFunctions.instanceFor(
                               region: kFunctionsRegion,
                             );
-
-                            final rewardFn = functions.httpsCallable('submitRewardAN3'); // 포인트 지급
-                            final expFn = functions.httpsCallable('submitPetExpAN3'); // EXP/레벨업
+                            final rewardFn =
+                            functions.httpsCallable('submitRewardAN3');
+                            final expFn =
+                            functions.httpsCallable('submitPetExpAN3');
 
                             if (earned > 0) {
-                              // UI 즉시 반영
                               widget.onPointsAdded?.call(earned);
-
                               try {
                                 await rewardFn.call({
                                   'uid': uid,
                                   'earned': earned,
                                   'dateKey': dateKey,
                                 });
-
-                                final resp = await expFn.call({
+                                await expFn.call({
                                   'uid': uid,
                                   'earned': earned,
                                   'dateKey': dateKey,
                                 });
-                                
-                                print('submitPetExpAN3 resp.data = ${resp.data}');
                               } catch (e) {
-                                // 실패 시 UI 롤백
                                 widget.onPointsAdded?.call(-earned);
                                 rethrow;
                               }
                             }
+
+                            // ✅ daily meta에 제출 기록
+                            await api.markDailySubmitted(dateKey);
 
                             if (!mounted) return;
                             setState(() => _isSubmitted = true);
@@ -362,7 +333,8 @@ class _PlannerMainState extends State<PlannerMain> {
                           } catch (e) {
                             showDialog(
                               context: context,
-                              builder: (_) => AlertDialog(content: Text(e.toString())),
+                              builder: (_) =>
+                                  AlertDialog(content: Text(e.toString())),
                             );
                           } finally {
                             if (mounted) setState(() => _submitting = false);
@@ -452,8 +424,8 @@ class _PlannerMainState extends State<PlannerMain> {
                   updatePoint(repeatTaskList, index, newPoint),
               onStartEditing: (index) {
                 setState(() {
-                  repeatTaskList[index] =
-                      repeatTaskList[index].copyWith(isEditing: true);
+                  repeatTaskList[index] = repeatTaskList[index]
+                      .copyWith(isEditing: true);
                 });
               },
               sortingMethod: widget.sortingMethod,
@@ -478,8 +450,8 @@ class _PlannerMainState extends State<PlannerMain> {
                   updatePoint(todayTaskList, index, newPoint),
               onStartEditing: (index) {
                 setState(() {
-                  todayTaskList[index] =
-                      todayTaskList[index].copyWith(isEditing: true);
+                  todayTaskList[index] = todayTaskList[index]
+                      .copyWith(isEditing: true);
                 });
               },
               sortingMethod: widget.sortingMethod,

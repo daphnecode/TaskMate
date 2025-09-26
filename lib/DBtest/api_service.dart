@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
-import 'package:taskmate/DBtest/task.dart'; // ✅ Task.toJson() 사용하려면 필요
+import 'package:taskmate/DBtest/task.dart';
 
 // ️ 실제 프로젝트 ID로 교체
 const String baseUrl =
@@ -14,14 +14,13 @@ Future<Map<String, String>> _authHeaders() async {
   return {"Authorization": "Bearer $token", "Content-Type": "application/json"};
 }
 
-// 반복 리스트 읽기 (서버 API → List<Map>)
+// ======================= 반복 리스트 =======================
 Future<List<Map<String, dynamic>>> fetchRepeatList() async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/repeatList/read/$uid");
   final r = await http.get(url, headers: await _authHeaders());
 
   if (r.statusCode == 401) {
-    // 토큰 강제갱신 후 1회 재시도
     final token = await FirebaseAuth.instance.currentUser!.getIdToken(true);
     final r2 = await http.get(
       url,
@@ -42,7 +41,6 @@ Future<List<Map<String, dynamic>>> fetchRepeatList() async {
   return List<Map<String, dynamic>>.from(jsonDecode(r.body)["data"] ?? []);
 }
 
-//  반복 리스트: 체크/해제
 Future<void> checkRepeatItem(String todoId, bool value) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/repeatList/check/$uid/$todoId");
@@ -53,7 +51,6 @@ Future<void> checkRepeatItem(String todoId, bool value) async {
   }
 }
 
-// 반복 리스트 저장 (화면의 리스트를 '인자로' 받기)
 Future<void> saveRepeatList(List<Task> tasks) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/repeatList/save/$uid");
@@ -83,78 +80,39 @@ Future<Map<String, dynamic>> addDailyLikeTask({
       "todoPoint": point,
     }),
   );
-  // 상태 확인 로그
-  
-  print('[API] add status=${r.statusCode} body=${r.body}');
   if (r.statusCode != 200) {
     throw Exception("add failed: ${r.statusCode} ${r.body}");
   }
   return jsonDecode(r.body) as Map<String, dynamic>;
 }
 
-// ---------- planner (오늘 리스트) ----------
-Future<Map<String, dynamic>> readPlanner(String dateKey) async {
+// ======================= dailyTasks =======================
+
+// ✔ submitted/lastSubmit까지 함께 읽어오는 모델/함수 추가
+class DailyRead {
+  final List<Task> tasks;
+  final bool submitted;
+  final String? lastSubmit;
+  DailyRead({required this.tasks, required this.submitted, this.lastSubmit});
+}
+
+Future<DailyRead> readDailyWithMeta(String dateKey) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
-  final url = Uri.parse("$baseUrl/planner/read/$uid/$dateKey");
+  final url = Uri.parse("$baseUrl/daily/read/$uid/$dateKey");
   final r = await http.get(url, headers: await _authHeaders());
   if (r.statusCode != 200) {
-    throw Exception("planner read failed: ${r.statusCode} ${r.body}");
+    throw Exception("daily read failed: ${r.statusCode} ${r.body}");
   }
   final obj = jsonDecode(r.body) as Map<String, dynamic>;
-  final List<Task> tasks = (obj["todayTasks"] as List)
+  final tasks = (obj["tasks"] as List)
       .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
       .toList();
-  return {"tasks": tasks, "submitted": obj["submitted"] ?? false};
+  final submitted = (obj["submitted"] ?? false) as bool;
+  final lastSubmit = obj["lastSubmit"] as String?;
+  return DailyRead(tasks: tasks, submitted: submitted, lastSubmit: lastSubmit);
 }
 
-Future<void> savePlanner(String dateKey, List<Task> tasks) async {
-  final uid = FirebaseAuth.instance.currentUser!.uid;
-  final url = Uri.parse("$baseUrl/planner/save/$uid/$dateKey");
-  final body = jsonEncode({"tasks": tasks.map((t) => t.toJson()).toList()});
-  final r = await http.post(url, headers: await _authHeaders(), body: body);
-  if (r.statusCode != 200) {
-    throw Exception("planner save failed: ${r.statusCode} ${r.body}");
-  }
-}
-
-Future<void> updatePlannerItem(
-  String dateKey,
-  String todoId, {
-  String? text,
-  int? point,
-}) async {
-  final uid = FirebaseAuth.instance.currentUser!.uid;
-  final url = Uri.parse("$baseUrl/planner/update/$uid/$dateKey/$todoId");
-  final body = jsonEncode({
-    if (text != null) "todoText": text,
-    if (point != null) "todoPoint": point,
-  });
-  final r = await http.patch(url, headers: await _authHeaders(), body: body);
-  if (r.statusCode != 200) {
-    throw Exception("planner update failed: ${r.statusCode} ${r.body}");
-  }
-}
-
-Future<void> checkPlannerItem(String dateKey, String todoId, bool value) async {
-  final uid = FirebaseAuth.instance.currentUser!.uid;
-  final url = Uri.parse("$baseUrl/planner/check/$uid/$dateKey/$todoId");
-  final body = jsonEncode({"todoCheck": value});
-  final r = await http.patch(url, headers: await _authHeaders(), body: body);
-  if (r.statusCode != 200) {
-    throw Exception("planner check failed: ${r.statusCode} ${r.body}");
-  }
-}
-
-Future<void> deletePlannerItem(String dateKey, String todoId) async {
-  final uid = FirebaseAuth.instance.currentUser!.uid;
-  final url = Uri.parse("$baseUrl/planner/delete/$uid/$dateKey/$todoId");
-  final r = await http.delete(url, headers: await _authHeaders());
-  if (r.statusCode != 200) {
-    throw Exception("planner delete failed: ${r.statusCode} ${r.body}");
-  }
-}
-
-// ---------- dailyTasks (특정 날짜의 일일 목록) ----------
+// (참고) 기존 fetchDaily가 필요한 다른 화면이 있으면 남겨둡니다.
 Future<List<Task>> fetchDaily(String dateKey) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/daily/read/$uid/$dateKey");
@@ -180,11 +138,11 @@ Future<void> saveDaily(String dateKey, List<Task> tasks) async {
 }
 
 Future<void> updateDailyItem(
-  String dateKey,
-  String todoId, {
-  String? text,
-  int? point,
-}) async {
+    String dateKey,
+    String todoId, {
+      String? text,
+      int? point,
+    }) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/daily/update/$uid/$dateKey/$todoId");
   final body = jsonEncode({
@@ -216,6 +174,16 @@ Future<void> deleteDailyItem(String dateKey, String todoId) async {
   }
 }
 
+Future<void> markDailySubmitted(String dateKey) async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final url = Uri.parse("$baseUrl/daily/submit/$uid/$dateKey");
+  final r = await http.post(url, headers: await _authHeaders());
+  if (r.statusCode != 200) {
+    throw Exception("daily submit failed: ${r.statusCode} ${r.body}");
+  }
+}
+
+// ======================= 펫 =======================
 Future<void> useItem(String itemName) async {
   try {
     final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -260,7 +228,7 @@ Future<void> useStyleItem(String itemName) async {
     final r = await http.patch(
       url,
       headers: await _authHeaders(),
-      body: json.encode({"styleID":itemName}),
+      body: json.encode({"styleID": itemName}),
     );
 
     if (r.statusCode == 200) {
