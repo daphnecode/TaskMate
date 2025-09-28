@@ -62,7 +62,7 @@ class _PlannerMainState extends State<PlannerMain> {
   }
 
   Future<void> toggleCheck(List<Task> tasklist, int index) async {
-    if (_isSubmitted) return; // 안전가드
+    if (_isSubmitted) return; // 제출 후 잠금
 
     final old = tasklist[index];
     final newVal = !old.isChecked;
@@ -155,6 +155,7 @@ class _PlannerMainState extends State<PlannerMain> {
       return;
     }
 
+    // KST 자정 streak 보정
     Future.microtask(() async {
       try {
         await resetStreakIfNeededKST(userId!);
@@ -163,19 +164,19 @@ class _PlannerMainState extends State<PlannerMain> {
       }
     });
 
-    // ✅ 오늘 리스트를 submitted 포함해서 로드
+    // 오늘 리스트 + 제출 여부
     api.readDailyWithMeta(dateKey).then((res) {
       if (!mounted) return;
       setState(() {
         todayTaskList = res.tasks;
-        _isSubmitted = res.submitted; // 서버 제출 상태 반영
+        _isSubmitted = res.submitted;
       });
     }).catchError((e) {
       
     });
 
     // 방문 로그
-    firestore
+    FirebaseFirestore.instance
         .collection('Users')
         .doc(userId!)
         .collection('log')
@@ -273,6 +274,14 @@ class _PlannerMainState extends State<PlannerMain> {
                 return;
               }
 
+              // 이미 제출 상태면 즉시 차단
+              if (_isSubmitted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("이미 제출하였습니다.")),
+                );
+                return;
+              }
+
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -287,17 +296,24 @@ class _PlannerMainState extends State<PlannerMain> {
                           setState(() => _submitting = true);
 
                           try {
-                            await submitTasksToFirestore(
-                              uid,
-                              dateKey,
-                              todayTaskList,
-                              repeatTaskList,
-                            );
+                            // ✅ 서버 기준으로도 한 번 더 중복 제출 확인
+                            final latest = await api.readDailyWithMeta(dateKey);
+                            if (latest.submitted) {
+                              throw Exception("이미 제출했습니다.");
+                            }
 
+                            // 1) 오늘/반복 리스트 저장
+                            await Future.wait([
+                              api.saveDaily(dateKey, todayTaskList),
+                              api.saveRepeatList(repeatTaskList),
+                            ]);
+
+                            // 2) 포인트 계산
                             final earned = _calcEarnedPointsForToday();
+
+                            // 3) 포인트/EXP 지급
                             final functions = FirebaseFunctions.instanceFor(
-                              region: kFunctionsRegion,
-                            );
+                                region: kFunctionsRegion);
                             final rewardFn =
                             functions.httpsCallable('submitRewardAN3');
                             final expFn =
@@ -322,7 +338,7 @@ class _PlannerMainState extends State<PlannerMain> {
                               }
                             }
 
-                            // ✅ daily meta에 제출 기록
+                            // 4) 제출 플래그 업데이트 (dailyTasks.meta.submitted)
                             await api.markDailySubmitted(dateKey);
 
                             if (!mounted) return;
@@ -331,11 +347,19 @@ class _PlannerMainState extends State<PlannerMain> {
                               const SnackBar(content: Text("제출 완료!")),
                             );
                           } catch (e) {
-                            showDialog(
-                              context: context,
-                              builder: (_) =>
-                                  AlertDialog(content: Text(e.toString())),
-                            );
+                            final msg = e.toString();
+                            if (msg.contains("이미 제출했습니다")) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("이미 제출하였습니다.")),
+                              );
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (_) =>
+                                    AlertDialog(content: Text(msg)),
+                              );
+                            }
                           } finally {
                             if (mounted) setState(() => _submitting = false);
                           }
