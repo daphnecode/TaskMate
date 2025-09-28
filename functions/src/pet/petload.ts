@@ -44,7 +44,7 @@ router.get("/:userId/pets", async (req, res) => {
     const pets = snap.docs.map((doc) => {
       const d = doc.data() as Pet; // 🔑 QueryDocumentSnapshot<DocumentData> → data() OK
       return {
-        petName: d.petName ?? "",
+        petName: d.name ?? "",
         level: Number(d.level ?? 0),
       };
     });
@@ -78,7 +78,7 @@ router.post("/:userId/pets", async (req, res) => {
     const newPetRef = refPets(uid).doc(petName);
     const initialPetData = {
       image: "assets/images/" + petName + ".png",
-      petName: petName, 
+      name: petName, 
       hunger: 100,
       happy: 100,
       level: 1,

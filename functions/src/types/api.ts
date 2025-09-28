@@ -1,6 +1,6 @@
 export interface Pet {
   image: string;
-  petName: string;
+  name: string;
   hunger: number;
   happy: number;
   level: number;
@@ -11,7 +11,7 @@ export interface Pet {
 export interface Item {
   icon: string;
   category: number;
-  itemName: string;
+  name: string;
   hunger: number;
   happy: number;
   count: number;

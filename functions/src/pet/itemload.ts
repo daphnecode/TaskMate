@@ -56,7 +56,7 @@ router.get("/:userId/items", async (req, res) => {
       return {
         icon: d.icon,
         category: d.category,
-        itemName: d.itemName,
+        name: d.name,
         hunger: d.hunger,
         happy: d.happy,
         count: d.count,
