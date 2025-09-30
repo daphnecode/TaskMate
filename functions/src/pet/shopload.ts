@@ -2,6 +2,7 @@ import express from "express";
 import { getAuth } from "firebase-admin/auth";
 import {db} from "../firebase.js";
 import { Item } from "../types/api.js";
+import { user } from "firebase-functions/v1/auth";
 
 const router = express.Router();
 
@@ -70,37 +71,50 @@ router.get("/items", async (req, res) => {
 });
 
 // POST /aLLitems/items
-router.post("/items", async (req, res) => {
+router.post("/items/:userId", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
     const { itemName } = req.body;
     const uid = decoded.uid;
 
+    if (decoded.uid !== uid) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+
     if (!itemName) {
       return res.status(400).json({ success: false, message: "itemName is required" });
     }
 
-    const itemRef = db.collection("Users").doc(uid).collection("items").doc(itemName);
-    const snap = await itemRef.get();
+    const userRef = db.collection("Users").doc(uid); 
+    const shopRef = db.collection("aLLitems").doc(itemName);
+    const snap2 = await userRef.get();
+    const snap3 = await shopRef.get();
 
-    if (snap.exists) {
-      // 이미 존재하면 count 1 증가
-      const currentCount = snap.data()?.count ?? 0;
-      await itemRef.update({ count: currentCount + 1 });
+    const userPoint = snap2.data()?.currentPoint;
+    const itemPrice = snap3.data()?.price;
+
+    if (userPoint >= itemPrice) {
+      await userRef.update({ currentPoint: userPoint - itemPrice });
+
+      const itemRef = db.collection("Users").doc(uid).collection("items").doc(itemName);
+      const snap1 = await itemRef.get();
+      if (snap1.exists) {
+        // 이미 존재하면 count 1 증가
+        const currentCount = snap1.data()?.count ?? 0;
+        await itemRef.update({ count: currentCount + 1 });
+      } else {
+        // 존재하지 않으면 새로 생성
+        const itemData = snap3.data();
+        await itemRef.set({
+          ...itemData,
+          count: 1,
+        });
+      }
     } else {
-      // 존재하지 않으면 새로 생성
-      const newItem = {
-        name: itemName,
-        count: 1,
-        // 필요하면 나머지 필드 초기값 설정
-        price: 0,
-        icon: "",
-        category: 0,
-        hunger: 0,
-        happy: 0,
-        itemText: "",
-      };
-      await itemRef.set(newItem);
+      return res.json({
+        success: false,
+        message: "item purchase fail: not enough point",
+      });
     }
 
     return res.json({
