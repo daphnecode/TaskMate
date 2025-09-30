@@ -279,7 +279,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (idx) {
       case 0:
-        print("pet in myhomepage: ${widget.pet!.toMap()}");
         currentWidget = Petmain(
           updatePet: widget.updatePet,
           onNext: goNext,

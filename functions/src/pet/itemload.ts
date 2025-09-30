@@ -37,7 +37,7 @@ router.get("/:userId/items", async (req, res) => {
     let query: FirebaseFirestore.Query<Item> = colRef;
 
     if (itemCategory) {
-      query = colRef.where("category", "==", itemCategory); // Query로 변경
+      query = colRef.where("category", "==", Number(itemCategory)); // Query로 변경
     }
 
     // 2. Firestore 참조 (예시 함수 - 직접 구현 필요)

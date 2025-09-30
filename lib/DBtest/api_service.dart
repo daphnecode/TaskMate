@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:taskmate/DBtest/task.dart';
+import 'package:taskmate/object.dart';
 
 // ️ 실제 프로젝트 ID로 교체
 const String baseUrl =
@@ -138,11 +139,11 @@ Future<void> saveDaily(String dateKey, List<Task> tasks) async {
 }
 
 Future<void> updateDailyItem(
-    String dateKey,
-    String todoId, {
-      String? text,
-      int? point,
-    }) async {
+  String dateKey,
+  String todoId, {
+  String? text,
+  int? point,
+}) async {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final url = Uri.parse("$baseUrl/daily/update/$uid/$dateKey/$todoId");
   final body = jsonEncode({
@@ -238,5 +239,24 @@ Future<void> useStyleItem(String itemName) async {
     }
   } catch (e) {
     throw Exception("Error updating style: $e");
+  }
+}
+
+Future<List<Item>> readItemList(int category) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/users/$uid/items?itemCategory=$category");
+    final r = await http.get(url, headers: await _authHeaders());
+
+    if (r.statusCode == 200) {
+      final data = jsonDecode(r.body)['data'] as List;
+      return data.map((e) => Item.fromMap(e)).toList();
+    } else {
+      // throw Exception("Failed to load itemList: ${r.statusCode}, ${r.body}");
+      return [];
+    }
+  } catch (e) {
+    // throw Exception("Error loading itemList: $e");
+    return [];
   }
 }

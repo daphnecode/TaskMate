@@ -32,14 +32,14 @@ class Item {
 
   factory Item.fromMap(Map<String, dynamic> map) {
     return Item(
-      icon: map['icon'],
-      category: map['category'],
-      name: map['name'],
-      hunger: map['hunger'],
-      happy: map['happy'],
-      count: map['count'],
-      price: map['price'],
-      itemText: map['itemText'],
+      icon: map['icon'] ?? "",
+      category: map['category'] ?? 1,
+      name: map['name'] ?? "",
+      hunger: map['hunger'] ?? 0,
+      happy: map['happy'] ?? 0,
+      count: map['count'] ?? 1,
+      price: map['price'] ?? 10,
+      itemText: map['itemText'] ?? "",
     );
   }
 }
