@@ -17,6 +17,8 @@ import repeatRouter from "./planner/repeat_function.js";
 import dailyRouter from "./planner/daily_function.js";
 import petRouter from "./pet/petload.js";
 import itemRouter from "./pet/itemload.js";
+import shopRouter from "./pet/shopload.js";
+import gameRouter from "./pet/gamereward.js";
 
 // ===== Express 앱 (v2 onRequest) =====
 const app = express();
@@ -38,6 +40,9 @@ app.use("/repeatList", repeatRouter);
 
 app.use("/users", petRouter);
 app.use("/users", itemRouter);
+
+app.use("/shop", shopRouter);
+app.use("/game", gameRouter);
 
 // Cloud Functions v2 onRequest
 export const api = onRequest({ region: "asia-northeast3" }, app);

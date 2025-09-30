@@ -2,7 +2,6 @@ import express from "express";
 import { getAuth } from "firebase-admin/auth";
 import {db} from "../firebase.js";
 import { Item } from "../types/api.js";
-import { user } from "firebase-functions/v1/auth";
 
 const router = express.Router();
 
