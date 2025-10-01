@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:taskmate/DBtest/task.dart';
-import 'package:taskmate/object.dart';
+import '../object.dart';
 
 // ️ 실제 프로젝트 ID로 교체
 const String baseUrl =
@@ -252,11 +252,45 @@ Future<List<Item>> readItemList(int category) async {
       final data = jsonDecode(r.body)['data'] as List;
       return data.map((e) => Item.fromMap(e)).toList();
     } else {
-      // throw Exception("Failed to load itemList: ${r.statusCode}, ${r.body}");
-      return [];
+      return []; // 404나 오류 시 빈 리스트 반환
     }
   } catch (e) {
-    // throw Exception("Error loading itemList: $e");
-    return [];
+    return []; // 네트워크 오류 시도 빈 리스트
+  }
+}
+
+Future<List<Item>> readShopList(int category) async {
+  try {
+    final url = Uri.parse("$baseUrl/shop/items?category=$category");
+    final r = await http.get(url, headers: await _authHeaders());
+
+    if (r.statusCode == 200) {
+      final data = jsonDecode(r.body)['data'] as List;
+      return data.map((e) => Item.fromMap(e)).toList();
+    } else {
+      return []; // 404나 오류 시 빈 리스트 반환
+    }
+  } catch (e) {
+    return []; // 네트워크 오류 시도 빈 리스트
+  }
+}
+
+Future<void> buyItem(String itemName) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/shop/items/$uid");
+    final r = await http.post(
+      url,
+      headers: await _authHeaders(),
+      body: json.encode({"itemName": itemName}),
+    );
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception("Failed to buy item: ${r.statusCode}, ${r.body}");
+    }
+  } catch (e) {
+    throw Exception("Error updating inventory: $e");
   }
 }
