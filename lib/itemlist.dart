@@ -35,7 +35,6 @@ class ItemlistPage1 extends StatefulWidget {
   final Users user;
   final int pageType;
   final bool isUseItem;
-  final List<Item> inventory;
   const ItemlistPage1({
     required this.updatePet,
     required this.onNext,
@@ -43,7 +42,6 @@ class ItemlistPage1 extends StatefulWidget {
     required this.user,
     required this.pageType,
     required this.isUseItem,
-    required this.inventory,
     super.key,
   });
 
@@ -52,8 +50,27 @@ class ItemlistPage1 extends StatefulWidget {
 }
 
 class _ItemlistPage1State extends State<ItemlistPage1> {
+  List<Item>? inventory; // null이면 아직 로딩 중
+
+  @override
+  void initState() {
+    super.initState();
+    _loadItems();
+  }
+
+  Future<void> _loadItems() async {
+    final result = await readItemList(1);
+    setState(() {
+      inventory = result;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (inventory == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     if (widget.isUseItem) {
       return Scaffold(
         appBar: AppBar(),
@@ -105,9 +122,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                  itemCount: widget.inventory.length,
+                  itemCount: inventory!.length,
                   itemBuilder: (context, index) {
-                    final item = widget.inventory[index];
+                    final item = inventory![index];
                     return ListTile(
                       onTap: () {
                         showDialog(
@@ -299,9 +316,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                 padding: EdgeInsets.all(8.0),
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: ListView.builder(
-                  itemCount: widget.inventory.length,
+                  itemCount: inventory!.length,
                   itemBuilder: (context, index) {
-                    final item = widget.inventory[index];
+                    final item = inventory![index];
                     return ListTile(
                       onTap: () {
                         showDialog(
@@ -1717,7 +1734,6 @@ class _ItemCategoryState extends State<ItemCategory> {
                                     user: widget.user,
                                     pageType: 2,
                                     isUseItem: true,
-                                    inventory: getItemsByCategory(1),
                                   ),
                                 ),
                               ).then((value) {
@@ -1938,7 +1954,6 @@ class _ShopCategoryState extends State<ShopCategory> {
 
   @override
   Widget build(BuildContext context) {
-    print("pet in shopcategory: ${widget.pet!.toMap()}");
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -2021,7 +2036,6 @@ class _ShopCategoryState extends State<ShopCategory> {
                                     user: widget.user,
                                     pageType: 3,
                                     isUseItem: false,
-                                    inventory: getItemsByCategory(1),
                                   ),
                                 ),
                               ).then((value) {

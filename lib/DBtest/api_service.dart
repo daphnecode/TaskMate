@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:taskmate/DBtest/task.dart';
+import '../object.dart';
 
 // ️ 실제 프로젝트 ID로 교체
 const String baseUrl =
@@ -238,5 +239,22 @@ Future<void> useStyleItem(String itemName) async {
     }
   } catch (e) {
     throw Exception("Error updating style: $e");
+  }
+}
+
+Future<List<Item>> readItemList(int category) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/users/$uid/items?itemCategory=$category");
+    final r = await http.get(url, headers: await _authHeaders());
+
+    if (r.statusCode == 200) {
+      final data = jsonDecode(r.body)['data'] as List;
+      return data.map((e) => Item.fromMap(e)).toList();
+    } else {
+      return []; // 404나 오류 시 빈 리스트 반환
+    }
+  } catch (e) {
+    return []; // 네트워크 오류 시도 빈 리스트
   }
 }
