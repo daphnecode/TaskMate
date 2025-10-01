@@ -281,7 +281,7 @@ class _ShoplistPage1State extends State<ShoplistPage1> {
   }
 
   Future<void> _loadItems() async {
-    final result = await readItemList(1);
+    final result = await readShopList(1);
     setState(() {
       inventory = result;
     });
@@ -415,11 +415,9 @@ class _ShoplistPage1State extends State<ShoplistPage1> {
                       final uid =
                       FirebaseAuth.instance.currentUser?.uid;
                       if (uid != null) {
-                        await itemSaveDB(uid, item.name, item);
-                        await userSavePointDB(
-                      uid,
-                      widget.user.currentPoint,
-                        );
+                        // await itemSaveDB(uid, item.name, item);
+                        // await userSavePointDB(uid, widget.user.currentPoint,);
+                        await buyItem(item.name);
                       }
                     }
                     Navigator.pop(context);

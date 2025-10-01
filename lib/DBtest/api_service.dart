@@ -261,7 +261,7 @@ Future<List<Item>> readItemList(int category) async {
 
 Future<List<Item>> readShopList(int category) async {
   try {
-    final url = Uri.parse("$baseUrl/aLLitems/items?category=$category");
+    final url = Uri.parse("$baseUrl/shop/items?category=$category");
     final r = await http.get(url, headers: await _authHeaders());
 
     if (r.statusCode == 200) {
@@ -272,5 +272,25 @@ Future<List<Item>> readShopList(int category) async {
     }
   } catch (e) {
     return []; // 네트워크 오류 시도 빈 리스트
+  }
+}
+
+Future<void> buyItem(String itemName) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/shop/items/$uid");
+    final r = await http.post(
+      url, 
+      headers: await _authHeaders(),
+      body: json.encode({ "itemName": itemName }),
+    );
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception("Failed to buy item: ${r.statusCode}, ${r.body}");
+    }
+  } catch (e) {
+    throw Exception("Error updating inventory: $e");
   }
 }
