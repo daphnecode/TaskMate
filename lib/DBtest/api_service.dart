@@ -258,3 +258,19 @@ Future<List<Item>> readItemList(int category) async {
     return []; // 네트워크 오류 시도 빈 리스트
   }
 }
+
+Future<List<Item>> readShopList(int category) async {
+  try {
+    final url = Uri.parse("$baseUrl/aLLitems/items?category=$category");
+    final r = await http.get(url, headers: await _authHeaders());
+
+    if (r.statusCode == 200) {
+      final data = jsonDecode(r.body)['data'] as List;
+      return data.map((e) => Item.fromMap(e)).toList();
+    } else {
+      return []; // 404나 오류 시 빈 리스트 반환
+    }
+  } catch (e) {
+    return []; // 네트워크 오류 시도 빈 리스트
+  }
+}
