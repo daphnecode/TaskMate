@@ -294,3 +294,41 @@ Future<void> buyItem(String itemName) async {
     throw Exception("Error updating inventory: $e");
   }
 }
+
+Future<void> gameRunReward() async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/game/run/$uid");
+    final r = await http.patch(
+      url,
+      headers: await _authHeaders(),
+    );
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception("Failed to get reward: ${r.statusCode}, ${r.body}");
+    }
+  } catch (e) {
+    throw Exception("Error updating pet: $e");
+  }
+}
+
+Future<void> gameCleanReward() async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/game/clean/$uid");
+    final r = await http.patch(
+      url,
+      headers: await _authHeaders(),
+    );
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception("Failed to get reward: ${r.statusCode}, ${r.body}");
+    }
+  } catch (e) {
+    throw Exception("Error updating pet: $e");
+  }
+}

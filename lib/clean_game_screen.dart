@@ -5,7 +5,7 @@ import 'package:taskmate/widgets/joystick_widget.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'main.dart';
 import 'object.dart';
-import 'package:taskmate/DBtest/firestore_service.dart';
+import 'package:taskmate/DBtest/api_service.dart';
 
 class CleanGameScreen extends StatefulWidget {
   final void Function(int) onNext;
@@ -71,7 +71,8 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
 
                     //  DB 반영
                     try {
-                      await petSaveDB(widget.uid, widget.petId, widget.pet);
+                      // await petSaveDB(widget.uid, widget.petId, widget.pet);
+                      await gameCleanReward();
                     } catch (e) {
 
                     }

@@ -6,7 +6,7 @@ import 'package:taskmate/game/background.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'main.dart';
 import 'object.dart';
-import 'package:taskmate/DBtest/firestore_service.dart';
+import 'package:taskmate/DBtest/api_service.dart';
 
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
@@ -94,7 +94,8 @@ class _RunGameScreenState extends State<RunGameScreen> {
 
                           // 2) DB 반영
                           try {
-                            await petSaveDB(widget.uid, widget.petId, widget.pet);
+                            // await petSaveDB(widget.uid, widget.petId, widget.pet);
+                            await gameRunReward();
                           } catch (e) {
 
                           }
