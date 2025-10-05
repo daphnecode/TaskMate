@@ -11,50 +11,59 @@ async function verifyToken(req: express.Request) {
   return getAuth().verifyIdToken(token);
 }
 
-const app = express.Router();
+console.log("▶ /game router loaded");
 
-app.patch("/run/:userId", async (req, res) => {
+router.patch("/run/:userId", async (req, res) => {
+  console.log("▶ /run/:userId 요청 도착:", req.method, req.path);
   try {
-    // 1️⃣ 인증 토큰 검증
     const decoded = await verifyToken(req);
+    console.log("✅ 토큰 검증 성공:", decoded.uid);
+
     const uid = decoded.uid;
     const { userId } = req.params;
 
     if (uid !== userId) {
+      console.log("❌ uid 불일치:", uid, userId);
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
-    // 2️⃣ user 문서에서 nowPet 필드 읽기
+    console.log("📍 1단계: Firestore에서 Users 문서 접근 시작");
     const userRef = db.collection("Users").doc(uid);
     const userSnap = await userRef.get();
+    console.log("📍 2단계: userSnap.exists =", userSnap.exists);
 
     if (!userSnap.exists) {
+      console.log("❌ User not found:", uid);
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
     const nowPet = userSnap.data()?.nowPet;
+    console.log("📍 3단계: nowPet =", nowPet);
+
     if (!nowPet) {
+      console.log("❌ nowPet not set");
       return res.status(400).json({ success: false, message: "nowPet not set" });
     }
 
-    // 3️⃣ pet 문서 불러오기
-    const petRef = db.collection("Pets").doc(nowPet);
+    console.log("📍 4단계: Pets 문서 접근 시작");
+    const petRef = userRef.collection("pets").doc(nowPet);
     const petSnap = await petRef.get();
+    console.log("📍 5단계: petSnap.exists =", petSnap.exists);
 
     if (!petSnap.exists) {
+      console.log("❌ Pet not found:", nowPet);
       return res.status(404).json({ success: false, message: "Pet not found" });
     }
 
     const petData = petSnap.data() || {};
+    console.log("📍 6단계: petData =", petData);
 
-    // 4️⃣ happy +20, hunger -20 업데이트
     const newHappy = Math.min((petData.happy ?? 0) + 20, 100);
-    const newHunger = Math.max((petData.hunger ?? 0) - 20, 0); // 음수 방지
+    const newHunger = Math.max((petData.hunger ?? 0) - 20, 0);
 
-    await petRef.update({
-      happy: newHappy,
-      hunger: newHunger,
-    });
+    console.log("📍 7단계: 업데이트 시도");
+    await petRef.update({ happy: newHappy, hunger: newHunger });
+    console.log("✅ 8단계: 업데이트 완료");
 
     return res.json({
       success: true,
@@ -64,12 +73,13 @@ app.patch("/run/:userId", async (req, res) => {
     });
 
   } catch (e: any) {
-    console.error(e);
+    console.error("🔥 /run/:userId 처리 중 에러:", e);
     return res.status(500).json({ success: false, message: e?.message || "Server error" });
   }
 });
 
-app.patch("/clean/:userId", async (req, res) => {
+
+router.patch("/clean/:userId", async (req, res) => {
   try {
     // 1️⃣ 인증 토큰 검증
     const decoded = await verifyToken(req);
@@ -94,7 +104,7 @@ app.patch("/clean/:userId", async (req, res) => {
     }
 
     // 3️⃣ pet 문서 불러오기
-    const petRef = db.collection("Pets").doc(nowPet);
+    const petRef = userRef.collection("pets").doc(nowPet);   
     const petSnap = await petRef.get();
 
     if (!petSnap.exists) {
