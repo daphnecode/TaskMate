@@ -256,53 +256,6 @@ Future<void> syncDailyToPlanner(String userId, String dateKey) async {
   }, SetOptions(merge: true));
 }
 
-// Pet 관련 함수들.
-Future<void> itemSaveDB(String userID, String itemID, Item target) async {
-  final refDoc = FirebaseFirestore.instance
-      .collection('Users')
-      .doc(userID)
-      .collection('items')
-      .doc(itemID);
-
-  DocumentSnapshot tmpDoc = await refDoc.get();
-
-  if (tmpDoc.exists) {
-    await refDoc.update({'count': target.count});
-  } else {
-    await refDoc.set(target.toMap());
-  }
-}
-
-Future<void> petSaveDB(String userID, String petID, Pets? pet) async {
-  await FirebaseFirestore.instance
-      .collection('Users')
-      .doc(userID)
-      .collection('pets')
-      .doc(petID)
-      .update({'hunger': pet!.hunger, 'happy': pet.happy});
-}
-
-Future<void> petSaveStyleDB(String userID, String petID, String styleID) async {
-  await FirebaseFirestore.instance
-      .collection('Users')
-      .doc(userID)
-      .collection('pets')
-      .doc(petID)
-      .update({'styleID': styleID});
-}
-
-Future<void> userSavePointDB(String userID, int point) async {
-  await FirebaseFirestore.instance.collection('Users').doc(userID).update({
-    'currentPoint': point,
-  });
-}
-
-Future<void> userSavePlaceDB(String userID, String placeID) async {
-  await FirebaseFirestore.instance.collection('Users').doc(userID).update({
-    'placeID': placeID,
-  });
-}
-
 /// ==========================
 /// KST 자정 보정: 전날 제출이 없으면 streakDays=0으로
 /// ==========================
