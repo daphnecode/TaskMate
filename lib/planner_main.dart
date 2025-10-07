@@ -45,6 +45,7 @@ class _PlannerMainState extends State<PlannerMain> {
 
   String? userId;
 
+  // NOTE: 서버와 동일 포맷을 사용하세요. (현재 YYYY-MM-DD)
   String _dateKey(DateTime date) =>
       "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
@@ -139,6 +140,117 @@ class _PlannerMainState extends State<PlannerMain> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('저장 실패: $e')),
       );
+    }
+  }
+
+  Future<void> _handleSubmit(BuildContext context) async {
+    if (_submitting) return;
+
+    final uid = userId ?? FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인이 필요합니다.')),
+      );
+      return;
+    }
+
+    if (_isSubmitted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("이미 제출하였습니다.")),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        content: const Text('정말 제출하겠습니까?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('아니요')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('예')),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final dateKey = _dateKey(selectedDate);
+    setState(() => _submitting = true);
+
+    try {
+      // ✅ 서버 기준 중복 제출 검사
+      final latest = await api.readDailyWithMeta(dateKey);
+      if (latest.submitted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("이미 제출하였습니다.")),
+        );
+        setState(() => _isSubmitted = true);
+        return;
+      }
+
+      // 1) 오늘/반복 리스트 저장
+      await Future.wait([
+        api.saveDaily(dateKey, todayTaskList),
+        api.saveRepeatList(repeatTaskList),
+      ]);
+
+      // 2) 포인트 계산
+      final earned = _calcEarnedPointsForToday();
+
+      // 3) EXP → 포인트 순서 (데이터 불일치 방지)
+      if (earned > 0) {
+        final functions = FirebaseFunctions.instanceFor(region: kFunctionsRegion);
+        final expFn = functions.httpsCallable('submitPetExpAN3');
+        final rewardFn = functions.httpsCallable('submitRewardAN3');
+
+        // EXP 먼저
+        final expResp = await expFn.call({
+          'uid': uid,
+          'earned': earned,
+          'dateKey': dateKey,
+        });
+
+        // 🔎 서버 steps 로깅(콘솔)
+        try {
+          final steps = (expResp.data as Map?)?['steps'];
+          
+          
+        } catch (_) {}
+
+        // 포인트 다음
+        await rewardFn.call({
+          'uid': uid,
+          'earned': earned,
+          'dateKey': dateKey,
+        });
+
+        // UI 포인트 반영 (성공 후)
+        widget.onPointsAdded?.call(earned);
+      }
+
+      // 4) 제출 플래그
+      await api.markDailySubmitted(dateKey);
+
+      if (!mounted) return;
+      setState(() => _isSubmitted = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("제출 완료!")),
+      );
+    } catch (e) {
+      final msg = e.toString();
+      if (msg.contains("이미 제출했습니다")) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("이미 제출하였습니다.")),
+        );
+        setState(() => _isSubmitted = true);
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(content: Text(msg)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
     }
   }
 
@@ -263,120 +375,7 @@ class _PlannerMainState extends State<PlannerMain> {
         centerTitle: true,
         actions: [
           TextButton(
-            onPressed: () {
-              if (_submitting) return;
-
-              final uid = userId ?? FirebaseAuth.instance.currentUser?.uid;
-              if (uid == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('로그인이 필요합니다.')),
-                );
-                return;
-              }
-
-              // 이미 제출 상태면 즉시 차단
-              if (_isSubmitted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("이미 제출하였습니다.")),
-                );
-                return;
-              }
-
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    content: const Text('정말 제출하겠습니까?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-
-                          final dateKey = _dateKey(selectedDate);
-                          setState(() => _submitting = true);
-
-                          try {
-                            // ✅ 서버 기준으로도 한 번 더 중복 제출 확인
-                            final latest = await api.readDailyWithMeta(dateKey);
-                            if (latest.submitted) {
-                              throw Exception("이미 제출했습니다.");
-                            }
-
-                            // 1) 오늘/반복 리스트 저장
-                            await Future.wait([
-                              api.saveDaily(dateKey, todayTaskList),
-                              api.saveRepeatList(repeatTaskList),
-                            ]);
-
-                            // 2) 포인트 계산
-                            final earned = _calcEarnedPointsForToday();
-
-                            // 3) 포인트/EXP 지급
-                            final functions = FirebaseFunctions.instanceFor(
-                                region: kFunctionsRegion);
-                            final rewardFn =
-                            functions.httpsCallable('submitRewardAN3');
-                            final expFn =
-                            functions.httpsCallable('submitPetExpAN3');
-
-                            if (earned > 0) {
-                              widget.onPointsAdded?.call(earned);
-                              try {
-                                await rewardFn.call({
-                                  'uid': uid,
-                                  'earned': earned,
-                                  'dateKey': dateKey,
-                                });
-                                await expFn.call({
-                                  'uid': uid,
-                                  'earned': earned,
-                                  'dateKey': dateKey,
-                                });
-                              } catch (e) {
-                                widget.onPointsAdded?.call(-earned);
-                                rethrow;
-                              }
-                            }
-
-                            // 4) 제출 플래그 업데이트 (dailyTasks.meta.submitted)
-                            await api.markDailySubmitted(dateKey);
-
-                            if (!mounted) return;
-                            setState(() => _isSubmitted = true);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("제출 완료!")),
-                            );
-                          } catch (e) {
-                            final msg = e.toString();
-                            if (msg.contains("이미 제출했습니다")) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("이미 제출하였습니다.")),
-                              );
-                            } else {
-                              showDialog(
-                                context: context,
-                                builder: (_) =>
-                                    AlertDialog(content: Text(msg)),
-                              );
-                            }
-                          } finally {
-                            if (mounted) setState(() => _submitting = false);
-                          }
-                        },
-                        child: const Text('예'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('아니요'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
+            onPressed: _submitting ? null : () => _handleSubmit(context),
             child: const Text('제출'),
           ),
         ],
