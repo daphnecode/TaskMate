@@ -38,12 +38,9 @@ class _LoginPageState extends State<LoginPage> {
       // ✅ 신규 계정 → 기본 필드 세팅 (최초 1회)
       await usersDoc.set({
         'email': user.email,
-        'provider': provider, // 'password' | 'anonymous'
-        'createdAt': FieldValue.serverTimestamp(),
         'lastLoginAt': FieldValue.serverTimestamp(),
         // 상위 기본
         'currentPoint': 0,
-        'currentExp': 0,
         'gotPoint': 0,
         'nowPet': 'dragon',
         'setting': {
@@ -53,7 +50,6 @@ class _LoginPageState extends State<LoginPage> {
           'sound': true,
           'placeID': 'assets/images/prairie.png',
         },
-        'statistics': {},
       }, SetOptions(merge: true));
 
       // 하위 컬렉션 시드(없을 때만 생성)
@@ -65,7 +61,6 @@ class _LoginPageState extends State<LoginPage> {
       // ✅ 기존 계정 → 덮어쓰기 금지(숫자 필드 절대 건드리지 않음). 메타만 갱신.
       await usersDoc.set({
         'email': user.email,
-        'provider': provider,
         'lastLoginAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
@@ -91,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
         'level': 1,
         'currentExp': 0,
         'styleID': 'basic',
-        'createdAt': FieldValue.serverTimestamp(),
       });
     }
     // pets/unicon
@@ -105,7 +99,6 @@ class _LoginPageState extends State<LoginPage> {
         'level': 1,
         'currentExp': 0,
         'styleID': 'basic',
-        'createdAt': FieldValue.serverTimestamp(),
       });
     }
 
@@ -114,9 +107,7 @@ class _LoginPageState extends State<LoginPage> {
     final daily = userRef.collection('dailyTasks').doc(todayId);
     if (!(await daily.get()).exists) {
       await daily.set({
-        'date': todayId,
         'tasks': <dynamic>[],
-        'createdAt': FieldValue.serverTimestamp(),
       });
     }
 
@@ -150,7 +141,6 @@ class _LoginPageState extends State<LoginPage> {
 
     final Map<String, dynamic> patch = {};
     if (!data.containsKey('currentPoint')) patch['currentPoint'] = 0;
-    if (!data.containsKey('currentExp'))   patch['currentExp'] = 0;
     if (!data.containsKey('gotPoint'))     patch['gotPoint'] = 0;
     if (!data.containsKey('nowPet'))       patch['nowPet'] = 'dragon';
 

@@ -8,6 +8,15 @@ import '../object.dart';
 const String baseUrl =
     "BASE_URL";
 
+String _kstDateKey([DateTime? d]) {
+  final now = (d ?? DateTime.now()).toUtc().add(const Duration(hours: 9));
+  final y = now.year.toString().padLeft(4, '0');
+  final m = now.month.toString().padLeft(2, '0');
+  final day = now.day.toString().padLeft(2, '0');
+  return '$y-$m-$day';
+}
+
+
 Future<Map<String, String>> _authHeaders() async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) throw Exception("로그인 필요");
@@ -62,6 +71,112 @@ Future<void> saveRepeatList(List<Task> tasks) async {
   if (r.statusCode != 200) {
     throw Exception("repeatList save failed: ${r.statusCode} ${r.body}");
   }
+}
+
+// meta.lastUpdated 어떤 형식이 와도 KST dateKey로 변환
+String? _normalizeToKstDateKey(dynamic v) {
+  if (v == null) return null;
+
+  // 이미 YYYY-MM-DD면 그대로
+  if (v is String && RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(v)) return v;
+
+  DateTime? dt;
+
+  // ISO 문자열
+  if (v is String) {
+    try { dt = DateTime.parse(v).toUtc(); } catch (_) {}
+  }
+
+  // epoch (ms/s)
+  if (dt == null && v is num) {
+    final ms = v > 20000000000 ? v.toInt() : (v.toInt() * 1000);
+    dt = DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true).toUtc();
+  }
+
+  // DateTime
+  if (dt == null && v is DateTime) dt = v.toUtc();
+
+  if (dt == null) return null;
+  return _kstDateKey(dt); // ← 이미 파일 상단에 존재하는 KST dateKey 유틸 사용
+}
+
+// 토큰 만료 대비 간단 재시도 헬퍼
+Future<http.Response> _getWithRetry(Uri url) async {
+  var r = await http.get(url, headers: await _authHeaders());
+  if (r.statusCode == 401) {
+    await FirebaseAuth.instance.currentUser!.getIdToken(true);
+    r = await http.get(url, headers: await _authHeaders());
+  }
+  return r;
+}
+
+Future<http.Response> _postWithRetry(Uri url, String body) async {
+  var r = await http.post(url, headers: await _authHeaders(), body: body);
+  if (r.statusCode == 401) {
+    await FirebaseAuth.instance.currentUser!.getIdToken(true);
+    r = await http.post(url, headers: await _authHeaders(), body: body);
+  }
+  return r;
+}
+
+/// 서버 메타(lastUpdated)를 보고 날짜가 바뀌면 isChecked 전부 false로 초기화.
+/// 단, "오늘 이미 제출했으면" 절대 초기화하지 않는다(제출한 날엔 체크 유지 보장).
+Future<List<Map<String, dynamic>>> fetchRepeatListEnsured() async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final todayKey = _kstDateKey();
+
+  // 1) 반복리스트 읽기
+  final readUrl = Uri.parse("$baseUrl/repeatList/read/$uid");
+  final r = await _getWithRetry(readUrl);
+  if (r.statusCode != 200) {
+    throw Exception("repeatList read failed: ${r.statusCode} ${r.body}");
+  }
+
+  final obj = jsonDecode(r.body) as Map<String, dynamic>;
+  final List<Map<String, dynamic>> rows =
+  List<Map<String, dynamic>>.from(obj["data"] ?? []);
+  final meta = (obj["meta"] is Map) ? Map<String, dynamic>.from(obj["meta"]) : {};
+  final lastKey = _normalizeToKstDateKey(meta["lastUpdated"]); // ← 핵심: 정규화
+
+  // 2) "오늘 제출 여부" 확인 → 제출했으면 어떤 경우에도 초기화 금지
+  try {
+    final daily = await readDailyWithMeta(todayKey);
+    if (daily.submitted == true) {
+      // meta가 오늘이 아니면 오늘로 바로 맞춰 동기화(체크는 건드리지 않음)
+      if (lastKey != todayKey) {
+        final saveUrl = Uri.parse("$baseUrl/repeatList/save/$uid");
+        final body = jsonEncode({
+          "tasks": rows,
+          "meta": {"lastUpdated": todayKey}
+        });
+        await _postWithRetry(saveUrl, body);
+      }
+      return rows; // ✅ 제출한 날: 체크 유지
+    }
+  } catch (_) {
+    // daily API 실패해도 계속 진행(보수적)
+  }
+
+  // 3) 제출 안 했고, 날짜가 다르면 오늘로 초기화
+  if (lastKey == null || lastKey != todayKey) {
+    final cleared = rows.map((e) => {...e, "isChecked": false}).toList();
+
+    final saveUrl = Uri.parse("$baseUrl/repeatList/save/$uid");
+    final body = jsonEncode({
+      "tasks": cleared,
+      "meta": {"lastUpdated": todayKey}
+    });
+
+    final saveResp = await _postWithRetry(saveUrl, body);
+    if (saveResp.statusCode == 200) {
+      return cleared;
+    }
+    // 저장 실패 시에도 최소 화면은 초기화된 상태로 노출
+    return cleared;
+  }
+
+  // 4) 날짜 같으면 그대로 유지
+  return rows;
 }
 
 // 노션 스펙 호환: 할 일 추가

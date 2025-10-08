@@ -166,8 +166,8 @@ class _PlannerMainState extends State<PlannerMain> {
       builder: (ctx) => AlertDialog(
         content: const Text('정말 제출하겠습니까?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('아니요')),
           TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('예')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('아니요')),
         ],
       ),
     );
@@ -296,7 +296,7 @@ class _PlannerMainState extends State<PlannerMain> {
         .set({'visited': true}, SetOptions(merge: true));
 
     // 반복 리스트 로드
-    api.fetchRepeatList().then((rows) {
+    api.fetchRepeatListEnsured().then((rows) {
       if (!mounted) return;
       setState(() {
         repeatTaskList = rows

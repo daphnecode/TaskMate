@@ -17,8 +17,33 @@ function refRepeat(uid: string) {
   return db.collection("Users").doc(uid).collection("repeatTasks").doc("default");
 }
 
-function kstNowISO() {
-  return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString();
+// ✅ KST YYYY-MM-DD 포맷
+function kstDateKey(d: Date = new Date()): string {
+  const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+  const y = String(kst.getUTCFullYear()).padStart(4, "0");
+  const m = String(kst.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(kst.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+// ✅ 어떤 입력이 와도 KST YYYY-MM-DD로 정규화
+function normalizeToKstDateKey(v: any): string | null {
+  if (v == null) return null;
+  if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v)) return v; // 이미 dateKey
+
+  let dt: Date | null = null;
+
+  if (typeof v === "string") {
+    const parsed = new Date(v);
+    if (!isNaN(parsed.getTime())) dt = parsed;
+  } else if (typeof v === "number") {
+    // epoch s/ms 추정
+    const ms = v > 20000000000 ? v : v * 1000;
+    dt = new Date(ms);
+  }
+
+  if (!dt) return null;
+  return kstDateKey(dt);
 }
 
 /** id필드가 있으면 id로, 없으면 문자열/숫자 인덱스로 찾는다 */
@@ -41,19 +66,25 @@ router.get("/read/:userId", async (req, res) => {
     }
 
     const snap = await refRepeat(uidFromParam).get();
-    if (!snap.exists) {
-      return res.json({ success: true, message: "repeatList read complete", data: [] });
-    }
-
-    const raw = snap.data() || {};
+    const raw = snap.exists ? (snap.data() || {}) : {};
     const tasks: any[] = Array.isArray(raw.tasks) ? raw.tasks : [];
+
     const data = tasks.map((t) => ({
       text: t.text ?? t.todoText ?? "",
       point: Number(t.point ?? t.todoPoint ?? 0),
       isChecked: !!(t.isChecked ?? t.todoCheck),
     }));
 
-    return res.json({ success: true, message: "repeatList read complete", data });
+    // ✅ meta.lastUpdated 정규화해서 함께 반환 (없으면 빈 객체)
+    const lastKey = normalizeToKstDateKey(raw?.meta?.lastUpdated);
+    const meta = lastKey ? { lastUpdated: lastKey } : {};
+
+    return res.json({
+      success: true,
+      message: "repeatList read complete",
+      data,
+      meta,
+    });
   } catch (e: any) {
     console.error(e);
     return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
@@ -74,8 +105,13 @@ router.post("/save/:userId", async (req, res) => {
       isChecked: !!(t.isChecked ?? t.todoCheck),
     }));
 
-    const nowKST = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString();
-    await refRepeat(uid).set({ tasks, meta: { lastUpdated: nowKST } }, { merge: true });
+    // ✅ 클라가 meta.lastUpdated를 보냈으면 정규화해서 사용, 없으면 오늘 키
+    const desiredKey = normalizeToKstDateKey(req.body?.meta?.lastUpdated) || kstDateKey();
+
+    await refRepeat(uid).set(
+      { tasks, meta: { lastUpdated: desiredKey } },
+      { merge: true }
+    );
 
     return res.json({ success: true, message: "repeatList save complete" });
   } catch (e: any) {
@@ -85,8 +121,7 @@ router.post("/save/:userId", async (req, res) => {
 });
 
 /** ADD: POST /add/:userId
- *  - index.ts에서 /dailyList 및 /repeatList에 모두 마운트 →
- *    /dailyList/add/:userId  와  /repeatList/add/:userId 둘 다 동작
+ *  - index.ts에서 /dailyList 및 /repeatList에 모두 마운트 → 양쪽에서 동작
  */
 router.post("/add/:userId", async (req, res) => {
   try {
@@ -104,8 +139,10 @@ router.post("/add/:userId", async (req, res) => {
     const newTask = { text: todoText, point: todoPoint, isChecked: todoCheck };
     tasks.push(newTask);
 
-    const nowKST = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString();
-    await docRef.set({ tasks, meta: { lastUpdated: nowKST } }, { merge: true });
+    await docRef.set(
+      { tasks, meta: { lastUpdated: kstDateKey() } },
+      { merge: true }
+    );
 
     return res.json({
       success: true,
@@ -139,10 +176,13 @@ router.patch("/update/:userId/:todoId", async (req, res) => {
     const newText  = body.todoText ?? body.text;
     const newPoint = body.todoPoint ?? body.point;
 
-    if (typeof newText === "string")  tasks[idx].text = newText;
+    if (typeof newText === "string") tasks[idx].text = newText;
     if (typeof newPoint !== "undefined") tasks[idx].point = Number(newPoint);
 
-    await docRef.set({ tasks, meta: { lastUpdated: kstNowISO() } }, { merge: true });
+    await docRef.set(
+      { tasks, meta: { lastUpdated: kstDateKey() } },
+      { merge: true }
+    );
 
     return res.json({
       success: true,
@@ -176,16 +216,21 @@ router.patch("/check/:userId/:todoId", async (req, res) => {
     if (idx < 0) return res.status(404).json({ success: false, message: "Todo not found" });
 
     const body = req.body || {};
-    const val = (typeof body.todoCheck !== "undefined") ? !!body.todoCheck
-               : (typeof body.isChecked !== "undefined") ? !!body.isChecked
-               : null;
+    const val = (typeof body.todoCheck !== "undefined")
+      ? !!body.todoCheck
+      : (typeof body.isChecked !== "undefined")
+        ? !!body.isChecked
+        : null;
 
     // 스펙은 명시적 설정이므로 toggle는 안 하고, 값이 없으면 에러 처리
     if (val === null) return res.status(400).json({ success: false, message: "todoCheck required" });
 
     tasks[idx].isChecked = val;
 
-    await docRef.set({ tasks, meta: { lastUpdated: kstNowISO() } }, { merge: true });
+    await docRef.set(
+      { tasks, meta: { lastUpdated: kstDateKey() } },
+      { merge: true }
+    );
 
     return res.json({ success: true, message: "dailyList check complete" });
   } catch (e: any) {
@@ -213,7 +258,10 @@ router.delete("/delete/:userId/:todoId", async (req, res) => {
 
     tasks.splice(idx, 1);
 
-    await docRef.set({ tasks, meta: { lastUpdated: kstNowISO() } }, { merge: true });
+    await docRef.set(
+      { tasks, meta: { lastUpdated: kstDateKey() } },
+      { merge: true }
+    );
 
     return res.json({ success: true, message: "dailyList delete complete" });
   } catch (e: any) {
