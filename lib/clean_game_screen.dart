@@ -14,7 +14,8 @@ class CleanGameScreen extends StatefulWidget {
   final String uid;
   final String petId;
 
-  const CleanGameScreen({super.key,
+  const CleanGameScreen({
+    super.key,
     required this.onNext,
     required this.soundEffectsOn,
     required this.pet,
@@ -29,17 +30,36 @@ class CleanGameScreen extends StatefulWidget {
 class _CleanGameScreenState extends State<CleanGameScreen> {
   final CleanGame _game = CleanGame();
 
-  //중복 보상 방지
-  bool _rewardApplied = false;
+  // ── 보상/트리거 가드 ──────────────────────────────────────────────
+  bool _rewardApplied = false; // 이미 보상 실행?
+  bool _playedOnce = false;    // 유저가 실제 버튼 눌렀나?
+  bool _completed = false;     // 보상 절대 1회만
 
   @override
   void initState() {
     super.initState();
-    // Root에서 현재 사운드 설정 읽기
+
+    // 사운드
     final rootState = context.findAncestorStateOfType<RootState>();
     if (rootState != null && rootState.user.setting['sound']) {
       BgmManager.playBgm('bgm2.wav');
     }
+
+    // 가드 초기화
+    _rewardApplied = false;
+    _playedOnce = false;
+    _completed = false;
+
+    // 🔒 시작 시에는 게임이 스스로 팝업 못 띄우게 게이트 닫기
+    _game.allowClearOverlay(false);
+
+    // 🔧 혹시 CleanGame이 onLoad 직후 팝업을 띄워버리면(레벨이 이미 클리어 상태 등)
+    //    첫 프레임에 유저 조작 전이면 팝업을 제거하는 안전망
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_playedOnce && _game.overlays.isActive('ClearPopup')) {
+        _game.overlays.remove('ClearPopup');
+      }
+    });
   }
 
   @override
@@ -48,8 +68,41 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
     super.dispose();
   }
 
+  // ── 보상은 이 함수 "단 한 곳"에서만 실행 ────────────────────────
+  Future<void> _applyRewardOnce() async {
+    if (_completed || _rewardApplied) return; // 재진입/중복 클릭 방지
+    _completed = true;
+    _rewardApplied = true;
+
+    // 로컬 즉시 반영 (null 안전)
+    if (widget.pet != null) {
+      setState(() {
+        widget.pet!.happy = (widget.pet!.happy + 10).clamp(0, 9999);
+      });
+    }
+
+    // 서버 반영 (실패해도 UX 흐름은 유지)
+    try {
+      await gameCleanReward();
+      // 필요 시: await petSaveDB(widget.uid, widget.petId, widget.pet);
+    } catch (_) {
+      // TODO: 스낵바/토스트 등 안내 원하면 여기
+    }
+
+    // 팝업 닫고, 부모에 변경됨(true) 전달
+    _game.overlays.remove('ClearPopup');
+    if (mounted) {
+      Navigator.pop(context, true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 빌드 타이밍에도 혹시 떠 있으면 제거(한 번 더 안전망)
+    if (!_playedOnce && _game.overlays.isActive('ClearPopup')) {
+      _game.overlays.remove('ClearPopup');
+    }
+
     return Scaffold(
       body: Column(
         children: [
@@ -61,24 +114,8 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
               overlayBuilderMap: {
                 'ClearPopup': (context, _) => ClearPopup(
                   onClose: () async {
-                    if (_rewardApplied) return;
-                    _rewardApplied = true;
-
-                    // 로컬 즉시 반영
-                    setState(() {
-                      widget.pet!.happy = (widget.pet!.happy + 10).clamp(0, 9999);
-                    });
-
-                    //  DB 반영
-                    try {
-                      // await petSaveDB(widget.uid, widget.petId, widget.pet);
-                      await gameCleanReward();
-                    } catch (e) {
-
-                    }
-                    // 부모에게 "변경됨" 신호 보내서 돌아간 화면이 setState 하도록
-                    _game.overlays.remove('ClearPopup');
-                    Navigator.pop(context, true);
+                    // ✅ 보상은 오직 여기서만
+                    await _applyRewardOnce();
                   },
                 ),
               },
@@ -96,15 +133,19 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
                 children: [
                   Icon(Icons.home, color: Colors.white),
                   SizedBox(width: 10),
-                  Text("청소",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
+                  Text(
+                    "청소",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+
           Expanded(
             flex: 3,
             child: Container(
@@ -115,12 +156,14 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   JoystickWidget(onDirectionChanged: _game.handleDirection),
+
+                  // 🔹 버튼: 유저 조작 발생 → 게이트 열고, 클린 시 게임이 팝업 띄움
                   ElevatedButton(
                     onPressed: () {
-                      _game.tryClean();
-                      if (_game.isClear()) {
-                        _game.overlays.add('ClearPopup');
-                      }
+                      _playedOnce = true;             // 실제 조작 발생
+                      _game.allowClearOverlay(true);  // 🔓 이제부터 팝업 허용
+                      _game.tryClean();               // 마지막 조각이면 게임이 팝업을 띄움
+                      // ❌ 더 이상 여기서 overlays.add('ClearPopup') 하지 않음
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.lightBlueAccent,
@@ -148,9 +191,7 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.calendar_month),
-                onPressed: () {
-                  widget.onNext(3);
-                },
+                onPressed: () => widget.onNext(3),
               ),
               IconButton(
                 icon: const Icon(Icons.home),
@@ -158,8 +199,7 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.settings),
-                onPressed: () {widget.onNext(6);
-                  },
+                onPressed: () => widget.onNext(6),
               ),
             ],
           ),
@@ -189,8 +229,10 @@ class ClearPopup extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("CLEAR!",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, )),
+              const Text(
+                "CLEAR!",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 12),
               const Text("행복도 +10"),
               const SizedBox(height: 12),
