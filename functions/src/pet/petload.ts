@@ -1,73 +1,14 @@
 import express from "express";
-import { getAuth } from "firebase-admin/auth";
-import {db} from "../firebase.js";
+import { verifyToken, refUser, refPets } from "./refAPI.js";
 import { Pet } from "../types/api.js";
 
 
 const router = express.Router();
 
-async function verifyToken(req: express.Request) {
-  const h = req.headers.authorization || "";
-  if (!h.startsWith("Bearer ")) throw new Error("No ID token provided");
-  const token = h.substring("Bearer ".length);
-  return getAuth().verifyIdToken(token);
-}
-function refPets(uid: string) {
-  return db.collection("Users").doc(uid).collection("pets") as FirebaseFirestore.CollectionReference<Pet>;
-}
-/**
- * ✅ GET /users/:userID/pets
- * 특정 사용자의 펫 목록 조회
- */
-/** READ: GET /users/:userId/pets */
-router.get("/:userId/pets", async (req, res) => {
-  try {
-    // 1. Firebase Token 인증
-    const decoded = await verifyToken(req);
-    const { userId: uid } = req.params;
-
-    if (decoded.uid !== uid) {
-      return res.status(403).json({ success: false, message: "Forbidden" });
-    }
-
-    // 2. Firestore 참조 (예시 함수 - 직접 구현 필요)
-    const snap = await refPets(uid).get();
-    if (snap.empty) {
-      return res.json({
-        success: true,
-        message: "no pets found",
-        data: [],
-      });
-    }
-
-    // 3. 데이터 정규화
-    const pets = snap.docs.map((doc) => {
-      const d = doc.data() as Pet; // 🔑 QueryDocumentSnapshot<DocumentData> → data() OK
-      return {
-        petName: d.name ?? "",
-        level: Number(d.level ?? 0),
-      };
-    });
-
-    // 4. 성공 응답
-    return res.json({
-      success: true,
-      message: "pet read complete",
-      data: pets,
-    });
-
-  } catch (e: any) {
-    console.error(e);
-    return res.status(401).json({
-      success: false,
-      message: e?.message || "Unauthorized",
-    });
-  }
-});
 // ---------------------------
 // POST /users/:userId/pets
-// 새로운 펫 생성
-router.post("/:userId/pets", async (req, res) => {
+// 새로운 펫 선택
+router.post("/:userId/nowPet", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
     const { userId: uid } = req.params;
@@ -75,23 +16,15 @@ router.post("/:userId/pets", async (req, res) => {
     if (decoded.uid !== uid) return res.status(403).json({ success: false, message: "Forbidden" });
     if (!petName) return res.status(400).json({ success: false, message: "petName is required" });
 
-    const newPetRef = refPets(uid).doc(petName);
-    const initialPetData = {
-      image: "assets/images/" + petName + ".png",
-      name: petName, 
-      hunger: 100,
-      happy: 100,
-      level: 1,
-      currentExp: 0,
-      styleID: "default"
-    };
-
-    await newPetRef.set(initialPetData);
+    const userRef = refUser(uid);
+    userRef.set({
+      nowPet: petName
+    })
 
     return res.status(201).json({
       success: true,
-      message: "pet add complete",
-      ...initialPetData
+      message: "pet choose complete",
+      petName: petName
     });
 
   } catch (e: any) {
