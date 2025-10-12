@@ -1,17 +1,8 @@
 import express from "express";
-import { getAuth } from "firebase-admin/auth";
-import {db} from "../firebase.js";
+import { verifyToken, refUser, refItem, refShop, refShopItem } from "./refAPI.js";
 import { Item } from "../types/api.js";
 
 const router = express.Router();
-
-async function verifyToken(req: express.Request) {
-  const h = req.headers.authorization || "";
-  if (!h.startsWith("Bearer ")) throw new Error("No ID token provided");
-  const token = h.substring("Bearer ".length);
-  return getAuth().verifyIdToken(token);
-}
-
 
 
 // ✅ 상점 아이템 불러오기
@@ -27,10 +18,7 @@ router.get("/items", async (req, res) => {
     }
 
     // Firestore에서 카테고리별 아이템 불러오기
-    const snap = await db
-      .collection("aLLitems")
-      .where("category", "==", Number(category))
-      .get();
+    const snap = await refShop(Number(category));
 
     if (snap.empty) {
       return res.json({
@@ -84,8 +72,8 @@ router.post("/items/:userId", async (req, res) => {
       return res.status(400).json({ success: false, message: "itemName is required" });
     }
 
-    const userRef = db.collection("Users").doc(uid); 
-    const shopRef = db.collection("aLLitems").doc(itemName);
+    const userRef = refUser(uid);
+    const shopRef = refShopItem(itemName);
     const snap2 = await userRef.get();
     const snap3 = await shopRef.get();
 
@@ -95,7 +83,7 @@ router.post("/items/:userId", async (req, res) => {
     if (userPoint >= itemPrice) {
       await userRef.update({ currentPoint: userPoint - itemPrice });
 
-      const itemRef = db.collection("Users").doc(uid).collection("items").doc(itemName);
+      const itemRef = refItem(uid, itemName);
       const snap1 = await itemRef.get();
       if (snap1.exists) {
         // 이미 존재하면 count 1 증가

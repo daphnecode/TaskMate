@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'object.dart';
 
 class Mainarea1 extends StatelessWidget {
   const Mainarea1({super.key});
@@ -31,34 +28,6 @@ class Subarea1 extends StatefulWidget {
 }
 
 class _Subarea1State extends State<Subarea1> {
-  Future<Pets> loadPet(String currentPet) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) {
-      throw Exception("로그인 필요");
-    }
-
-    final userRef = FirebaseFirestore.instance.collection('Users').doc(uid);
-
-    // 선택한 펫 문서 읽기
-    final petDoc = await userRef.collection('pets').doc(currentPet).get();
-    final Pets loaded = petDoc.exists
-        ? Pets.fromMap(petDoc.data() as Map<String, dynamic>)
-        : Pets(
-            image: "",
-            name: "",
-            hunger: 0,
-            happy: 0,
-            level: 0,
-            currentExp: 0,
-            styleID: "",
-          );
-
-    // 현재 선택 펫 저장
-    await userRef.update({'nowPet': currentPet});
-
-    return loaded;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(

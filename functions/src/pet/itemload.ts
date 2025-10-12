@@ -1,26 +1,8 @@
 import express from "express";
-import { getAuth } from "firebase-admin/auth";
-import {db} from "../firebase.js";
+import { verifyToken, refInventory, refUser, refItem } from "./refAPI.js";
 import { Item } from "../types/api.js";
 
 const router = express.Router();
-
-async function verifyToken(req: express.Request) {
-  const h = req.headers.authorization || "";
-  if (!h.startsWith("Bearer ")) throw new Error("No ID token provided");
-  const token = h.substring("Bearer ".length);
-  return getAuth().verifyIdToken(token);
-}
-function refInventory(uid: string) {
-  return db.collection("Users").doc(uid).collection("items") as FirebaseFirestore.CollectionReference<Item>;
-}
-function refItem(uid: string, itemName: string) {
-  return db.collection("Users").doc(uid).collection("items").doc(itemName) as FirebaseFirestore.DocumentReference<Item>;
-}
-function refUser(uid: string) {
-  return db.collection("Users").doc(uid);
-}
-
 
 router.get("/:userId/items", async (req, res) => {
   try {
@@ -177,7 +159,7 @@ router.patch("/:userId/items/:itemName/style", async (req, res) => {
     // 3️⃣ pets/{nowPet} 문서 업데이트
     // const petRef = await refPets(uid);
     // await petRef.doc(nowPet).update({ styleID });
-    await db.collection("Users").doc(uid).collection("pets").doc(nowPet).update({ styleID });
+    await userRef.collection("pets").doc(nowPet).update({ styleID });
 
     return res.json({
       success: true,

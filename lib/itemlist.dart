@@ -3,7 +3,6 @@ import 'DBtest/api_service.dart';
 import 'petmain.dart';
 import 'object.dart';
 import 'package:taskmate/utils/icon_utis.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 String nameChange(String name) {
@@ -930,6 +929,7 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
       inventory = result;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     if (widget.user.setting['placeID'] == "") {
@@ -1239,11 +1239,9 @@ class _ShoplistPage3State extends State<ShoplistPage3> {
                                 TextButton(
                                   child: Text('구매'),
                                   onPressed: () async {
-                                    if (item.price <
-                                        widget.user.currentPoint) {
+                                    if (item.price < widget.user.currentPoint) {
                                       setState(() {
-                                        widget.user.currentPoint -=
-                                            item.price;
+                                        widget.user.currentPoint -= item.price;
                                       });
                                       // ✅ 현재 로그인한 사용자 uid 사용
                                       await buyItem(item.name);
@@ -1545,6 +1543,7 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
       inventory = result;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1651,13 +1650,11 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
                                 TextButton(
                                   child: Text('구매'),
                                   onPressed: () async {
-                                    if (item.price <
-                                        widget.user.currentPoint) {
+                                    if (item.price < widget.user.currentPoint) {
                                       setState(() {
-                                        widget.user.currentPoint -=
-                                            item.price;
+                                        widget.user.currentPoint -= item.price;
                                       });
-                                     await buyItem(item.name); 
+                                      await buyItem(item.name);
                                     }
                                     Navigator.pop(context);
                                   },
@@ -1743,47 +1740,6 @@ class ItemCategory extends StatefulWidget {
 }
 
 class _ItemCategoryState extends State<ItemCategory> {
-  List<Item> inventory = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadItems();
-  }
-
-  Future<void> loadItems() async {
-    List<Item> itemDoc = [];
-
-    // ✅ 현재 로그인한 사용자 uid 사용
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) {
-      setState(() {
-        inventory = [];
-      });
-      return;
-    }
-
-    QuerySnapshot snapshot1 = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(uid)
-        .collection('items')
-        .get();
-
-    if (snapshot1.docs.isNotEmpty) {
-      itemDoc = snapshot1.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    setState(() {
-      inventory = itemDoc;
-    });
-  }
-
-  List<Item> getItemsByCategory(int category) {
-    return inventory.where((item) => item.category == category).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -2036,36 +1992,6 @@ class ShopCategory extends StatefulWidget {
 }
 
 class _ShopCategoryState extends State<ShopCategory> {
-  List<Item> inventory = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadItems();
-  }
-
-  Future<void> loadItems() async {
-    List<Item> shopDoc = [];
-
-    QuerySnapshot snapshot2 = await FirebaseFirestore.instance
-        .collection('aLLitems')
-        .get();
-
-    if (snapshot2.docs.isNotEmpty) {
-      shopDoc = snapshot2.docs.map((doc) {
-        return Item.fromMap(doc.data() as Map<String, dynamic>);
-      }).toList();
-    }
-
-    setState(() {
-      inventory = shopDoc;
-    });
-  }
-
-  List<Item> getItemsByCategory(int category) {
-    return inventory.where((item) => item.category == category).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
