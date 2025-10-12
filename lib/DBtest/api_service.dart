@@ -369,7 +369,9 @@ Future<List<Item>> readItemList(int category) async {
 
     if (r.statusCode == 200) {
       final data = jsonDecode(r.body)['data'] as List;
-      return data.map((e) => Item.fromMap(e)).toList();
+      final items = data.map((e) => Item.fromMap(e)).toList();
+      items.sort((a, b) => a.price.compareTo(b.price));
+      return items;
     } else {
       return []; // 404나 오류 시 빈 리스트 반환
     }
@@ -385,7 +387,9 @@ Future<List<Item>> readShopList(int category) async {
 
     if (r.statusCode == 200) {
       final data = jsonDecode(r.body)['data'] as List;
-      return data.map((e) => Item.fromMap(e)).toList();
+      final items = data.map((e) => Item.fromMap(e)).toList();
+      items.sort((a, b) => a.price.compareTo(b.price));
+      return items;
     } else {
       return []; // 404나 오류 시 빈 리스트 반환
     }

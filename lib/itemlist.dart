@@ -113,93 +113,100 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              getThemedIcon(
-                                context,
-                                item.icon,
-                                width: 100,
-                                height: 100,
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "포만도 +${item.hunger}",
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        return ListTile(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "포만도 +${item.hunger}",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "행복도 +${item.happy}",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      item.itemText,
                                       style: TextStyle(fontSize: 16),
                                     ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
                                   ),
-                                  Expanded(
-                                    child: Text(
-                                      "행복도 +${item.happy}",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
+                                  TextButton(
+                                    child: Text('사용'),
+                                    onPressed: () async {
+                                      if (item.count > 0) {
+                                        setState(() {
+                                          item.count--;
+                                          widget.pet!.hunger += item.hunger;
+                                          widget.pet!.happy += item.happy;
+                                        });
+                                        // ✅ 현재 로그인한 사용자 uid 사용
+                                        final uid = FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid;
+                                        if (uid != null) {
+                                          await useItem(item.name);
+                                        }
+                                      }
+                                      Navigator.pop(context);
+                                    },
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              Text(
-                                item.itemText,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
+                            );
+                          },
+                          leading: getThemedIcon(
+                            context,
+                            item.icon,
+                            width: 30,
+                            height: 30,
                           ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                            TextButton(
-                              child: Text('사용'),
-                              onPressed: () async {
-                                if (item.count > 0) {
-                                  setState(() {
-                                    item.count--;
-                                    widget.pet!.hunger += item.hunger;
-                                    widget.pet!.happy += item.happy;
-                                  });
-                                  // ✅ 현재 로그인한 사용자 uid 사용
-                                  final uid =
-                                      FirebaseAuth.instance.currentUser?.uid;
-                                  if (uid != null) {
-                                    await useItem(item.name);
-                                  }
-                                }
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: getThemedIcon(
-                      context,
-                      item.icon,
-                      width: 30,
-                      height: 30,
+                          title: Text(
+                            item.name,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          trailing: Text(
+                            '${item.count}개',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      },
                     ),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text(
-                      '${item.count}개',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -341,90 +348,99 @@ class _ShoplistPage1State extends State<ShoplistPage1> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              getThemedIcon(
-                                context,
-                                item.icon,
-                                width: 100,
-                                height: 100,
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "포만도 +${item.hunger}",
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        return ListTile(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "포만도 +${item.hunger}",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            "행복도 +${item.happy}",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      '가격은 ${item.price}pt입니다.',
                                       style: TextStyle(fontSize: 16),
                                     ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () => Navigator.pop(context),
                                   ),
-                                  Expanded(
-                                    child: Text(
-                                      "행복도 +${item.happy}",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
+                                  TextButton(
+                                    child: Text('구매'),
+                                    onPressed: () async {
+                                      if (item.price <
+                                          widget.user.currentPoint) {
+                                        setState(() {
+                                          widget.user.currentPoint -=
+                                              item.price;
+                                          item.count++;
+                                        });
+                                        // ✅ 현재 로그인한 사용자 uid 사용
+                                        final uid = FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid;
+                                        if (uid != null) {
+                                          await buyItem(item.name);
+                                        }
+                                      }
+                                      Navigator.pop(context);
+                                    },
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              Text(
-                                '가격은 ${item.price}pt입니다.',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
+                            );
+                          },
+                          leading: getThemedIcon(
+                            context,
+                            item.icon,
+                            width: 30,
+                            height: 30,
                           ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('구매'),
-                              onPressed: () async {
-                                if (item.price < widget.user.currentPoint) {
-                                  setState(() {
-                                    widget.user.currentPoint -= item.price;
-                                    item.count++;
-                                  });
-                                  // ✅ 현재 로그인한 사용자 uid 사용
-                                  final uid =
-                                      FirebaseAuth.instance.currentUser?.uid;
-                                  if (uid != null) {
-                                    await buyItem(item.name);
-                                  }
-                                }
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: getThemedIcon(
-                      context,
-                      item.icon,
-                      width: 30,
-                      height: 30,
+                          title: Text(
+                            item.name,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          trailing: Text(
+                            '${item.price}pt',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      },
                     ),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text(
-                      '${item.price}pt',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -549,84 +565,91 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              getThemedIcon(
-                                context,
-                                item.icon,
-                                width: 100,
-                                height: 100,
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "행복도 +${item.happy}",
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        return ListTile(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "행복도 +${item.happy}",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      item.itemText,
                                       style: TextStyle(fontSize: 16),
                                     ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  TextButton(
+                                    child: Text('사용'),
+                                    onPressed: () async {
+                                      if (item.count > 0) {
+                                        setState(() {
+                                          item.count--;
+                                          widget.pet!.happy += item.happy;
+                                        });
+                                        // ✅ 현재 로그인한 사용자 uid 사용
+                                        final uid = FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid;
+                                        if (uid != null) {
+                                          await useItem(item.name);
+                                        }
+                                      }
+                                      Navigator.pop(context);
+                                    },
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              Text(
-                                item.itemText,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
+                            );
+                          },
+                          leading: getThemedIcon(
+                            context,
+                            item.icon,
+                            width: 30,
+                            height: 30,
                           ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('사용'),
-                              onPressed: () async {
-                                if (item.count > 0) {
-                                  setState(() {
-                                    item.count--;
-                                    widget.pet!.happy += item.happy;
-                                  });
-                                  // ✅ 현재 로그인한 사용자 uid 사용
-                                  final uid =
-                                      FirebaseAuth.instance.currentUser?.uid;
-                                  if (uid != null) {
-                                    await useItem(item.name);
-                                  }
-                                }
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: getThemedIcon(
-                      context,
-                      item.icon,
-                      width: 30,
-                      height: 30,
+                          title: Text(
+                            item.name,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          trailing: Text(
+                            '${item.count}개',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      },
                     ),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text(
-                      '${item.count}개',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -764,84 +787,93 @@ class _ShoplistPage2State extends State<ShoplistPage2> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  return ListTile(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: Center(child: Text(item.name)),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              getThemedIcon(
-                                context,
-                                item.icon,
-                                width: 100,
-                                height: 100,
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "행복도 +${item.happy}",
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        return ListTile(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Center(child: Text(item.name)),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    getThemedIcon(
+                                      context,
+                                      item.icon,
+                                      width: 100,
+                                      height: 100,
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "행복도 +${item.happy}",
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      '가격은 ${item.price}pt입니다.',
                                       style: TextStyle(fontSize: 16),
                                     ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text('취소'),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  TextButton(
+                                    child: Text('구매'),
+                                    onPressed: () async {
+                                      if (item.price <
+                                          widget.user.currentPoint) {
+                                        setState(() {
+                                          widget.user.currentPoint -=
+                                              item.price;
+                                          item.count++;
+                                        });
+                                        // ✅ 현재 로그인한 사용자 uid 사용
+                                        final uid = FirebaseAuth
+                                            .instance
+                                            .currentUser
+                                            ?.uid;
+                                        if (uid != null) {
+                                          await buyItem(item.name);
+                                        }
+                                      }
+                                      Navigator.pop(context);
+                                    },
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              Text(
-                                '가격은 ${item.price}pt입니다.',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
+                            );
+                          },
+                          leading: getThemedIcon(
+                            context,
+                            item.icon,
+                            width: 30,
+                            height: 30,
                           ),
-                          actions: [
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                            TextButton(
-                              child: Text('구매'),
-                              onPressed: () async {
-                                if (item.price < widget.user.currentPoint) {
-                                  setState(() {
-                                    widget.user.currentPoint -= item.price;
-                                    item.count++;
-                                  });
-                                  // ✅ 현재 로그인한 사용자 uid 사용
-                                  final uid =
-                                      FirebaseAuth.instance.currentUser?.uid;
-                                  if (uid != null) {
-                                    await buyItem(item.name);
-                                  }
-                                }
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    leading: getThemedIcon(
-                      context,
-                      item.icon,
-                      width: 30,
-                      height: 30,
+                          title: Text(
+                            item.name,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          trailing: Text(
+                            '${item.price}pt',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      },
                     ),
-                    title: Text(item.name, style: TextStyle(fontSize: 18)),
-                    trailing: Text(
-                      '${item.price}pt',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -970,73 +1002,79 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  final isHighlighted =
-                      item.name == nameChange(widget.user.setting['placeID']);
-                  return Container(
-                    color: isHighlighted
-                        ? (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey
-                              : Colors.yellow)
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if (!isHighlighted) {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Center(child: Text(item.name)),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  getThemedIcon(
-                                    context,
-                                    item.icon,
-                                    width: 100,
-                                    height: 100,
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        final isHighlighted =
+                            item.name ==
+                            nameChange(widget.user.setting['placeID']);
+                        return Container(
+                          color: isHighlighted
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey
+                                    : Colors.yellow)
+                              : Colors.transparent,
+                          child: ListTile(
+                            onTap: () {
+                              if (!isHighlighted) {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: Center(child: Text(item.name)),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        getThemedIcon(
+                                          context,
+                                          item.icon,
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          item.itemText,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('취소'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      TextButton(
+                                        child: Text('사용'),
+                                        onPressed: () async {
+                                          setState(() {
+                                            widget.user.setting['placeID'] =
+                                                "assets/images/${item.name}.png";
+                                          });
+                                          await usePlaceItem(item.name);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    item.itemText,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: Text('취소'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text('사용'),
-                                  onPressed: () async {
-                                    setState(() {
-                                      widget.user.setting['placeID'] =
-                                          "assets/images/${item.name}.png";
-                                    });
-                                    await usePlaceItem(item.name);
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
+                                );
+                              }
+                            },
+                            leading: getThemedIcon(
+                              context,
+                              item.icon,
+                              width: 30,
+                              height: 30,
                             ),
-                          );
-                        }
+                            title: Text(
+                              item.name,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        );
                       },
-                      leading: getThemedIcon(
-                        context,
-                        item.icon,
-                        width: 30,
-                        height: 30,
-                      ),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
                     ),
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -1178,79 +1216,86 @@ class _ShoplistPage3State extends State<ShoplistPage3> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  final check = (item.count != 0);
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        final check = (item.count != 0);
 
-                  return Container(
-                    color: check
-                        ? (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey
-                              : Colors.red)
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if (!check) {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Center(child: Text(item.name)),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  getThemedIcon(
-                                    context,
-                                    item.icon,
-                                    width: 100,
-                                    height: 100,
+                        return Container(
+                          color: check
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey
+                                    : Colors.red)
+                              : Colors.transparent,
+                          child: ListTile(
+                            onTap: () {
+                              if (!check) {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: Center(child: Text(item.name)),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        getThemedIcon(
+                                          context,
+                                          item.icon,
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          '가격은 ${item.price}pt입니다.',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('취소'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      TextButton(
+                                        child: Text('구매'),
+                                        onPressed: () async {
+                                          if (item.price <
+                                              widget.user.currentPoint) {
+                                            setState(() {
+                                              widget.user.currentPoint -=
+                                                  item.price;
+                                            });
+                                            // ✅ 현재 로그인한 사용자 uid 사용
+                                            await buyItem(item.name);
+                                          }
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    '가격은 ${item.price}pt입니다.',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: Text('취소'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text('구매'),
-                                  onPressed: () async {
-                                    if (item.price < widget.user.currentPoint) {
-                                      setState(() {
-                                        widget.user.currentPoint -= item.price;
-                                      });
-                                      // ✅ 현재 로그인한 사용자 uid 사용
-                                      await buyItem(item.name);
-                                    }
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
+                                );
+                              }
+                            },
+                            leading: getThemedIcon(
+                              context,
+                              item.icon,
+                              width: 30,
+                              height: 30,
                             ),
-                          );
-                        }
+                            title: Text(
+                              item.name,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            trailing: Text(
+                              '${item.price}pt',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        );
                       },
-                      leading: getThemedIcon(
-                        context,
-                        item.icon,
-                        width: 30,
-                        height: 30,
-                      ),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text(
-                        '${item.price}pt',
-                        style: TextStyle(fontSize: 16),
-                      ),
                     ),
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -1376,77 +1421,82 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  final isHighlighted = item.name == usedItem;
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        final isHighlighted = item.name == usedItem;
 
-                  return Container(
-                    color: isHighlighted
-                        ? (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey
-                              : Colors.yellow)
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if (!isHighlighted) {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Center(child: Text(item.name)),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  getThemedIcon(
-                                    context,
-                                    item.icon,
-                                    width: 100,
-                                    height: 100,
+                        return Container(
+                          color: isHighlighted
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey
+                                    : Colors.yellow)
+                              : Colors.transparent,
+                          child: ListTile(
+                            onTap: () {
+                              if (!isHighlighted) {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: Center(child: Text(item.name)),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        getThemedIcon(
+                                          context,
+                                          item.icon,
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          item.itemText,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('취소'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      TextButton(
+                                        child: Text('사용'),
+                                        onPressed: () async {
+                                          setState(() {
+                                            usedItem = item.name;
+                                          });
+                                          // ✅ 현재 로그인한 사용자 uid 사용
+                                          await useStyleItem(item.name);
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    item.itemText,
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: Text('취소'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text('사용'),
-                                  onPressed: () async {
-                                    setState(() {
-                                      usedItem = item.name;
-                                    });
-                                    // ✅ 현재 로그인한 사용자 uid 사용
-                                    await useStyleItem(item.name);
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
+                                );
+                              }
+                            },
+                            leading: getThemedIcon(
+                              context,
+                              item.icon,
+                              width: 30,
+                              height: 30,
                             ),
-                          );
-                        }
+                            title: Text(
+                              item.name,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            trailing: Text(
+                              '${item.count}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        );
                       },
-                      leading: getThemedIcon(
-                        context,
-                        item.icon,
-                        width: 30,
-                        height: 30,
-                      ),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text(
-                        '${item.count}',
-                        style: TextStyle(fontSize: 16),
-                      ),
                     ),
-                  );
-                },
-              ),
             ),
           ),
         ],
@@ -1584,77 +1634,84 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
             child: Container(
               padding: EdgeInsets.all(8.0),
               color: Theme.of(context).scaffoldBackgroundColor,
-              child: ListView.builder(
-                itemCount: inventory!.length,
-                itemBuilder: (context, index) {
-                  final item = inventory![index];
-                  final check = (item.count != 0);
-                  return Container(
-                    color: check
-                        ? (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.grey
-                              : Colors.red)
-                        : Colors.transparent,
-                    child: ListTile(
-                      onTap: () {
-                        if (!check) {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Center(child: Text(item.name)),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  getThemedIcon(
-                                    context,
-                                    item.icon,
-                                    width: 100,
-                                    height: 100,
+              child: (inventory == null)
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: inventory!.length,
+                      itemBuilder: (context, index) {
+                        final item = inventory![index];
+                        final check = (item.count != 0);
+                        return Container(
+                          color: check
+                              ? (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey
+                                    : Colors.red)
+                              : Colors.transparent,
+                          child: ListTile(
+                            onTap: () {
+                              if (!check) {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: Center(child: Text(item.name)),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        getThemedIcon(
+                                          context,
+                                          item.icon,
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          '가격은 ${item.price}pt입니다.',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('취소'),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      TextButton(
+                                        child: Text('구매'),
+                                        onPressed: () async {
+                                          if (item.price <
+                                              widget.user.currentPoint) {
+                                            setState(() {
+                                              widget.user.currentPoint -=
+                                                  item.price;
+                                            });
+                                            await buyItem(item.name);
+                                          }
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    '가격은 ${item.price}pt입니다.',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: Text('취소'),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                                TextButton(
-                                  child: Text('구매'),
-                                  onPressed: () async {
-                                    if (item.price < widget.user.currentPoint) {
-                                      setState(() {
-                                        widget.user.currentPoint -= item.price;
-                                      });
-                                      await buyItem(item.name);
-                                    }
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
+                                );
+                              }
+                            },
+                            leading: getThemedIcon(
+                              context,
+                              item.icon,
+                              width: 30,
+                              height: 30,
                             ),
-                          );
-                        }
+                            title: Text(
+                              item.name,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            trailing: Text(
+                              '${item.price}pt',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        );
                       },
-                      leading: getThemedIcon(
-                        context,
-                        item.icon,
-                        width: 30,
-                        height: 30,
-                      ),
-                      title: Text(item.name, style: TextStyle(fontSize: 18)),
-                      trailing: Text(
-                        '${item.price}pt',
-                        style: TextStyle(fontSize: 16),
-                      ),
                     ),
-                  );
-                },
-              ),
             ),
           ),
         ],
