@@ -171,10 +171,6 @@ class RootState extends State<Root> {
                   final petData = petSnap.data!.data()!;
                   final pet = Pets.fromMap(petData);
 
-                  void updatePet(String newPet) async {
-                    await userDocRef.update({'nowPet': newPet});
-                  }
-
                   return MyHomePage(
                     title: "Virtual Pet",
                     user: loadedUser,
@@ -186,7 +182,6 @@ class RootState extends State<Root> {
                     onSortingChanged: toggleSortingMethod,
                     onSoundEffectsChanged: toggleSoundEffects,
                     onPointsAdded: _onPointsAdded,
-                    updatePet: updatePet,
                   );
                 },
               );
@@ -209,7 +204,6 @@ class MyHomePage extends StatefulWidget {
   final Function(String) onSortingChanged;
   final Function(bool) onSoundEffectsChanged;
   final Function(int) onPointsAdded;
-  final Function(String) updatePet;
 
   const MyHomePage({
     required this.title,
@@ -222,7 +216,6 @@ class MyHomePage extends StatefulWidget {
     required this.onSortingChanged,
     required this.onSoundEffectsChanged,
     required this.onPointsAdded,
-    required this.updatePet,
     super.key,
   });
 
@@ -262,7 +255,6 @@ class _MyHomePageState extends State<MyHomePage> {
     switch (idx) {
       case 0:
         currentWidget = Petmain(
-          updatePet: widget.updatePet,
           onNext: goNext,
           pet: widget.pet,
           user: widget.user,
@@ -272,7 +264,6 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 1:
         currentWidget = ItemCategory(
-          updatePet: widget.updatePet,
           onNext: goNext,
           pet: widget.pet,
           user: widget.user,
@@ -280,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         break;
       case 2:
-        currentWidget = PetChoose(updatePet: widget.updatePet, onNext: goNext);
+        currentWidget = PetChoose(onNext: goNext);
         break;
       case 3:
         currentWidget = PlannerMain(
@@ -318,7 +309,6 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 5:
         currentWidget = ShopCategory(
-          updatePet: widget.updatePet,
           onNext: goNext,
           pet: widget.pet,
           user: widget.user,

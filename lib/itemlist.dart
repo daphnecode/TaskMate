@@ -27,13 +27,11 @@ String nameChange(String name) {
 }
 
 class ItemlistPage1 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ItemlistPage1({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -77,7 +75,6 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -245,13 +242,11 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
 }
 
 class ShoplistPage1 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ShoplistPage1({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -295,7 +290,6 @@ class _ShoplistPage1State extends State<ShoplistPage1> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -473,13 +467,11 @@ class _ShoplistPage1State extends State<ShoplistPage1> {
 }
 
 class ItemlistPage2 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ItemlistPage2({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -519,7 +511,6 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -678,13 +669,11 @@ class _ItemlistPage2State extends State<ItemlistPage2> {
 }
 
 class ShoplistPage2 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ShoplistPage2({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -724,7 +713,6 @@ class _ShoplistPage2State extends State<ShoplistPage2> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -896,13 +884,11 @@ class _ShoplistPage2State extends State<ShoplistPage2> {
 }
 
 class ItemlistPage3 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ItemlistPage3({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -946,7 +932,6 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -1094,13 +1079,11 @@ class _ItemlistPage3State extends State<ItemlistPage3> {
 }
 
 class ShoplistPage3 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ShoplistPage3({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -1144,7 +1127,6 @@ class _ShoplistPage3State extends State<ShoplistPage3> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -1311,13 +1293,11 @@ class _ShoplistPage3State extends State<ShoplistPage3> {
 }
 
 class ItemlistPage4 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ItemlistPage4({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -1358,7 +1338,6 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -1510,13 +1489,11 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
 }
 
 class ShoplistPage4 extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ShoplistPage4({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -1556,7 +1533,6 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -1721,13 +1697,11 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
 }
 
 class ItemCategory extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ItemCategory({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -1752,7 +1726,6 @@ class _ItemCategoryState extends State<ItemCategory> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -1805,7 +1778,6 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage1(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1836,7 +1808,6 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage2(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1873,7 +1844,6 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage3(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1904,7 +1874,6 @@ class _ItemCategoryState extends State<ItemCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ItemlistPage4(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -1973,13 +1942,11 @@ class _ItemCategoryState extends State<ItemCategory> {
 }
 
 class ShopCategory extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const ShopCategory({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -2004,7 +1971,6 @@ class _ShopCategoryState extends State<ShopCategory> {
               color: Theme.of(context).scaffoldBackgroundColor,
               child: Mainarea(
                 key: ValueKey(widget.pet!.name),
-                updatePet: widget.updatePet,
                 onNext: widget.onNext,
                 pet: widget.pet,
                 user: widget.user,
@@ -2070,7 +2036,6 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ShoplistPage1(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -2101,7 +2066,6 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ShoplistPage2(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -2138,7 +2102,6 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ShoplistPage3(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,
@@ -2169,7 +2132,6 @@ class _ShopCategoryState extends State<ShopCategory> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => ShoplistPage4(
-                                    updatePet: widget.updatePet,
                                     onNext: widget.onNext,
                                     pet: widget.pet,
                                     user: widget.user,

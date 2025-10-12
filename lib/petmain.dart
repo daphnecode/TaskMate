@@ -14,13 +14,11 @@ import 'run_game_screen.dart';
 
 // 화면 상단 구성
 class Mainarea extends StatefulWidget {
-  final Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   const Mainarea({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -68,10 +66,7 @@ class _MainareaState extends State<Mainarea> {
               final result = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => PetChoose(
-                    updatePet: widget.updatePet,
-                    onNext: widget.onNext,
-                  ),
+                  builder: (_) => PetChoose(onNext: widget.onNext),
                 ),
               );
               if (!mounted || result == null) return;
@@ -134,14 +129,12 @@ class _MainareaState extends State<Mainarea> {
 }
 
 class Petmain extends StatefulWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
   final Pets? pet;
   final Users user;
   final int pageType;
   final bool soundEffectsOn;
   const Petmain({
-    required this.updatePet,
     required this.onNext,
     required this.pet,
     required this.user,
@@ -222,7 +215,6 @@ class _PetmainState extends State<Petmain> {
                   ? const Center(child: CircularProgressIndicator())
                   : Mainarea(
                       key: ValueKey(widget.pet!.name),
-                      updatePet: widget.updatePet,
                       onNext: widget.onNext,
                       pet: widget.pet,
                       user: widget.user,

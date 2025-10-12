@@ -57,6 +57,7 @@ router.get("/items", async (req, res) => {
   }
 });
 
+// 아이템 구매하기.
 // POST /aLLitems/items
 router.post("/items/:userId", async (req, res) => {
   try {

@@ -94,9 +94,8 @@ class _Subarea1State extends State<Subarea1> {
 }
 
 class PetChoose extends StatelessWidget {
-  final void Function(String) updatePet;
   final void Function(int) onNext;
-  const PetChoose({required this.updatePet, required this.onNext, super.key});
+  const PetChoose({required this.onNext, super.key});
 
   @override
   Widget build(BuildContext context) {
