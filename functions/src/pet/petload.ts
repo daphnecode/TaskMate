@@ -6,9 +6,9 @@ import { Pet } from "../types/api.js";
 const router = express.Router();
 
 // ---------------------------
-// POST /users/:userId/pets
+// PATCH /users/:userId/nowPet
 // 새로운 펫 선택
-router.post("/:userId/nowPet", async (req, res) => {
+router.patch("/:userId/nowPet", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
     const { userId: uid } = req.params;
@@ -17,11 +17,11 @@ router.post("/:userId/nowPet", async (req, res) => {
     if (!petName) return res.status(400).json({ success: false, message: "petName is required" });
 
     const userRef = refUser(uid);
-    userRef.set({
+    userRef.update({
       nowPet: petName
     })
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
       message: "pet choose complete",
       petName: petName

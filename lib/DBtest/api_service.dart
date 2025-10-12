@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:taskmate/DBtest/task.dart';
-import '../object.dart';
+import 'package:taskmate/object.dart';
 
 // ️ 실제 프로젝트 ID로 교체
 const String baseUrl =
@@ -15,7 +15,6 @@ String _kstDateKey([DateTime? d]) {
   final day = now.day.toString().padLeft(2, '0');
   return '$y-$m-$day';
 }
-
 
 Future<Map<String, String>> _authHeaders() async {
   final user = FirebaseAuth.instance.currentUser;
@@ -84,7 +83,9 @@ String? _normalizeToKstDateKey(dynamic v) {
 
   // ISO 문자열
   if (v is String) {
-    try { dt = DateTime.parse(v).toUtc(); } catch (_) {}
+    try {
+      dt = DateTime.parse(v).toUtc();
+    } catch (_) {}
   }
 
   // epoch (ms/s)
@@ -133,9 +134,12 @@ Future<List<Map<String, dynamic>>> fetchRepeatListEnsured() async {
   }
 
   final obj = jsonDecode(r.body) as Map<String, dynamic>;
-  final List<Map<String, dynamic>> rows =
-  List<Map<String, dynamic>>.from(obj["data"] ?? []);
-  final meta = (obj["meta"] is Map) ? Map<String, dynamic>.from(obj["meta"]) : {};
+  final List<Map<String, dynamic>> rows = List<Map<String, dynamic>>.from(
+    obj["data"] ?? [],
+  );
+  final meta = (obj["meta"] is Map)
+      ? Map<String, dynamic>.from(obj["meta"])
+      : {};
   final lastKey = _normalizeToKstDateKey(meta["lastUpdated"]); // ← 핵심: 정규화
 
   // 2) "오늘 제출 여부" 확인 → 제출했으면 어떤 경우에도 초기화 금지
@@ -147,7 +151,7 @@ Future<List<Map<String, dynamic>>> fetchRepeatListEnsured() async {
         final saveUrl = Uri.parse("$baseUrl/repeatList/save/$uid");
         final body = jsonEncode({
           "tasks": rows,
-          "meta": {"lastUpdated": todayKey}
+          "meta": {"lastUpdated": todayKey},
         });
         await _postWithRetry(saveUrl, body);
       }
@@ -164,7 +168,7 @@ Future<List<Map<String, dynamic>>> fetchRepeatListEnsured() async {
     final saveUrl = Uri.parse("$baseUrl/repeatList/save/$uid");
     final body = jsonEncode({
       "tasks": cleared,
-      "meta": {"lastUpdated": todayKey}
+      "meta": {"lastUpdated": todayKey},
     });
 
     final saveResp = await _postWithRetry(saveUrl, body);
@@ -414,10 +418,7 @@ Future<void> gameRunReward() async {
   try {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final url = Uri.parse("$baseUrl/game/run/$uid");
-    final r = await http.patch(
-      url,
-      headers: await _authHeaders(),
-    );
+    final r = await http.patch(url, headers: await _authHeaders());
 
     if (r.statusCode == 200) {
       return jsonDecode(r.body);
@@ -433,15 +434,32 @@ Future<void> gameCleanReward() async {
   try {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final url = Uri.parse("$baseUrl/game/clean/$uid");
-    final r = await http.patch(
-      url,
-      headers: await _authHeaders(),
-    );
+    final r = await http.patch(url, headers: await _authHeaders());
 
     if (r.statusCode == 200) {
       return jsonDecode(r.body);
     } else {
       throw Exception("Failed to get reward: ${r.statusCode}, ${r.body}");
+    }
+  } catch (e) {
+    throw Exception("Error updating pet: $e");
+  }
+}
+
+Future<void> choosePet(String petName) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/users/$uid/nowPet");
+    final r = await http.patch(
+      url,
+      headers: await _authHeaders(),
+      body: json.encode({"petName": petName}),
+    );
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception("Failed to change pet: ${r.statusCode}, ${r.body}");
     }
   } catch (e) {
     throw Exception("Error updating pet: $e");

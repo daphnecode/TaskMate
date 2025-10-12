@@ -32,13 +32,7 @@ class RootState extends State<Root> {
   int _currentIndex = 0;
   StreamSubscription<User?>? _authSub;
 
-  Users user = Users(
-    currentPoint: 0,
-    gotPoint: 0,
-    nowPet: "",
-    setting: {},
-    statistics: {},
-  );
+  Users user = Users(currentPoint: 0, gotPoint: 0, nowPet: "", setting: {});
 
   bool isLoading = true;
 
@@ -65,13 +59,7 @@ class RootState extends State<Root> {
     if (uid == null) {
       // 로그인 안 된 상태 → 임시 기본값
       setState(() {
-        user = Users(
-          currentPoint: 0,
-          gotPoint: 0,
-          nowPet: "",
-          setting: {},
-          statistics: {},
-        );
+        user = Users(currentPoint: 0, gotPoint: 0, nowPet: "", setting: {});
         isLoading = false;
       });
       return;
@@ -86,13 +74,7 @@ class RootState extends State<Root> {
       if (doc1.exists) {
         user = Users.fromMap(doc1.data() as Map<String, dynamic>);
       } else {
-        user = Users(
-          currentPoint: 0,
-          gotPoint: 0,
-          nowPet: "",
-          setting: {},
-          statistics: {},
-        );
+        user = Users(currentPoint: 0, gotPoint: 0, nowPet: "", setting: {});
       }
       isLoading = false;
     });

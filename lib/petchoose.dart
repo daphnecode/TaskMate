@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:taskmate/DBtest/api_service.dart';
 
 class Mainarea1 extends StatelessWidget {
   const Mainarea1({super.key});
@@ -36,7 +37,8 @@ class _Subarea1State extends State<Subarea1> {
         Expanded(
           child: ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context, "dragon"); // ✅ Pets로 pop
+              await choosePet("dragon");
+              Navigator.pop(context); // ✅ Pets로 pop
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red[100]),
             child: Center(
@@ -53,7 +55,8 @@ class _Subarea1State extends State<Subarea1> {
         Expanded(
           child: ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context, "unicon");
+              await choosePet("unicon");
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green[100]),
             child: Center(
@@ -71,8 +74,8 @@ class _Subarea1State extends State<Subarea1> {
           child: ElevatedButton(
             onPressed: () async {
               // 필요하면 다른 펫 ID로 교체
-
-              Navigator.pop(context, "unicon");
+              await choosePet("unicon");
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100]),
             child: Center(

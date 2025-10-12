@@ -37,11 +37,16 @@ Row happyStatus(BuildContext context, int nowHappy) {
   );
 }
 
-class PetStatArea extends StatefulWidget{
+class PetStatArea extends StatefulWidget {
   final Pets? pet;
   final Users user;
   final int pageType;
-  const PetStatArea({required this.pet, required this.user, required this.pageType, super.key});
+  const PetStatArea({
+    required this.pet,
+    required this.user,
+    required this.pageType,
+    super.key,
+  });
 
   @override
   State<PetStatArea> createState() => _PetStatAreaState();
@@ -59,7 +64,7 @@ class _PetStatAreaState extends State<PetStatArea> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0),
               ),
-              child: PetStatus(pet: widget.pet, user: widget.user,),
+              child: PetStatus(pet: widget.pet, user: widget.user),
             );
           },
         );
@@ -70,12 +75,11 @@ class _PetStatAreaState extends State<PetStatArea> {
             children: [
               Expanded(
                 child: Text(
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold), 
-                  "LV ${widget.pet!.level}",),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  "LV ${widget.pet!.level}",
+                ),
               ),
-              Expanded(
-                child: happyStatus(context, widget.pet!.happy),
-              ),
+              Expanded(child: happyStatus(context, widget.pet!.happy)),
             ],
           ),
           Row(
@@ -84,14 +88,12 @@ class _PetStatAreaState extends State<PetStatArea> {
                 child: Container(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
-                    icon: Icon(Icons.question_mark,),
+                    icon: Icon(Icons.question_mark),
                     onPressed: () => showTutorial(context, widget.pageType),
-                    )
                   ),
+                ),
               ),
-              Expanded(
-                child: hungerStatus(context, widget.pet!.hunger),
-              ),
+              Expanded(child: hungerStatus(context, widget.pet!.hunger)),
             ],
           ),
         ],
@@ -100,7 +102,7 @@ class _PetStatAreaState extends State<PetStatArea> {
   }
 }
 
-class PetStatus extends StatelessWidget{
+class PetStatus extends StatelessWidget {
   final Pets? pet;
   final Users user;
   const PetStatus({required this.pet, required this.user, super.key});
@@ -110,7 +112,7 @@ class PetStatus extends StatelessWidget{
   */
   @override
   Widget build(BuildContext context) {
-    double progress = pet!.currentExp / petLevelTable[pet!.level-1].expToNext;
+    double progress = pet!.currentExp / petLevelTable[pet!.level - 1].expToNext;
     return Padding(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -130,20 +132,24 @@ class PetStatus extends StatelessWidget{
                 child: Column(
                   children: [
                     Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 8,
-                          backgroundColor: Colors.white,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 8,
+                            backgroundColor: Colors.white,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.blue,
+                            ),
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 4),
-                    ],
-                  ),
-                    Text("${pet!.currentExp}/${petLevelTable[pet!.level-1].expToNext}"),
+                        SizedBox(width: 4),
+                      ],
+                    ),
+                    Text(
+                      "${pet!.currentExp}/${petLevelTable[pet!.level - 1].expToNext}",
+                    ),
                   ],
                 ),
               ),
@@ -151,50 +157,101 @@ class PetStatus extends StatelessWidget{
           ),
           Row(
             children: [
-              Expanded(child: getThemedIcon(context, "assets/icons/icon-heart.png")),
+              Expanded(
+                child: getThemedIcon(context, "assets/icons/icon-heart.png"),
+              ),
               Expanded(child: Text("${pet!.happy}/100")),
-              Expanded(child: getThemedIcon(context, "assets/icons/icon-chickenalt.png")),
+              Expanded(
+                child: getThemedIcon(
+                  context,
+                  "assets/icons/icon-chickenalt.png",
+                ),
+              ),
               Expanded(child: Text("${pet!.hunger}/100")),
             ],
           ),
-          SizedBox(height: 40,),
+          SizedBox(height: 40),
           /*
           사용자의 통계 정보로 갱신하기.
           */
           Row(
             children: [
-              Expanded(child: Text("총 달린 거리", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text('${user.statistics['distance']}', style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(child: Text("총 달린 거리", style: TextStyle(fontSize: 16))),
+              Expanded(
+                child: Text(
+                  '1600m',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.end,
+                ),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: Text("행복도 증가 횟수", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text('${user.statistics['doCount']}', style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(
+                child: Text("행복도 증가 횟수", style: TextStyle(fontSize: 16)),
+              ),
+              Expanded(
+                child: Text(
+                  '1',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.end,
+                ),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: Text("먹이 준 횟수", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text('${user.statistics['feedCount']}', style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(child: Text("먹이 준 횟수", style: TextStyle(fontSize: 16))),
+              Expanded(
+                child: Text(
+                  '2',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.end,
+                ),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: Text("가장 많이 준 먹이", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("딸기", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(
+                child: Text("가장 많이 준 먹이", style: TextStyle(fontSize: 16)),
+              ),
+              Expanded(
+                child: Text(
+                  "딸기",
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.end,
+                ),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: Text("경험치 총 획득량", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("${user.gotPoint}pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(
+                child: Text("경험치 총 획득량", style: TextStyle(fontSize: 16)),
+              ),
+              Expanded(
+                child: Text(
+                  "${user.gotPoint}pt",
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.end,
+                ),
+              ),
             ],
           ),
           Row(
             children: [
-              Expanded(child: Text("포인트 총 소비량", style: TextStyle(fontSize: 16),)),
-              Expanded(child: Text("${user.gotPoint - user.currentPoint}pt", style: TextStyle(fontSize: 16), textAlign: TextAlign.end,)),
+              Expanded(
+                child: Text("포인트 총 소비량", style: TextStyle(fontSize: 16)),
+              ),
+              Expanded(
+                child: Text(
+                  "${user.gotPoint - user.currentPoint}pt",
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.end,
+                ),
+              ),
             ],
           ),
           SizedBox(height: 20.0),

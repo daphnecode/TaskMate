@@ -77,7 +77,6 @@ class _MainareaState extends State<Mainarea> {
               if (!mounted || result == null) return;
 
               // 즉시 반영
-              widget.updatePet(result);
             },
             child: AspectRatio(
               aspectRatio: 1 / 1,
@@ -362,7 +361,7 @@ class _PetmainState extends State<Petmain> {
                                           Navigator.pop(context);
                                           widget.onNext(index);
                                         },
-					pet: widget.pet,
+                                        pet: widget.pet,
                                         soundEffectsOn: widget.soundEffectsOn,
                                         uid: uid, // ✅ 하드코딩 제거
                                         petId: petId,
