@@ -16,7 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool isLogin = true;      // true: 로그인, false: 회원가입
+  bool isLogin = true; // true: 로그인, false: 회원가입
   bool isLoading = false;
   bool _obscure = true;
 
@@ -31,7 +31,9 @@ class _LoginPageState extends State<LoginPage> {
   /// - 신규 계정: 기본 문서/컬렉션 시드 생성
   /// - 기존 계정: lastLoginAt 갱신 + 누락 필드만 보완(덮어쓰기 금지)
   Future<void> _bootstrapUserDoc(User user, {required String provider}) async {
-    final usersDoc = FirebaseFirestore.instance.collection('Users').doc(user.uid);
+    final usersDoc = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid);
     final snap = await usersDoc.get().timeout(const Duration(seconds: 10));
 
     if (!snap.exists) {
@@ -106,9 +108,7 @@ class _LoginPageState extends State<LoginPage> {
     final todayId = DateTime.now().toIso8601String().substring(0, 10);
     final daily = userRef.collection('dailyTasks').doc(todayId);
     if (!(await daily.get()).exists) {
-      await daily.set({
-        'tasks': <dynamic>[],
-      });
+      await daily.set({'tasks': <dynamic>[]});
     }
 
     // log/first (선택)
@@ -137,21 +137,23 @@ class _LoginPageState extends State<LoginPage> {
     final users = FirebaseFirestore.instance.collection('Users');
     final userDoc = users.doc(uid);
     final snap = await userDoc.get();
-    final data = (snap.data() as Map<String, dynamic>?) ?? {};
+    final data = snap.data() ?? {};
 
     final Map<String, dynamic> patch = {};
     if (!data.containsKey('currentPoint')) patch['currentPoint'] = 0;
-    if (!data.containsKey('gotPoint'))     patch['gotPoint'] = 0;
-    if (!data.containsKey('nowPet'))       patch['nowPet'] = 'dragon';
+    if (!data.containsKey('gotPoint')) patch['gotPoint'] = 0;
+    if (!data.containsKey('nowPet')) patch['nowPet'] = 'dragon';
 
     final setting = Map<String, dynamic>.from(data['setting'] ?? {});
     final Map<String, dynamic> settingPatch = {};
     if (!setting.containsKey('darkMode')) settingPatch['darkMode'] = false;
-    if (!setting.containsKey('push'))     settingPatch['push'] = false;
+    if (!setting.containsKey('push')) settingPatch['push'] = false;
     if (!setting.containsKey('listSort')) settingPatch['listSort'] = 'default';
-    if (!setting.containsKey('sound'))    settingPatch['sound'] = true;
-    if (!setting.containsKey('placeID'))  settingPatch['placeID'] = 'assets/images/prairie.png';
-    if (settingPatch.isNotEmpty) patch['setting'] = {...setting, ...settingPatch};
+    if (!setting.containsKey('sound')) settingPatch['sound'] = true;
+    if (!setting.containsKey('placeID'))
+      settingPatch['placeID'] = 'assets/images/prairie.png';
+    if (settingPatch.isNotEmpty)
+      patch['setting'] = {...setting, ...settingPatch};
 
     if (patch.isNotEmpty) {
       await userDoc.set(patch, SetOptions(merge: true));
@@ -176,7 +178,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInAnonymously() async {
     setState(() => isLoading = true);
     try {
-      final cred = await _auth.signInAnonymously().timeout(const Duration(seconds: 10));
+      final cred = await _auth.signInAnonymously().timeout(
+        const Duration(seconds: 10),
+      );
       final user = cred.user;
       if (user == null) {
         throw FirebaseAuthException(code: 'unknown', message: '익명 로그인 실패');
@@ -185,10 +189,10 @@ class _LoginPageState extends State<LoginPage> {
       // 화면 전환은 상위(authStateChanges)에서 처리
     } on TimeoutException {
       _showError('요청이 지연됩니다. 네트워크를 확인해주세요.');
-    } on FirebaseException catch (e) {
-      _showError('Firebase 오류: ${e.message ?? e.code}');
     } on FirebaseAuthException catch (e) {
       _showError(e.message ?? '익명 로그인 오류');
+    } on FirebaseException catch (e) {
+      _showError('Firebase 오류: ${e.message ?? e.code}');
     } catch (e) {
       _showError('알 수 없는 오류: $e');
     } finally {
@@ -219,7 +223,10 @@ class _LoginPageState extends State<LoginPage> {
 
         final user = cred.user;
         if (user == null) {
-          throw FirebaseAuthException(code: 'unknown', message: '로그인 실패: 사용자 없음');
+          throw FirebaseAuthException(
+            code: 'unknown',
+            message: '로그인 실패: 사용자 없음',
+          );
         }
 
         await user.reload().timeout(const Duration(seconds: 10));
@@ -242,7 +249,10 @@ class _LoginPageState extends State<LoginPage> {
 
         final user = cred.user;
         if (user == null) {
-          throw FirebaseAuthException(code: 'unknown', message: '회원가입 실패: 사용자 없음');
+          throw FirebaseAuthException(
+            code: 'unknown',
+            message: '회원가입 실패: 사용자 없음',
+          );
         }
 
         await _maybeSendVerificationEmail(user);
@@ -251,10 +261,10 @@ class _LoginPageState extends State<LoginPage> {
       }
     } on TimeoutException {
       _showError('요청이 지연됩니다. 네트워크를 확인해주세요.');
-    } on FirebaseException catch (e) {
-      _showError('Firebase 오류: ${e.message ?? e.code}');
     } on FirebaseAuthException catch (e) {
       _showError(e.message ?? '로그인/회원가입 오류');
+    } on FirebaseException catch (e) {
+      _showError('Firebase 오류: ${e.message ?? e.code}');
     } catch (e) {
       _showError('알 수 없는 오류: $e');
     } finally {
@@ -263,16 +273,23 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _maybeSendVerificationEmail(User? user) async {
-    try { await user?.sendEmailVerification(); } catch (_) {}
+    try {
+      await user?.sendEmailVerification();
+    } catch (_) {}
   }
 
-  Future<void> _showVerifyDialog({required bool emailSent, required String email}) async {
+  Future<void> _showVerifyDialog({
+    required bool emailSent,
+    required String email,
+  }) async {
     if (!mounted) return;
     await showDialog<void>(
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text('이메일 인증이 필요합니다'),
           content: Text(
             emailSent
@@ -310,8 +327,9 @@ class _LoginPageState extends State<LoginPage> {
     return InputDecoration(
       labelText: label,
       filled: true,
-      fillColor: base.colorScheme.surface
-          .withOpacity(base.brightness == Brightness.dark ? 0.35 : 0.9),
+      fillColor: base.colorScheme.surface.withOpacity(
+        base.brightness == Brightness.dark ? 0.35 : 0.9,
+      ),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -388,8 +406,13 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: _inputDeco(
                             '비밀번호',
                             suffix: IconButton(
-                              icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
-                              onPressed: () => setState(() => _obscure = !_obscure),
+                              icon: Icon(
+                                _obscure
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                              ),
+                              onPressed: () =>
+                                  setState(() => _obscure = !_obscure),
                               tooltip: _obscure ? '표시' : '숨기기',
                             ),
                           ),
@@ -414,7 +437,10 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               child: Text(
                                 submitText,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),
@@ -423,12 +449,17 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             height: 48,
                             child: OutlinedButton(
-                              onPressed: () => setState(() => isLogin = !isLogin),
+                              onPressed: () =>
+                                  setState(() => isLogin = !isLogin),
                               style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
-                                side: BorderSide(color: base.colorScheme.primary.withOpacity(0.35)),
+                                side: BorderSide(
+                                  color: base.colorScheme.primary.withOpacity(
+                                    0.35,
+                                  ),
+                                ),
                               ),
                               child: Text(
                                 toggleText,
@@ -440,7 +471,10 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          Opacity(opacity: 0.5, child: Divider(color: base.dividerColor)),
+                          Opacity(
+                            opacity: 0.5,
+                            child: Divider(color: base.dividerColor),
+                          ),
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,

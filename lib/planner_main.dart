@@ -54,10 +54,10 @@ class _PlannerMainState extends State<PlannerMain> {
   int _calcEarnedPointsForToday() {
     int sum = 0;
     for (final t in todayTaskList) {
-      if (t.isChecked) sum += (t.point ?? 0).toInt();
+      if (t.isChecked) sum += (t.point).toInt();
     }
     for (final t in repeatTaskList) {
-      if (t.isChecked) sum += (t.point ?? 0).toInt();
+      if (t.isChecked) sum += (t.point).toInt();
     }
     return sum;
   }
@@ -85,9 +85,9 @@ class _PlannerMainState extends State<PlannerMain> {
       setState(() {
         tasklist[index] = old;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('체크 저장 실패: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('체크 저장 실패: $e')));
     }
   }
 
@@ -122,9 +122,9 @@ class _PlannerMainState extends State<PlannerMain> {
       setState(() {
         taskList[index] = old;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('포인트 저장 실패: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('포인트 저장 실패: $e')));
     }
   }
 
@@ -137,9 +137,9 @@ class _PlannerMainState extends State<PlannerMain> {
       ]);
     } catch (e) {
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('저장 실패: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('저장 실패: $e')));
     }
   }
 
@@ -148,16 +148,16 @@ class _PlannerMainState extends State<PlannerMain> {
 
     final uid = userId ?? FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인이 필요합니다.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('로그인이 필요합니다.')));
       return;
     }
 
     if (_isSubmitted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("이미 제출하였습니다.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("이미 제출하였습니다.")));
       return;
     }
 
@@ -166,8 +166,14 @@ class _PlannerMainState extends State<PlannerMain> {
       builder: (ctx) => AlertDialog(
         content: const Text('정말 제출하겠습니까?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('예')),
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('아니요')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('예'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('아니요'),
+          ),
         ],
       ),
     );
@@ -181,9 +187,9 @@ class _PlannerMainState extends State<PlannerMain> {
       // ✅ 서버 기준 중복 제출 검사
       final latest = await api.readDailyWithMeta(dateKey);
       if (latest.submitted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("이미 제출하였습니다.")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("이미 제출하였습니다.")));
         setState(() => _isSubmitted = true);
         return;
       }
@@ -199,7 +205,9 @@ class _PlannerMainState extends State<PlannerMain> {
 
       // 3) EXP → 포인트 순서 (데이터 불일치 방지)
       if (earned > 0) {
-        final functions = FirebaseFunctions.instanceFor(region: kFunctionsRegion);
+        final functions = FirebaseFunctions.instanceFor(
+          region: kFunctionsRegion,
+        );
         final expFn = functions.httpsCallable('submitPetExpAN3');
         final rewardFn = functions.httpsCallable('submitRewardAN3');
 
@@ -218,11 +226,7 @@ class _PlannerMainState extends State<PlannerMain> {
         } catch (_) {}
 
         // 포인트 다음
-        await rewardFn.call({
-          'uid': uid,
-          'earned': earned,
-          'dateKey': dateKey,
-        });
+        await rewardFn.call({'uid': uid, 'earned': earned, 'dateKey': dateKey});
 
         // UI 포인트 반영 (성공 후)
         widget.onPointsAdded?.call(earned);
@@ -233,15 +237,15 @@ class _PlannerMainState extends State<PlannerMain> {
 
       if (!mounted) return;
       setState(() => _isSubmitted = true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("제출 완료!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("제출 완료!")));
     } catch (e) {
       final msg = e.toString();
       if (msg.contains("이미 제출했습니다")) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("이미 제출하였습니다.")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("이미 제출하였습니다.")));
         setState(() => _isSubmitted = true);
       } else {
         showDialog(
@@ -277,15 +281,18 @@ class _PlannerMainState extends State<PlannerMain> {
     });
 
     // 오늘 리스트 + 제출 여부
-    api.readDailyWithMeta(dateKey).then((res) {
-      if (!mounted) return;
-      setState(() {
-        todayTaskList = res.tasks;
-        _isSubmitted = res.submitted;
-      });
-    }).catchError((e) {
-      
-    });
+    api
+        .readDailyWithMeta(dateKey)
+        .then((res) {
+          if (!mounted) return;
+          setState(() {
+            todayTaskList = res.tasks;
+            _isSubmitted = res.submitted;
+          });
+        })
+        .catchError((e) {
+          
+        });
 
     // 방문 로그
     FirebaseFirestore.instance
@@ -296,22 +303,27 @@ class _PlannerMainState extends State<PlannerMain> {
         .set({'visited': true}, SetOptions(merge: true));
 
     // 반복 리스트 로드
-    api.fetchRepeatListEnsured().then((rows) {
-      if (!mounted) return;
-      setState(() {
-        repeatTaskList = rows
-            .map((e) => Task(
-          text: e['text'] ?? '',
-          point: (e['point'] ?? 0) is int
-              ? (e['point'] ?? 0) as int
-              : (e['point'] ?? 0).toInt(),
-          isChecked: e['isChecked'] ?? false,
-        ))
-            .toList();
-      });
-    }).catchError((e) {
-      
-    });
+    api
+        .fetchRepeatListEnsured()
+        .then((rows) {
+          if (!mounted) return;
+          setState(() {
+            repeatTaskList = rows
+                .map(
+                  (e) => Task(
+                    text: e['text'] ?? '',
+                    point: (e['point'] ?? 0) is int
+                        ? (e['point'] ?? 0) as int
+                        : (e['point'] ?? 0).toInt(),
+                    isChecked: e['isChecked'] ?? false,
+                  ),
+                )
+                .toList();
+          });
+        })
+        .catchError((e) {
+          
+        });
   }
 
   @override
@@ -363,9 +375,7 @@ class _PlannerMainState extends State<PlannerMain> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const StatisticsPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const StatisticsPage()),
               );
             },
             icon: const Icon(Icons.pie_chart),
@@ -382,64 +392,15 @@ class _PlannerMainState extends State<PlannerMain> {
       ),
       body: showFullRepeat
           ? RepeatTaskFullScreen(
-        taskList: repeatTaskList,
-        onToggleCheck: (index) {
-          if (!_isSubmitted) {
-            toggleCheck(repeatTaskList, index);
-          }
-        },
-        onCollapse: () {
-          setState(() {
-            showFullRepeat = false;
-          });
-        },
-        onEditPoints: () => toggleEditingMode(repeatTaskList),
-        onEditPoint: (index, newPoint) =>
-            updatePoint(repeatTaskList, index, newPoint),
-        onStartEditing: (index) {
-          setState(() {
-            repeatTaskList[index] =
-                repeatTaskList[index].copyWith(isEditing: true);
-          });
-        },
-      )
-          : showFullToday
-          ? TodayTaskFullScreen(
-        taskList: todayTaskList,
-        onToggleCheck: (index) {
-          if (!_isSubmitted) {
-            toggleCheck(todayTaskList, index);
-          }
-        },
-        onCollapse: () {
-          setState(() {
-            showFullToday = false;
-          });
-        },
-        onEditPoints: () => toggleEditingMode(todayTaskList),
-        onEditPoint: (index, newPoint) =>
-            updatePoint(todayTaskList, index, newPoint),
-        onStartEditing: (index) {
-          setState(() {
-            todayTaskList[index] =
-                todayTaskList[index].copyWith(isEditing: true);
-          });
-        },
-      )
-          : Column(
-        children: [
-          Expanded(
-            flex: 2,
-            child: RepeatTaskBox(
               taskList: repeatTaskList,
               onToggleCheck: (index) {
                 if (!_isSubmitted) {
                   toggleCheck(repeatTaskList, index);
                 }
               },
-              onExpand: () {
+              onCollapse: () {
                 setState(() {
-                  showFullRepeat = true;
+                  showFullRepeat = false;
                 });
               },
               onEditPoints: () => toggleEditingMode(repeatTaskList),
@@ -447,25 +408,23 @@ class _PlannerMainState extends State<PlannerMain> {
                   updatePoint(repeatTaskList, index, newPoint),
               onStartEditing: (index) {
                 setState(() {
-                  repeatTaskList[index] = repeatTaskList[index]
-                      .copyWith(isEditing: true);
+                  repeatTaskList[index] = repeatTaskList[index].copyWith(
+                    isEditing: true,
+                  );
                 });
               },
-              sortingMethod: widget.sortingMethod,
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: TodayTaskBox(
+            )
+          : showFullToday
+          ? TodayTaskFullScreen(
               taskList: todayTaskList,
               onToggleCheck: (index) {
                 if (!_isSubmitted) {
                   toggleCheck(todayTaskList, index);
                 }
               },
-              onExpand: () {
+              onCollapse: () {
                 setState(() {
-                  showFullToday = true;
+                  showFullToday = false;
                 });
               },
               onEditPoints: () => toggleEditingMode(todayTaskList),
@@ -473,15 +432,70 @@ class _PlannerMainState extends State<PlannerMain> {
                   updatePoint(todayTaskList, index, newPoint),
               onStartEditing: (index) {
                 setState(() {
-                  todayTaskList[index] = todayTaskList[index]
-                      .copyWith(isEditing: true);
+                  todayTaskList[index] = todayTaskList[index].copyWith(
+                    isEditing: true,
+                  );
                 });
               },
-              sortingMethod: widget.sortingMethod,
+            )
+          : Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: RepeatTaskBox(
+                    taskList: repeatTaskList,
+                    onToggleCheck: (index) {
+                      if (!_isSubmitted) {
+                        toggleCheck(repeatTaskList, index);
+                      }
+                    },
+                    onExpand: () {
+                      setState(() {
+                        showFullRepeat = true;
+                      });
+                    },
+                    onEditPoints: () => toggleEditingMode(repeatTaskList),
+                    onEditPoint: (index, newPoint) =>
+                        updatePoint(repeatTaskList, index, newPoint),
+                    onStartEditing: (index) {
+                      setState(() {
+                        repeatTaskList[index] = repeatTaskList[index].copyWith(
+                          isEditing: true,
+                        );
+                      });
+                    },
+                    sortingMethod: widget.sortingMethod,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: TodayTaskBox(
+                    taskList: todayTaskList,
+                    onToggleCheck: (index) {
+                      if (!_isSubmitted) {
+                        toggleCheck(todayTaskList, index);
+                      }
+                    },
+                    onExpand: () {
+                      setState(() {
+                        showFullToday = true;
+                      });
+                    },
+                    onEditPoints: () => toggleEditingMode(todayTaskList),
+                    onEditPoint: (index, newPoint) =>
+                        updatePoint(todayTaskList, index, newPoint),
+                    onStartEditing: (index) {
+                      setState(() {
+                        todayTaskList[index] = todayTaskList[index].copyWith(
+                          isEditing: true,
+                        );
+                      });
+                    },
+                    sortingMethod: widget.sortingMethod,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).cardColor,
         elevation: 0,

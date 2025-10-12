@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:taskmate/object.dart';
 import 'task.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
