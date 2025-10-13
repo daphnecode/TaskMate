@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, refUser, refPets } from "./refAPI.js";
+import { verifyToken, refUser, refPets } from "./refAPI";
 import { Pet } from "../types/api.js";
 
 
