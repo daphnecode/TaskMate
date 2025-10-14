@@ -14,7 +14,7 @@ export const submitRewardAN3 = onCall(
   async (req) => {
     const uid = (req.auth?.uid as string) || (req.data.uid as string);
     const earned = Number(req.data.earned);
-    const dateKey = String(req.data.dateKey);
+    const dateKey = req.data?.dateKey != null ? String(req.data.dateKey) : "";
 
     if (!uid || !Number.isFinite(earned) || !dateKey) {
       throw new HttpsError("invalid-argument", "uid, earned, dateKey are required");
