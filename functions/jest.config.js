@@ -10,5 +10,7 @@ export default {
     '^\\.\\/firebase(?:\\.js)?$': '<rootDir>/src/__mocks__/firebase.js',
     // 테스트에서 '../src/firebase' import 도 같은 mock으로 보냄
     '^\\.\\.\\/src\\/firebase$': '<rootDir>/src/__mocks__/firebase.js',
+    // daily_function.ts 처럼 상위로 올라가서 '../firebase' 또는 '../firebase.js'
+        '^\\.\\.\\/firebase(?:\\.js)?$': '<rootDir>/src/__mocks__/firebase.js',
   },
 };
