@@ -12,5 +12,6 @@ export default {
     '^\\.\\.\\/src\\/firebase$': '<rootDir>/src/__mocks__/firebase.js',
     // daily_function.ts 처럼 상위로 올라가서 '../firebase' 또는 '../firebase.js'
         '^\\.\\.\\/firebase(?:\\.js)?$': '<rootDir>/src/__mocks__/firebase.js',
+        '^\\.\\/pet\\/levelExp\\.js$': '<rootDir>/src/pet/levelExp.ts',
   },
 };

@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 import { db } from "./firebase.js";
-import { getLevelExp } from "./pet/levelExp.js";
+import { getLevelExp } from "./pet/levelExp";
 import { FieldValue } from "firebase-admin/firestore";
 
 export const submitPetExpAN3 = onCall(
