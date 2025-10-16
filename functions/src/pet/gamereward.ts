@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, refUser } from "./refAPI.js";
+import { verifyToken, refUser } from "./refAPI";
 
 const router = express.Router();
 
