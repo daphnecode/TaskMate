@@ -13,7 +13,6 @@ import type { Transaction, UpdateData, DocumentData } from "firebase-admin/fires
 
 import { db } from "./firebase.js";
 import repeatRouter from "./planner/repeat_function.js";
-// import plannerRouter from "./planner/planner_function.js";
 import dailyRouter from "./planner/daily_function.js";
 import petRouter from "./pet/petload.js";
 import itemRouter from "./pet/itemload.js";
@@ -35,7 +34,6 @@ app.use(express.json());
 // - /dailyList/...   (노션 스펙 호환: /dailyList/add/:userId)
 
 app.use("/daily", dailyRouter);
-// app.use("/planner", plannerRouter);
 app.use("/repeatList", repeatRouter);
 
 app.use("/users", petRouter);

@@ -1,6 +1,6 @@
 import express from "express";
-import { verifyToken, refUser, refItem, refShop, refShopItem } from "./refAPI.js";
-import { Item } from "../types/api.js";
+import { verifyToken, refUser, refItem, refShop, refShopItem } from "./refAPI";
+import { Item } from "../types/api";
 
 const router = express.Router();
 
