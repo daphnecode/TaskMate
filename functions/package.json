@@ -1,6 +1,6 @@
 {
   "name": "functions",
-  "type": "module",
+  "type": "commonjs",
   "main": "lib/index.js",
   "engines": {
     "node": "22"

@@ -1,6 +1,7 @@
 import express from "express";
 import { getAuth } from "firebase-admin/auth";
 import { db } from "../firebase.js";
+import { FieldValue } from "firebase-admin/firestore";
 
 const router = express.Router();
 
@@ -260,7 +261,9 @@ router.delete("/delete/:userId/:dateKey/:todoId", async (req, res) => {
 });
 
 /** SUBMIT: POST /daily/submit/:userId/:dateKey
- * 제출 플래그/제출일 기록
+ * - dailyTasks/meta.submitted=true (기존 유지)
+ * - 🔥 log/{dateKey}에 제출 필드 기록(merge) → onTaskSubmitted 트리거용
+ * - 완료/전체 개수는 서버에서 dailyTasks + repeatTasks 합쳐 계산
  */
 router.post("/submit/:userId/:dateKey", async (req, res) => {
   try {
@@ -270,11 +273,58 @@ router.post("/submit/:userId/:dateKey", async (req, res) => {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
-    const docRef = refDaily(uid, dateKey);
-    await docRef.set(
-      { meta: { submitted: true, lastSubmit: dateKey, lastUpdated: kstNowISO() } },
-      { merge: true }
-    );
+    const dailyRef  = refDaily(uid, dateKey);
+    const repeatRef = db.collection("Users").doc(uid)
+                        .collection("repeatTasks").doc("default");
+    const logRef    = db.collection("Users").doc(uid)
+                        .collection("log").doc(dateKey);
+
+    await db.runTransaction(async (tx) => {
+      // 1) 오늘 daily/repeat/log 읽기
+      const [dailySnap, repeatSnap, logSnap] = await Promise.all([
+        tx.get(dailyRef),
+        tx.get(repeatRef),
+        tx.get(logRef),
+      ]);
+
+      const dailyList  = Array.isArray(dailySnap.data()?.tasks) ? dailySnap.data()!.tasks : [];
+      const repeatList = Array.isArray(repeatSnap.data()?.tasks) ? repeatSnap.data()!.tasks : [];
+
+      // 2) 완료/전체 계산
+      const all = [...dailyList, ...repeatList];
+      const completedCount = all.filter((t:any) => !!(t?.isChecked ?? t?.todoCheck)).length;
+      const totalTasks     = all.length;
+
+      // 3) daily/meta 제출 플래그 (기존 기능 유지)
+      const prevMeta = (dailySnap.data()?.meta ?? {}) as any;
+      const newMeta = {
+        ...prevMeta,
+        submitted: true,
+        lastSubmit: dateKey,
+        lastUpdated: kstNowISO(),
+      };
+      tx.set(dailyRef, { tasks: dailyList, meta: newMeta }, { merge: true });
+
+      // 4) log 제출 필드 기록 (merge)
+      const alreadyCreditedExists =
+        logSnap.exists && typeof (logSnap.data() as any)?.creditedCompleted === "number";
+
+      const baseLog = {
+        submitted: true,
+        completedCount,
+        totalTasks,
+        submittedAt: FieldValue.serverTimestamp(),
+        submittedAtKST: kstNowISO(),
+        visited: true,
+      };
+
+      // 처음 제출일 때만 creditedCompleted: 0 세팅 (멱등성)
+      if (!alreadyCreditedExists) {
+        tx.set(logRef, { ...baseLog, creditedCompleted: 0 }, { merge: true });
+      } else {
+        tx.set(logRef, baseLog, { merge: true });
+      }
+    });
 
     return res.json({ success: true, message: "daily submit complete" });
   } catch (e: any) {
