@@ -5,7 +5,6 @@ const router = express.Router();
 
 
 router.patch("/run/:userId", async (req, res) => {
-  console.log("▶ /run/:userId 요청 도착:", req.method, req.path);
   try {
     const decoded = await verifyToken(req);
 

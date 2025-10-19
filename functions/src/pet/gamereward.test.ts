@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use("/game", router.default);
 
-describe("🐾 Pet Action API", () => {
+describe("장애물 달리기 경주 보상", () => {
   const mockUserId = "testUser";
 
   // 콘솔 로그/에러 숨김
@@ -36,9 +36,11 @@ describe("🐾 Pet Action API", () => {
   // ========================
   // ✅ PATCH /run/:userId
   // ========================
-  describe("PATCH /run/:userId", () => {
-    it("✅ should update pet happy+20 and hunger-20", async () => {
-      const mockPetSnap = { exists: true, data: () => ({ happy: 50, hunger: 70 }) };
+  describe("PATCH /game/run/:userId", () => {
+    it("✅펫 장애물 달리기 완수 보상. 행복도 20 증가 포만도 20 감소", async () => {
+      const mockPetSnap = { exists: true, 
+        data: () => ({ happy: 50, hunger: 70 }) 
+      };
       const mockPetRef = { get: jest.fn().mockResolvedValue(mockPetSnap), update: jest.fn() };
       const mockUserRef = {
         get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ nowPet: "petA" }) }),
@@ -48,7 +50,7 @@ describe("🐾 Pet Action API", () => {
       mockPetRef.get = jest.fn().mockResolvedValue(mockPetSnap);
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
-      const res = await request(app).patch(`/action/run/${mockUserId}`);
+      const res = await request(app).patch(`/game/run/${mockUserId}`);
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -57,23 +59,23 @@ describe("🐾 Pet Action API", () => {
       expect(mockPetRef.update).toHaveBeenCalledWith({ happy: 70, hunger: 50 });
     });
 
-    it("❌ should return 403 if uid mismatch", async () => {
+    it("❌사용자 id 불일치로 접근 금지", async () => {
       (verifyToken as jest.Mock).mockResolvedValue({ uid: "wrongUser" });
-      const res = await request(app).patch(`/action/run/${mockUserId}`);
+      const res = await request(app).patch(`/game/run/${mockUserId}`);
       expect(res.status).toBe(403);
       expect(res.body.message).toBe("Forbidden");
     });
 
-    it("❌ should return 400 if nowPet not set", async () => {
+    it("❌nowPet이 없을 때", async () => {
       const mockUserRef = { get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ nowPet: null }) }) };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
-      const res = await request(app).patch(`/action/run/${mockUserId}`);
+      const res = await request(app).patch(`/game/run/${mockUserId}`);
       expect(res.status).toBe(400);
       expect(res.body.message).toBe("nowPet not set");
     });
 
-    it("❌ should return 404 if pet not found", async () => {
+    it("❌펫이 존재하지 않을 때", async () => {
       const mockPetRef = { get: jest.fn().mockResolvedValue({ exists: false }) };
       const mockUserRef = {
         get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ nowPet: "petA" }) }),
@@ -82,14 +84,14 @@ describe("🐾 Pet Action API", () => {
       };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
-      const res = await request(app).patch(`/action/run/${mockUserId}`);
+      const res = await request(app).patch(`/game/run/${mockUserId}`);
       expect(res.status).toBe(404);
       expect(res.body.message).toBe("Pet not found");
     });
 
-    it("❌ should return 500 if token invalid", async () => {
+    it("❌사용자 인증 실패", async () => {
       (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
-      const res = await request(app).patch(`/action/run/${mockUserId}`);
+      const res = await request(app).patch(`/game/run/${mockUserId}`);
       expect(res.status).toBe(500);
       expect(res.body.message).toBe("Invalid token");
     });
@@ -98,8 +100,8 @@ describe("🐾 Pet Action API", () => {
   // ========================
   // ✅ PATCH /clean/:userId
   // ========================
-  describe("PATCH /clean/:userId", () => {
-    it("✅ should update pet happy+10", async () => {
+  describe("PATCH /game/clean/:userId", () => {
+    it("✅ 펫 청소 완수 보상. 행복도 10 증가", async () => {
       const mockPetSnap = { exists: true, data: () => ({ happy: 80 }) };
       const mockPetRef = { get: jest.fn().mockResolvedValue(mockPetSnap), update: jest.fn() };
       const mockUserRef = {
@@ -110,7 +112,7 @@ describe("🐾 Pet Action API", () => {
       mockPetRef.get = jest.fn().mockResolvedValue(mockPetSnap);
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
-      const res = await request(app).patch(`/action/clean/${mockUserId}`);
+      const res = await request(app).patch(`/game/clean/${mockUserId}`);
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -118,17 +120,17 @@ describe("🐾 Pet Action API", () => {
       expect(mockPetRef.update).toHaveBeenCalledWith({ happy: 90 });
     });
 
-    it("❌ should return 404 if user not found", async () => {
+    it("❌사용자가 없을 때", async () => {
       const mockUserRef = { get: jest.fn().mockResolvedValue({ exists: false }) };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
-      const res = await request(app).patch(`/action/clean/${mockUserId}`);
+      const res = await request(app).patch(`/game/clean/${mockUserId}`);
       expect(res.status).toBe(404);
       expect(res.body.message).toBe("User not found");
     });
 
-    it("❌ should return 500 if token invalid", async () => {
+    it("❌사용자 인증 실패", async () => {
       (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
-      const res = await request(app).patch(`/action/clean/${mockUserId}`);
+      const res = await request(app).patch(`/game/clean/${mockUserId}`);
       expect(res.status).toBe(500);
       expect(res.body.message).toBe("Invalid token");
     });

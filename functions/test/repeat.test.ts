@@ -25,6 +25,16 @@ app.use('/repeat', repeatRouter);
 const isDateKey = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s);
 
 describe('Repeat Router', () => {
+  beforeAll(() => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    (console.error as jest.Mock).mockRestore();
+    (console.log as jest.Mock).mockRestore();
+  });
+  
   beforeEach(() => {
     jest.clearAllMocks();
   });

@@ -18,12 +18,22 @@ app.use('/users', router.default);
 
 describe("GET /users/:userID/items", () => {
 
+  beforeAll(() => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    (console.error as jest.Mock).mockRestore();
+    (console.log as jest.Mock).mockRestore();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   // ✅ [GET] /users/:userId/items
-  it("사용자 음식 아이템 인벤토리 리스트 불러오기", async () => {
+  it("✅사용자 음식 아이템 인벤토리 리스트 불러오기", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
@@ -102,8 +112,22 @@ describe("GET /users/:userID/items", () => {
 });
 
 describe("PATCH /users/:userId/items/:itemName", () => {
+  beforeAll(() => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    (console.error as jest.Mock).mockRestore();
+    (console.log as jest.Mock).mockRestore();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  
   // ✅ [PATCH] /users/:userId/items/:itemName
-  it("소비형 아이템 사용하기", async () => {
+  it("✅소비형 아이템 사용하기", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     const mockSnap = { exists: true, 
@@ -187,8 +211,22 @@ describe("PATCH /users/:userId/items/:itemName", () => {
 });
 
 describe("PATCH /users/:userId/items/:itemName/set", () => {
+  beforeAll(() => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    (console.error as jest.Mock).mockRestore();
+    (console.log as jest.Mock).mockRestore();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  
   // ✅ [PATCH] /users/:userId/items/:itemName/set
-  it("배경 아이템 사용하기", async () => {
+  it("✅배경 아이템 사용하기", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
     const mockUserRef = { update: jest.fn().mockResolvedValue(undefined) };
     (refUser as jest.Mock).mockReturnValue(mockUserRef);
@@ -248,32 +286,25 @@ describe("PATCH /users/:userId/items/:itemName/set", () => {
     expect(res.body.message).toBe("Internal server error");
   });
 
-  // ✅ [PATCH] /users/:userId/items/:itemName/style
-  it("should update pet styleID", async () => {
-    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
-
-    const mockUserSnap = { exists: true, data: () => ({ nowPet: "pet01" }) };
-    const mockPetsCollection = { doc: jest.fn().mockReturnValue({ update: jest.fn() }) };
-    const mockUserRef = {
-      get: jest.fn().mockResolvedValue(mockUserSnap),
-      collection: jest.fn().mockReturnValue(mockPetsCollection),
-    };
-    (refUser as jest.Mock).mockReturnValue(mockUserRef);
-
-    const res = await request(app)
-      .patch("/users/user123/items/hat/style")
-      .send({ styleID: "coolHat" });
-
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(mockUserRef.collection).toHaveBeenCalledWith("pets");
-    expect(mockPetsCollection.doc).toHaveBeenCalledWith("pet01");
-  });
 });
 
 describe("PATCH /users/:userId/items/:itemName/style", () => {
+  beforeAll(() => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    (console.error as jest.Mock).mockRestore();
+    (console.log as jest.Mock).mockRestore();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  
   // ✅ [PATCH] /users/:userId/items/:itemName/style
-  it("스타일 아이템 사용하기", async () => {
+  it("✅스타일 아이템 사용하기", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     const mockUserSnap = { exists: true, data: () => ({ nowPet: "pet01" }) };

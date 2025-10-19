@@ -33,7 +33,7 @@ describe("Shop API", () => {
   });
 
   // ✅ 1️⃣ GET /shop/items
-  it("should return items by category successfully", async () => {
+  it("✅should return items by category successfully", async () => {
     // refShop mock
     const mockDocs = [
       { data: () => ({ name: "apple", category: 1, price: 10, icon: "🍎", hunger: 3, happy: 1, itemText: "fruit" }) },
@@ -59,7 +59,7 @@ describe("Shop API", () => {
   });
 
   // ✅ 2️⃣ POST /aLLitems/items/:userId
-  it("should purchase item successfully when enough points", async () => {
+  it("✅should purchase item successfully when enough points", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     // mock Firestore 참조들
