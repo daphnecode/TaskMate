@@ -130,4 +130,4 @@ export const onTaskSubmitted = onDocumentWritten("Users/{userId}/log/{logId}", a
 // 기존 export 유지 (ESM 로컬 모듈은 .js 필수)
 export * from "./submitReward.js";
 export { updateStatus } from "./pet/updateStatus.js";
-export { submitPetExpAN3 } from "./submitPetEXP.js";
+export { submitPetExpAN3 } from "./submitPetExp.js";

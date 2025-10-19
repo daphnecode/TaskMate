@@ -108,10 +108,7 @@ router.post("/save/:userId", async (req, res) => {
     // ✅ 클라가 meta.lastUpdated를 보냈으면 정규화해서 사용, 없으면 오늘 키
     const desiredKey = normalizeToKstDateKey(req.body?.meta?.lastUpdated) || kstDateKey();
 
-    await refRepeat(uid).set(
-      { tasks, meta: { lastUpdated: desiredKey } },
-      { merge: true }
-    );
+    await refRepeat(uid).set({ tasks, meta: { lastUpdated: desiredKey } }, { merge: true });
 
     return res.json({ success: true, message: "repeatList save complete" });
   } catch (e: any) {
@@ -129,7 +126,7 @@ router.post("/add/:userId", async (req, res) => {
     const uid = req.params.userId;
     if (decoded.uid !== uid) return res.status(403).json({ success: false, message: "Forbidden" });
 
-    const todoText  = String(req.body?.todoText ?? "");
+    const todoText = String(req.body?.todoText ?? "");
     const todoPoint = Number(req.body?.todoPoint ?? 0);
     const todoCheck = !!req.body?.todoCheck;
 
@@ -139,15 +136,12 @@ router.post("/add/:userId", async (req, res) => {
     const newTask = { text: todoText, point: todoPoint, isChecked: todoCheck };
     tasks.push(newTask);
 
-    await docRef.set(
-      { tasks, meta: { lastUpdated: kstDateKey() } },
-      { merge: true }
-    );
+    await docRef.set({ tasks, meta: { lastUpdated: kstDateKey() } }, { merge: true });
 
     return res.json({
       success: true,
-      message: "dailyList add complete",
-      todoID: String(tasks.length - 1), // 배열 인덱스를 임시 ID로
+      message: "repeatList add complete",
+      todoID: String(tasks.length - 1),
       todoText,
       todoCheck,
       todoPoint,
@@ -173,20 +167,17 @@ router.patch("/update/:userId/:todoId", async (req, res) => {
     if (idx < 0) return res.status(404).json({ success: false, message: "Todo not found" });
 
     const body = req.body || {};
-    const newText  = body.todoText ?? body.text;
+    const newText = body.todoText ?? body.text;
     const newPoint = body.todoPoint ?? body.point;
 
     if (typeof newText === "string") tasks[idx].text = newText;
     if (typeof newPoint !== "undefined") tasks[idx].point = Number(newPoint);
 
-    await docRef.set(
-      { tasks, meta: { lastUpdated: kstDateKey() } },
-      { merge: true }
-    );
+    await docRef.set({ tasks, meta: { lastUpdated: kstDateKey() } }, { merge: true });
 
     return res.json({
       success: true,
-      message: "dailyList update complete",
+      message: "repeatList update complete",
       todoText: tasks[idx].text ?? "",
       todoPoint: Number(tasks[idx].point ?? 0),
     });
@@ -196,11 +187,7 @@ router.patch("/update/:userId/:todoId", async (req, res) => {
   }
 });
 
-/**  CHECK: PATCH /check/:userId/:todoId
- * Body: { todoCheck: boolean }  // 스펙
- *       (호환) { isChecked: boolean }
- * 응답: { success, message }
- */
+/** CHECK: PATCH /check/:userId/:todoId */
 router.patch("/check/:userId/:todoId", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
@@ -216,32 +203,27 @@ router.patch("/check/:userId/:todoId", async (req, res) => {
     if (idx < 0) return res.status(404).json({ success: false, message: "Todo not found" });
 
     const body = req.body || {};
-    const val = (typeof body.todoCheck !== "undefined")
-      ? !!body.todoCheck
-      : (typeof body.isChecked !== "undefined")
+    const val =
+      typeof body.todoCheck !== "undefined"
+        ? !!body.todoCheck
+        : typeof body.isChecked !== "undefined"
         ? !!body.isChecked
         : null;
 
-    // 스펙은 명시적 설정이므로 toggle는 안 하고, 값이 없으면 에러 처리
     if (val === null) return res.status(400).json({ success: false, message: "todoCheck required" });
 
     tasks[idx].isChecked = val;
 
-    await docRef.set(
-      { tasks, meta: { lastUpdated: kstDateKey() } },
-      { merge: true }
-    );
+    await docRef.set({ tasks, meta: { lastUpdated: kstDateKey() } }, { merge: true });
 
-    return res.json({ success: true, message: "dailyList check complete" });
+    return res.json({ success: true, message: "repeatList check complete" });
   } catch (e: any) {
     console.error(e);
     return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
   }
 });
 
-/** DELETE: DELETE /delete/:userId/:todoId
- * 응답: { success, message }
- */
+/** DELETE: DELETE /delete/:userId/:todoId */
 router.delete("/delete/:userId/:todoId", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
@@ -258,12 +240,9 @@ router.delete("/delete/:userId/:todoId", async (req, res) => {
 
     tasks.splice(idx, 1);
 
-    await docRef.set(
-      { tasks, meta: { lastUpdated: kstDateKey() } },
-      { merge: true }
-    );
+    await docRef.set({ tasks, meta: { lastUpdated: kstDateKey() } }, { merge: true });
 
-    return res.json({ success: true, message: "dailyList delete complete" });
+    return res.json({ success: true, message: "repeatList delete complete" });
   } catch (e: any) {
     console.error(e);
     return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });

@@ -8,43 +8,47 @@ jest.mock('firebase-admin/auth', () => ({
   getAuth: () => authMocks,
 }));
 
-// 라우터 import (프로젝트 구조에 맞게)
+// 라우터 import (실제 경로)
 import repeatRouter from '../src/planner/repeat_function';
 
 // 같은 in-memory Firestore mock 인스턴스를 검증용으로 사용
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { db } = require('../src/__mocks__/firebase.js');
 
-const app = express();
-app.use(express.json());
-// 실제 index.ts에선 /repeatList, /dailyList 둘 다에 mount된다고 주석에 쓰여있지만,
-// 테스트에선 심플하게 /repeat 로만 붙여서 검증한다.
-app.use('/repeat', repeatRouter);
-
-// YYYY-MM-DD 패턴 체크용
 const isDateKey = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s);
 
-describe('Repeat Router', () => {
+// ✅ 실제 배포와 동일하게 /repeatList 로 마운트
+function makeApp() {
+  const app = express();
+  app.use(express.json());
+  app.use('/repeatList', repeatRouter);
+  return app;
+}
+
+describe('Repeat Router (mounted at /repeatList)', () => {
+  let app: express.Express;
+
   beforeAll(() => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(console, "log").mockImplementation(() => {});
+    app = makeApp();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterAll(() => {
     (console.error as jest.Mock).mockRestore();
     (console.log as jest.Mock).mockRestore();
   });
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('GET /repeat/read/:userId', () => {
+  describe('GET /repeatList/read/:userId', () => {
     it('✅ 문서가 없으면 data:[], meta:{} 반환', async () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid: 'r1' });
 
       const res = await request(app)
-        .get('/repeat/read/r1')
+        .get('/repeatList/read/r1')
         .set('Authorization', 'Bearer token');
 
       expect(authMocks.verifyIdToken).toHaveBeenCalled();
@@ -59,19 +63,18 @@ describe('Repeat Router', () => {
 
     it('✅ 문서가 있으면 tasks 표준화 및 meta.lastUpdated 정규화', async () => {
       const uid = 'r2';
-      // 사전 데이터 주입 (구키/신키 섞어서)
       await db.collection('Users').doc(uid).collection('repeatTasks').doc('default').set({
         tasks: [
           { text: 'A', point: 3, isChecked: true },
           { todoText: 'B', todoPoint: 7, todoCheck: false },
         ],
-        meta: { lastUpdated: '2025-11-03T12:00:00Z' }, // 문자열 → KST YYYY-MM-DD로 정규화됨
+        meta: { lastUpdated: '2025-11-03T12:00:00Z' },
       });
 
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .get(`/repeat/read/${uid}`)
+        .get(`/repeatList/read/${uid}`)
         .set('Authorization', 'Bearer token');
 
       expect(res.status).toBe(200);
@@ -80,7 +83,6 @@ describe('Repeat Router', () => {
         { text: 'A', point: 3, isChecked: true },
         { text: 'B', point: 7, isChecked: false },
       ]);
-      // meta.lastUpdated가 존재하면 YYYY-MM-DD여야 함
       if (res.body.meta.lastUpdated) {
         expect(isDateKey(res.body.meta.lastUpdated)).toBe(true);
       }
@@ -90,7 +92,7 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid: 'other' });
 
       const res = await request(app)
-        .get('/repeat/read/r3')
+        .get('/repeatList/read/r3')
         .set('Authorization', 'Bearer token');
 
       expect(res.status).toBe(403);
@@ -101,7 +103,7 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockRejectedValue(new Error('Invalid token'));
 
       const res = await request(app)
-        .get('/repeat/read/r4')
+        .get('/repeatList/read/r4')
         .set('Authorization', 'Bearer token');
 
       expect(res.status).toBe(401);
@@ -109,20 +111,19 @@ describe('Repeat Router', () => {
     });
   });
 
-  describe('POST /repeat/save/:userId', () => {
+  describe('POST /repeatList/save/:userId', () => {
     it('✅ 전체 덮어쓰기 + meta.lastUpdated 지정값(YYYY-MM-DD) 보존', async () => {
       const uid = 'r5';
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .post(`/repeat/save/${uid}`)
+        .post(`/repeatList/save/${uid}`)
         .set('Authorization', 'Bearer token')
         .send({
           tasks: [
             { text: 'N1', point: 1, isChecked: false },
             { todoText: 'N2', todoPoint: 5, todoCheck: true },
           ],
-          // 문자열/epoch/날짜 다 허용인데, 테스트는 YYYY-MM-DD로 명시 → 그대로 저장 기대
           meta: { lastUpdated: '2025-11-05' },
         });
 
@@ -145,7 +146,7 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .post(`/repeat/save/${uid}`)
+        .post(`/repeatList/save/${uid}`)
         .set('Authorization', 'Bearer token')
         .send({ tasks: [] });
 
@@ -162,7 +163,7 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid: 'wrong' });
 
       const res = await request(app)
-        .post('/repeat/save/r7')
+        .post('/repeatList/save/r7')
         .set('Authorization', 'Bearer token')
         .send({ tasks: [] });
 
@@ -171,18 +172,18 @@ describe('Repeat Router', () => {
     });
   });
 
-  describe('POST /repeat/add/:userId', () => {
+  describe('POST /repeatList/add/:userId', () => {
     it('✅ 항목 추가 & 응답 확인(todoID, text, point, check)', async () => {
       const uid = 'r8';
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .post(`/repeat/add/${uid}`)
+        .post(`/repeatList/add/${uid}`)
         .set('Authorization', 'Bearer token')
         .send({ todoText: 'X', todoPoint: 9, todoCheck: true });
 
       expect(res.status).toBe(200);
-      expect(res.body.message).toBe('dailyList add complete');
+      expect(res.body.message).toBe('repeatList add complete'); // ← 변경
       expect(res.body.todoText).toBe('X');
       expect(res.body.todoPoint).toBe(9);
       expect(res.body.todoCheck).toBe(true);
@@ -196,7 +197,7 @@ describe('Repeat Router', () => {
     });
   });
 
-  describe('PATCH /repeat/update/:userId/:todoId', () => {
+  describe('PATCH /repeatList/update/:userId/:todoId', () => {
     it('✅ 특정 항목 text/point 수정', async () => {
       const uid = 'r9';
       await db.collection('Users').doc(uid).collection('repeatTasks').doc('default').set({
@@ -206,12 +207,12 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .patch(`/repeat/update/${uid}/1`) // index=1 수정
+        .patch(`/repeatList/update/${uid}/1`)
         .set('Authorization', 'Bearer token')
         .send({ text: 'B2', point: 7 });
 
       expect(res.status).toBe(200);
-      expect(res.body.message).toBe('dailyList update complete');
+      expect(res.body.message).toBe('repeatList update complete'); // ← 변경
       expect(res.body.todoText).toBe('B2');
       expect(res.body.todoPoint).toBe(7);
 
@@ -231,7 +232,7 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .patch(`/repeat/update/${uid}/5`)
+        .patch(`/repeatList/update/${uid}/5`)
         .set('Authorization', 'Bearer token')
         .send({ text: 'X' });
 
@@ -240,7 +241,7 @@ describe('Repeat Router', () => {
     });
   });
 
-  describe('PATCH /repeat/check/:userId/:todoId', () => {
+  describe('PATCH /repeatList/check/:userId/:todoId', () => {
     it('✅ 체크 값을 true로 설정', async () => {
       const uid = 'r11';
       await db.collection('Users').doc(uid).collection('repeatTasks').doc('default').set({
@@ -250,12 +251,12 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .patch(`/repeat/check/${uid}/0`)
+        .patch(`/repeatList/check/${uid}/0`)
         .set('Authorization', 'Bearer token')
         .send({ isChecked: true });
 
       expect(res.status).toBe(200);
-      expect(res.body.message).toBe('dailyList check complete');
+      expect(res.body.message).toBe('repeatList check complete'); // ← 변경
 
       const saved = (
         await db.collection('Users').doc(uid).collection('repeatTasks').doc('default').get()
@@ -273,7 +274,7 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .patch(`/repeat/check/${uid}/0`)
+        .patch(`/repeatList/check/${uid}/0`)
         .set('Authorization', 'Bearer token')
         .send({});
 
@@ -282,7 +283,7 @@ describe('Repeat Router', () => {
     });
   });
 
-  describe('DELETE /repeat/delete/:userId/:todoId', () => {
+  describe('DELETE /repeatList/delete/:userId/:todoId', () => {
     it('✅ 항목 삭제', async () => {
       const uid = 'r13';
       await db.collection('Users').doc(uid).collection('repeatTasks').doc('default').set({
@@ -295,11 +296,11 @@ describe('Repeat Router', () => {
       authMocks.verifyIdToken.mockResolvedValue({ uid });
 
       const res = await request(app)
-        .delete(`/repeat/delete/${uid}/0`)
+        .delete(`/repeatList/delete/${uid}/0`)
         .set('Authorization', 'Bearer token');
 
       expect(res.status).toBe(200);
-      expect(res.body.message).toBe('dailyList delete complete');
+      expect(res.body.message).toBe('repeatList delete complete'); // ← 변경
 
       const saved = (
         await db.collection('Users').doc(uid).collection('repeatTasks').doc('default').get()
