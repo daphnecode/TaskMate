@@ -92,7 +92,10 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
 
   } catch (e: any) {
     console.error(e);
-    return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
+    if (e.message?.includes("token")) {
+    return res.status(401).json({ success: false, message: e.message });
+    }
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
@@ -122,7 +125,10 @@ router.patch("/:userId/items/:itemName/set", async (req, res) => {
 
   } catch (e: any) {
     console.error(e);
-    return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
+    if (e.message?.includes("token")) {
+    return res.status(401).json({ success: false, message: e.message });
+    }
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
@@ -169,7 +175,10 @@ router.patch("/:userId/items/:itemName/style", async (req, res) => {
 
   } catch (e: any) {
     console.error(e);
-    return res.status(500).json({ success: false, message: e.message || "Server error" });
+    if (e.message?.includes("token")) {
+    return res.status(401).json({ success: false, message: e.message });
+    }
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 

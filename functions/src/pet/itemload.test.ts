@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use('/users', router.default);
 
-describe("사용자 인벤토리 불러오기", () => {
+describe("GET /users/:userID/items", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -101,12 +101,14 @@ describe("사용자 인벤토리 불러오기", () => {
 
 });
 
-describe("사용자 아이템 사용하기", () => {
+describe("PATCH /users/:userId/items/:itemName", () => {
   // ✅ [PATCH] /users/:userId/items/:itemName
-  it("should decrease item count when using item", async () => {
+  it("소비형 아이템 사용하기", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
-    const mockSnap = { exists: true, data: () => ({ count: 3 }) };
+    const mockSnap = { exists: true, 
+      data: () => ({ icon: "assets/icons/icon-strawberry.png", name: "strawberry", category: 1, count: 5, happy: 5, hunger: 0, price: 10, itemText: "sweet and sour" })
+    };
     const mockItemRef = {
       get: jest.fn().mockResolvedValue(mockSnap),
       update: jest.fn().mockResolvedValue(undefined),
@@ -114,29 +116,136 @@ describe("사용자 아이템 사용하기", () => {
     (refItem as jest.Mock).mockReturnValue(mockItemRef);
 
     const res = await request(app)
-      .patch("/users/user123/items/apple")
-      .send({})
+      .patch("/users/user123/items/strawberry")
       .set("Authorization", "Bearer testtoken");
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.itemCount).toBe(2);
-    expect(mockItemRef.update).toHaveBeenCalledWith({ count: 2 });
+    expect(res.body.itemCount).toBe(4);
+    expect(mockItemRef.update).toHaveBeenCalledWith({ count: 4 });
   });
 
+  it("사용자 id 불일치로 접근 금지", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    const res = await request(app)
+      .patch("/users/user321/items/strawberry")
+      .set("Authorization", "Bearer testtoken"); 
+
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("아이템에 존재하지 않는 경우", async () => {
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    const mockSnap = { exists: false, };
+    const mockItemRef = {
+      get: jest.fn().mockResolvedValue(mockSnap),
+      update: jest.fn().mockResolvedValue(undefined),
+    };
+    (refItem as jest.Mock).mockReturnValue(mockItemRef);
+
+    const res = await request(app)
+      .patch("/users/user123/items/rainbow")
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Item not found");
+  });
+  
+  it("사용자 인증 실패", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
+
+    const res = await request(app)
+      .patch("/users/user123/items/strawberry")
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Invalid token");
+  });  
+
+  it("서버 응답 오류", async () => {
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    const mockQuery = { get: jest.fn().mockRejectedValue(new Error("Firestore error")) };
+    (refItem as jest.Mock).mockReturnValue(mockQuery);
+
+    const res = await request(app)
+      .patch("/users/user123/items/strawberry")
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Internal server error");
+  });
+
+});
+
+describe("PATCH /users/:userId/items/:itemName/set", () => {
   // ✅ [PATCH] /users/:userId/items/:itemName/set
-  it("should update user placeID", async () => {
+  it("배경 아이템 사용하기", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
     const mockUserRef = { update: jest.fn().mockResolvedValue(undefined) };
     (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
     const res = await request(app)
-      .patch("/users/user123/items/sofa/set")
-      .send({ placeID: "livingroom" });
+      .patch("/users/user123/items/livingroom/set")
+      .send({ placeID: "livingroom" })
+      .set("Authorization", "Bearer testtoken");
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
+    expect(res.body.message).toBe("inventory place use complete");
     expect(mockUserRef.update).toHaveBeenCalledWith({ "setting.placeID": "livingroom" });
+  });
+
+  it("사용자 id 불일치로 접근 금지", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    const res = await request(app)
+      .patch("/users/user321/items/livingroom/set")
+      .send({ placeID: "livingroom"})
+      .set("Authorization", "Bearer testtoken"); 
+
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("사용자 인증 실패", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
+
+    const res = await request(app)
+      .patch("/users/user123/items/livingroom/set")
+      .send({ placeID: "livingroom" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Invalid token");
+  });  
+
+  it("서버 응답 오류", async () => {
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    // Firestore get() 호출 시 오류 발생
+    const mockQuery = { get: jest.fn().mockRejectedValue(new Error("Firestore error")) };
+    (refUser as jest.Mock).mockReturnValue(mockQuery);
+
+    const res = await request(app)
+      .patch("/users/user123/items/livingroom/set")
+      .send({ placeID: "livingroom" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Internal server error");
   });
 
   // ✅ [PATCH] /users/:userId/items/:itemName/style
@@ -160,4 +269,125 @@ describe("사용자 아이템 사용하기", () => {
     expect(mockUserRef.collection).toHaveBeenCalledWith("pets");
     expect(mockPetsCollection.doc).toHaveBeenCalledWith("pet01");
   });
+});
+
+describe("PATCH /users/:userId/items/:itemName/style", () => {
+  // ✅ [PATCH] /users/:userId/items/:itemName/style
+  it("스타일 아이템 사용하기", async () => {
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    const mockUserSnap = { exists: true, data: () => ({ nowPet: "pet01" }) };
+    const mockPetsCollection = { doc: jest.fn().mockReturnValue({ update: jest.fn() }) };
+    const mockUserRef = {
+      get: jest.fn().mockResolvedValue(mockUserSnap),
+      collection: jest.fn().mockReturnValue(mockPetsCollection),
+    };
+    (refUser as jest.Mock).mockReturnValue(mockUserRef);
+
+    const res = await request(app)
+      .patch("/users/user123/items/coolhat/style")
+      .send({ styleID: "coolHat" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(mockUserRef.collection).toHaveBeenCalledWith("pets");
+    expect(mockPetsCollection.doc).toHaveBeenCalledWith("pet01");
+  });
+
+  it("사용자 id 불일치로 접근 금지", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    const res = await request(app)
+      .patch("/users/user1456/items/coolhat/style")
+      .send({ styleID: "coolHat" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("잘못된 userID 사용", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+    
+    const mockUserSnap = { exists: false };
+    (refUser as jest.Mock).mockReturnValue({ get: jest.fn().mockResolvedValue(mockUserSnap) });
+
+    const res = await request(app)
+      .patch("/users/user123/items/coolhat/style")
+      .send({ styleID: "coolhat" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("User not found");
+  });
+
+  it("잘못된 styleID 사용", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    const mockUserSnap = { exists: true, data: () => ({ nowPet: "pet01" }) };
+    (refUser as jest.Mock).mockReturnValue({ get: jest.fn().mockResolvedValue(mockUserSnap) });
+    
+    const res = await request(app)
+      .patch("/users/user123/items/pan123/style")
+      .send({ styleID: "pan123" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Invalid styleID");
+  });
+ 
+  it("nowPet이 없을 때", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+    
+    const mockUserSnap = { exists: true, data: () => ({ nowPet: undefined }) };
+    (refUser as jest.Mock).mockReturnValue({ get: jest.fn().mockResolvedValue(mockUserSnap) });
+
+    const res = await request(app)
+      .patch("/users/user123/items/coolhat/style")
+      .send({ styleID: "coolhat" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("nowPet not set");
+  });
+
+  it("사용자 인증 실패", async () => {
+    // mock verifyToken
+    (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
+
+    const res = await request(app)
+      .patch("/users/user123/items/coolhat/style")
+      .send({ styleID: "coolHat" })
+      .set("Authorization", "Bearer testtoken");
+    
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Invalid token");
+  });  
+
+  it("서버 응답 오류", async () => {
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+
+    // Firestore get() 호출 시 오류 발생
+    const mockQuery = { get: jest.fn().mockRejectedValue(new Error("Firestore error")) };
+    (refUser as jest.Mock).mockReturnValue(mockQuery);
+
+    const res = await request(app)
+      .patch("/users/user123/items/coolhat/style")
+      .send({ styleID: "coolHat" })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toBe("Internal server error");
+  });
+
 });
