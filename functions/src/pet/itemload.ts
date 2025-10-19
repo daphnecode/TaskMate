@@ -56,10 +56,10 @@ router.get("/:userId/items", async (req, res) => {
 
   } catch (e: any) {
     console.error(e);
-    return res.status(401).json({
-      success: false,
-      message: e?.message || "Unauthorized",
-    });
+    if (e.message?.includes("token")) {
+    return res.status(401).json({ success: false, message: e.message });
+    }
+    return res.status(500).json({ success: false, message: "Internal server error" }); 
   }
 });
 
