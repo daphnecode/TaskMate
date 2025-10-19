@@ -34,7 +34,7 @@ describe("장애물 달리기 경주 보상", () => {
   });
 
   // ========================
-  // ✅ PATCH /run/:userId
+  // ✅ PATCH /game/run/:userId
   // ========================
   describe("PATCH /game/run/:userId", () => {
     it("✅펫 장애물 달리기 완수 보상. 행복도 20 증가 포만도 20 감소", async () => {
@@ -59,14 +59,14 @@ describe("장애물 달리기 경주 보상", () => {
       expect(mockPetRef.update).toHaveBeenCalledWith({ happy: 70, hunger: 50 });
     });
 
-    it("❌사용자 id 불일치로 접근 금지", async () => {
+    it("❌ 사용자 id 불일치로 접근 금지", async () => {
       (verifyToken as jest.Mock).mockResolvedValue({ uid: "wrongUser" });
       const res = await request(app).patch(`/game/run/${mockUserId}`);
       expect(res.status).toBe(403);
       expect(res.body.message).toBe("Forbidden");
     });
 
-    it("❌nowPet이 없을 때", async () => {
+    it("❌ nowPet이 없을 때", async () => {
       const mockUserRef = { get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ nowPet: null }) }) };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
@@ -75,7 +75,7 @@ describe("장애물 달리기 경주 보상", () => {
       expect(res.body.message).toBe("nowPet not set");
     });
 
-    it("❌펫이 존재하지 않을 때", async () => {
+    it("❌ 펫이 존재하지 않을 때", async () => {
       const mockPetRef = { get: jest.fn().mockResolvedValue({ exists: false }) };
       const mockUserRef = {
         get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ nowPet: "petA" }) }),
@@ -89,7 +89,7 @@ describe("장애물 달리기 경주 보상", () => {
       expect(res.body.message).toBe("Pet not found");
     });
 
-    it("❌사용자 인증 실패", async () => {
+    it("❌ 사용자 인증 실패", async () => {
       (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
       const res = await request(app).patch(`/game/run/${mockUserId}`);
       expect(res.status).toBe(500);
@@ -98,7 +98,7 @@ describe("장애물 달리기 경주 보상", () => {
   });
 
   // ========================
-  // ✅ PATCH /clean/:userId
+  // ✅ PATCH /game/clean/:userId
   // ========================
   describe("PATCH /game/clean/:userId", () => {
     it("✅ 펫 청소 완수 보상. 행복도 10 증가", async () => {
@@ -120,7 +120,7 @@ describe("장애물 달리기 경주 보상", () => {
       expect(mockPetRef.update).toHaveBeenCalledWith({ happy: 90 });
     });
 
-    it("❌사용자가 없을 때", async () => {
+    it("❌ 사용자가 없을 때", async () => {
       const mockUserRef = { get: jest.fn().mockResolvedValue({ exists: false }) };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
       const res = await request(app).patch(`/game/clean/${mockUserId}`);
@@ -128,7 +128,7 @@ describe("장애물 달리기 경주 보상", () => {
       expect(res.body.message).toBe("User not found");
     });
 
-    it("❌사용자 인증 실패", async () => {
+    it("❌ 사용자 인증 실패", async () => {
       (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
       const res = await request(app).patch(`/game/clean/${mockUserId}`);
       expect(res.status).toBe(500);

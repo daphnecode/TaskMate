@@ -66,7 +66,7 @@ describe("GET /users/:userID/items", () => {
     expect(res.body.data[0].name).toBe("strawberry");
   });
 
-  it("사용자 id 불일치로 접근 금지", async () => {
+  it("❌ 사용자 id 불일치로 접근 금지", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
@@ -79,7 +79,7 @@ describe("GET /users/:userID/items", () => {
     expect(res.body.success).toBe(false);
   });
 
-  it("사용자 인증 실패", async () => {
+  it("❌ 사용자 인증 실패", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
 
@@ -93,7 +93,7 @@ describe("GET /users/:userID/items", () => {
     expect(res.body.message).toBe("Invalid token");
   });  
 
-  it("서버 응답 오류", async () => {
+  it("❌ 서버 응답 오류", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     // Firestore get() 호출 시 오류 발생
@@ -149,7 +149,7 @@ describe("PATCH /users/:userId/items/:itemName", () => {
     expect(mockItemRef.update).toHaveBeenCalledWith({ count: 4 });
   });
 
-  it("사용자 id 불일치로 접근 금지", async () => {
+  it("❌ 사용자 id 불일치로 접근 금지", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
@@ -161,7 +161,7 @@ describe("PATCH /users/:userId/items/:itemName", () => {
     expect(res.body.success).toBe(false);
   });
 
-  it("아이템에 존재하지 않는 경우", async () => {
+  it("❌ 아이템에 존재하지 않는 경우", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     const mockSnap = { exists: false, };
@@ -180,7 +180,7 @@ describe("PATCH /users/:userId/items/:itemName", () => {
     expect(res.body.message).toBe("Item not found");
   });
   
-  it("사용자 인증 실패", async () => {
+  it("❌ 사용자 인증 실패", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
 
@@ -193,7 +193,7 @@ describe("PATCH /users/:userId/items/:itemName", () => {
     expect(res.body.message).toBe("Invalid token");
   });  
 
-  it("서버 응답 오류", async () => {
+  it("❌ 서버 응답 오류", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     const mockQuery = { get: jest.fn().mockRejectedValue(new Error("Firestore error")) };
@@ -242,7 +242,7 @@ describe("PATCH /users/:userId/items/:itemName/set", () => {
     expect(mockUserRef.update).toHaveBeenCalledWith({ "setting.placeID": "livingroom" });
   });
 
-  it("사용자 id 불일치로 접근 금지", async () => {
+  it("❌ 사용자 id 불일치로 접근 금지", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
@@ -255,7 +255,7 @@ describe("PATCH /users/:userId/items/:itemName/set", () => {
     expect(res.body.success).toBe(false);
   });
 
-  it("사용자 인증 실패", async () => {
+  it("❌ 사용자 인증 실패", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
 
@@ -269,7 +269,7 @@ describe("PATCH /users/:userId/items/:itemName/set", () => {
     expect(res.body.message).toBe("Invalid token");
   });  
 
-  it("서버 응답 오류", async () => {
+  it("❌ 서버 응답 오류", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     // Firestore get() 호출 시 오류 발생
@@ -326,7 +326,7 @@ describe("PATCH /users/:userId/items/:itemName/style", () => {
     expect(mockPetsCollection.doc).toHaveBeenCalledWith("pet01");
   });
 
-  it("사용자 id 불일치로 접근 금지", async () => {
+  it("❌ 사용자 id 불일치로 접근 금지", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
@@ -339,7 +339,7 @@ describe("PATCH /users/:userId/items/:itemName/style", () => {
     expect(res.body.success).toBe(false);
   });
 
-  it("잘못된 userID 사용", async () => {
+  it("❌ 잘못된 userID 사용", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
     
@@ -356,7 +356,7 @@ describe("PATCH /users/:userId/items/:itemName/style", () => {
     expect(res.body.message).toBe("User not found");
   });
 
-  it("잘못된 styleID 사용", async () => {
+  it("❌ 잘못된 styleID 사용", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
@@ -365,7 +365,7 @@ describe("PATCH /users/:userId/items/:itemName/style", () => {
     
     const res = await request(app)
       .patch("/users/user123/items/pan123/style")
-      .send({ styleID: "pan123" })
+      .send({ styleID: null })
       .set("Authorization", "Bearer testtoken");
 
     expect(res.status).toBe(400);
@@ -373,7 +373,7 @@ describe("PATCH /users/:userId/items/:itemName/style", () => {
     expect(res.body.message).toBe("Invalid styleID");
   });
  
-  it("nowPet이 없을 때", async () => {
+  it("❌ nowPet이 없을 때", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
     
@@ -390,7 +390,7 @@ describe("PATCH /users/:userId/items/:itemName/style", () => {
     expect(res.body.message).toBe("nowPet not set");
   });
 
-  it("사용자 인증 실패", async () => {
+  it("❌ 사용자 인증 실패", async () => {
     // mock verifyToken
     (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
 
@@ -404,7 +404,7 @@ describe("PATCH /users/:userId/items/:itemName/style", () => {
     expect(res.body.message).toBe("Invalid token");
   });  
 
-  it("서버 응답 오류", async () => {
+  it("❌ 서버 응답 오류", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
     // Firestore get() 호출 시 오류 발생
