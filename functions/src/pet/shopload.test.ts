@@ -59,9 +59,9 @@ describe("GET /shop/items", () => {
       .get("/shop/items?category=1")
       .set("Authorization", "Bearer testtoken");
 
-    console.log(res.body);
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
+    expect(res.body.data.length).toBe(5);
   });
 
   it("❌ category 쿼리 파라미터가 없는 경우", async () => {

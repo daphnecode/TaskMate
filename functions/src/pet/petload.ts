@@ -28,7 +28,11 @@ router.patch("/:userId/nowPet", async (req, res) => {
     });
 
   } catch (e: any) {
-    return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
+    console.error(e);
+    if (e.message?.includes("token")) {
+    return res.status(401).json({ success: false, message: e.message });
+    }
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
@@ -48,7 +52,11 @@ router.get("/:userId/pets/:petName", async (req, res) => {
     return res.json({ success: true, message: "pet condition read complete", data: pet });
 
   } catch (e: any) {
-    return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
+    console.error(e);
+    if (e.message?.includes("token")) {
+    return res.status(401).json({ success: false, message: e.message });
+    }
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
 
