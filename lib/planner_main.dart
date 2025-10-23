@@ -269,7 +269,7 @@ class _PlannerMainState extends State<PlannerMain> {
     if (userId == null) {
       return;
     }
-    
+
     // 오늘 리스트 + 제출 여부
     api
         .readDailyWithMeta(dateKey)

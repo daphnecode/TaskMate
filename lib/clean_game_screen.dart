@@ -155,24 +155,46 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  // 🎮 조이스틱
                   JoystickWidget(onDirectionChanged: _game.handleDirection),
 
-                  // 🔹 버튼: 유저 조작 발생 → 게이트 열고, 클린 시 게임이 팝업 띄움
-                  ElevatedButton(
-                    onPressed: () {
-                      _playedOnce = true;             // 실제 조작 발생
-                      _game.allowClearOverlay(true);  // 🔓 이제부터 팝업 허용
-                      _game.tryClean();               // 마지막 조각이면 게임이 팝업을 띄움
-                      // ❌ 더 이상 여기서 overlays.add('ClearPopup') 하지 않음
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlueAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 48),
+
+                  // 🧹 정사각형 치우기 버튼 (아이콘 + 텍스트)
+                  SizedBox(
+                    width: 100, // ✅ 정사각형 크기 지정
+                    height: 100,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _playedOnce = true;
+                        _game.allowClearOverlay(true);
+                        _game.tryClean();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.cleaning_services_rounded, size: 36),
+                          SizedBox(height: 6),
+                          Text(
+                            "치우기",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: const Text("치우기"),
                   ),
                 ],
               ),
