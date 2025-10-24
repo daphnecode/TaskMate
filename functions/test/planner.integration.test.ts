@@ -10,7 +10,7 @@ jest.mock("firebase-admin/auth", () => ({ getAuth: () => authMocks }));
 import repeatRouter from "../src/planner/repeat_function";
 import dailyRouter from "../src/planner/daily_function";
 import { submitRewardAN3 } from "../src/submitReward";
-import { submitPetExpAN3 } from "../src/submitPetExp";
+import { submitPetExpAN3 } from "../src/submitPetEXP";
 
 // ✅ 같은 in-memory Firestore mock
 // eslint-disable-next-line @typescript-eslint/no-var-requires

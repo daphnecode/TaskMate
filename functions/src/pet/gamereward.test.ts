@@ -1,14 +1,14 @@
-import express from 'express';
-import request from 'supertest';
-import * as router from './gamereward';
+import express from "express";
+import request from "supertest";
+import * as router from "./gamereward";
 
 // ✅ verifyToken, refInventory, refUser, refPets를 mock 처리
-jest.mock('./refAPI', () => ({
+jest.mock("./refAPI", () => ({
   verifyToken: jest.fn(),
   refUser: jest.fn(),
 }));
 
-import { verifyToken, refUser } from './refAPI';
+import { verifyToken, refUser } from "./refAPI";
 
 const app = express();
 app.use(express.json());

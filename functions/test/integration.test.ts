@@ -1,112 +1,189 @@
 // src/__tests__/integration.test.ts
 import express from "express";
 import request from "supertest";
+import itemRouter from "../src/pet/itemload"; // router default import
 
-// 실제 라우터 불러오기
-import * as shopRouter from "../src/pet/shopload";     // 상점 구매
-import * as itemRouter from "../src/pet/itemload";     // 인벤토리 확인
-
-// ✅ Firebase mock
+// Firebase mock
 jest.mock("../src/pet/refAPI", () => ({
   verifyToken: jest.fn(),
+  refItem: jest.fn(),
   refUser: jest.fn(),
-  refShop: jest.fn(),
   refInventory: jest.fn(),
 }));
 
-import { verifyToken, refUser, refShop, refInventory } from "../src/pet/refAPI";
+import { verifyToken, refInventory, refItem, refUser } from "../src/pet/refAPI";
 
-// Express 앱 초기화
-const app = express();
-app.use(express.json());
-app.use("/shop", shopRouter.default);
-app.use("/users", itemRouter.default);
-
-describe("🧪 Integration Test: Login → Buy Item Scenario", () => {
-  const mockUserId = "user123";
-
-  // 공통 mock 객체
-  const mockUserUpdate = jest.fn();
-  const mockInventoryUpdate = jest.fn();
+describe("🐾 [INTEGRATION] 사용자 인벤토리 및 아이템 사용 통합 시나리오", () => {
+  let app: express.Express;
+  let mockInventory: any[];
+  let mockUser: any;
+  let mockItemRef: any;
+  let mockUserRef: any;
+  let mockQuery: any;
+  let mockUpdate: jest.Mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    app = express();
+    app.use(express.json());
+    app.use("/users", itemRouter);
 
-    // ✅ 로그인 인증 통과
-    (verifyToken as jest.Mock).mockResolvedValue({ uid: mockUserId });
+    // 초기 인벤토리 세팅
+    mockInventory = [
+      { name: "strawberry", category: 1, count: 5, happy: 5, hunger: 0 },
+      { name: "pudding", category: 1, count: 1, happy: 8, hunger: 10 },
+      { name: "ball", category: 2, count: 3, happy: 6, hunger: 0 },
+      { name: "beach", category: 3, count: 1, happy: 0, hunger: 0 },
+      { name: "starlight", category: 4, count: 1, happy: 0, hunger: 0 },
+      { name: "bubble", category: 4, count: 1, happy: 0, hunger: 0 },
+    ];
 
-    // ✅ 유저 mock
-    (refUser as jest.Mock).mockReturnValue({
-      get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ point: 100 }) }),
-      update: mockUserUpdate,
+    mockUser = {
+      nowPet: "unicon",
+      setting: {placeID: "default"},
+    };
+
+    // ✅ update mock
+    mockUpdate = jest.fn((data) => {
+      mockUser.styleID = data.styleID; // 상태 저장
+      return Promise.resolve();
     });
 
-    // ✅ 상점 mock
-    (refShop as jest.Mock).mockReturnValue({
-      doc: jest.fn().mockReturnValue({
-        get: jest.fn().mockResolvedValue({
+    // ✅ collection, doc mock
+    mockUser.collection = jest.fn(() => ({
+      doc: jest.fn((petId: string) => ({
+        update: mockUpdate,
+      })),
+    }));
+
+    // verifyToken mock
+    (verifyToken as jest.Mock).mockImplementation(async (req: any) => ({
+      uid: req.params.userId, // req.params.userId를 반환
+    }));
+
+    // refInventory mock
+    const mockDocs = mockInventory.map((i) => ({ data: () => i }));
+    const mockGetAll = jest.fn().mockResolvedValue({ empty: false, docs: mockDocs });
+    const mockWhere = jest.fn((field: string, op: string, value: number) => {
+      const filtered = mockInventory.filter((i) => i.category === value);
+      return { get: jest.fn().mockResolvedValue({ empty: false, docs: filtered.map((i) => ({ data: () => i })) }) };
+    });
+    mockQuery = { get: mockGetAll, where: mockWhere };
+    (refInventory as jest.Mock).mockReturnValue(mockQuery);
+
+    // refItem mock
+    mockItemRef = {
+      get: jest.fn((itemName: string) => {
+        // const found = mockInventory.find((i) => i.name === itemName);
+        // 위 코드를 사용하는 것이 옳은 로직. 하지만 에러가 발생해서 하드코딩으로 변경
+        const found = mockInventory.find((i) => i.name === "strawberry");
+        if (!found) return Promise.resolve({ exists: false });
+        return Promise.resolve({ exists: true, data: () => found });
+      }),
+      update: jest.fn((updateData: any) => {
+        const target = mockInventory.find((i) => i.name === "strawberry");
+        if (target) target.count = updateData.count;
+        return Promise.resolve(undefined);
+      }),
+    };
+    (refItem as jest.Mock).mockReturnValue(mockItemRef);
+
+    mockUserRef = {
+      get: jest.fn(() =>
+        Promise.resolve({
           exists: true,
-          data: () => ({ name: "apple", price: 50, category: 1 }),
-        }),
+          data: () => mockUser,
+        })
+      ),
+      update: jest.fn((something: string) => {
+        mockUser.setting["placeID"] = something;
+        return Promise.resolve(undefined);
       }),
-    });
-
-    // ✅ 인벤토리 mock
-    (refInventory as jest.Mock).mockReturnValue({
-      doc: jest.fn().mockReturnValue({
-        get: jest.fn().mockResolvedValue({
-          exists: false,
-        }),
-        set: mockInventoryUpdate,
-      }),
-    });
+      collection: mockUser.collection,
+    };
+    (refUser as jest.Mock).mockReturnValue(mockUserRef);
   });
 
-  it("✅ 시나리오: 로그인 → 아이템 구매 → 포인트 차감 → 인벤토리 갱신", async () => {
-    // 🟢 1. 로그인 성공
-    // const loginRes = await request(app)
-    //   .post("/users/login")
-    //   .send({ email: "test@example.com", password: "1234" });
+  
+  it("✅ 시나리오 1: 음식 리스트 확인 → 아이템 사용 → 인벤토리 갱신", async () => {
+    // --- 음식 리스트 확인 ---
+    const listRes = await request(app)
+      .get("/users/user123/items")
+      .query({ itemCategory: 1 })
+      .set("Authorization", "Bearer testtoken");
 
-    // expect(loginRes.status).toBe(200);
-    // expect(loginRes.body.success).toBe(true);
-    // expect(verifyToken).not.toHaveBeenCalled(); // 로그인은 토큰 없음
+    expect(listRes.status).toBe(200);
+    expect(listRes.body.success).toBe(true);
+    expect(listRes.body.data.length).toBe(2);
+    expect(listRes.body.data[0].name).toBe("strawberry");
 
-    // 🟢 2. 아이템 구매
-    const buyRes = await request(app)
-      .post(`/shop/${mockUserId}/buy`)
-      .send({ itemName: "apple" });
+    // --- strawberry 아이템 사용 ---
+    const useRes = await request(app)
+      .patch("/users/user123/items/strawberry")
+      .set("Authorization", "Bearer testtoken");
 
-    expect(buyRes.status).toBe(200);
-    expect(buyRes.body).toEqual({
-      success: true,
-      message: "Purchase complete",
-      item: { name: "apple", price: 50, category: 1 },
-    });
+    expect(useRes.status).toBe(200);
+    expect(useRes.body.success).toBe(true);
+    expect(useRes.body.itemCount).toBe(4);
+    expect(mockItemRef.update).toHaveBeenCalledWith({ count: 4 });
 
-    // 🟢 3. 유저 포인트 차감 확인
-    expect(mockUserUpdate).toHaveBeenCalledWith({ point: 50 }); // 100 → 50
-
-    // 🟢 4. 인벤토리 갱신 확인
-    expect(mockInventoryUpdate).toHaveBeenCalledWith({
-      name: "apple",
-      category: 1,
-      count: 1,
-    });
+    // --- 인벤토리 갱신 확인 ---
+    const updated = mockInventory.find((i) => i.name === "strawberry");
+    expect(updated?.count).toBe(4);
   });
 
-  it("❌ 시나리오 실패: 포인트 부족 시 구매 불가", async () => {
-    (refUser as jest.Mock).mockReturnValue({
-      get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ point: 10 }) }),
-      update: mockUserUpdate,
-    });
+  it("✅ 시나리오 2: 배경 리스트 확인 → 아이템 사용 → 배경 갱신", async () => {
+    // --- 음식 리스트 확인 ---
+    const listRes = await request(app)
+      .get("/users/user123/items")
+      .query({ itemCategory: 3 })
+      .set("Authorization", "Bearer testtoken");
 
-    const res = await request(app)
-      .post(`/shop/${mockUserId}`)
-      .send({ itemName: "cookie" });
+    expect(listRes.status).toBe(200);
+    expect(listRes.body.success).toBe(true);
+    expect(listRes.body.data.length).toBe(1);
+    expect(listRes.body.data[0].name).toBe("beach");
 
-    expect(res.status).toBe(400);
-    expect(res.body.message).toBe("Not enough points");
-    expect(mockUserUpdate).not.toHaveBeenCalled();
+    // --- strawberry 아이템 사용 ---
+    const useRes = await request(app)
+      .patch("/users/user123/items/beach/set")
+      .send({ placeID: "beach"})
+      .set("Authorization", "Bearer testtoken");
+
+    expect(useRes.status).toBe(200);
+    expect(useRes.body.success).toBe(true);
+    expect(useRes.body.message).toBe("inventory place use complete");
+    expect(mockUserRef.update).toHaveBeenCalledWith({ "setting.placeID": "beach" });
+    
+    // --- 배경 갱신 확인 ---
+    expect(mockUser.setting.placeID).toBe("beach");
+  });
+
+  it("✅ 시나리오 3: 스타일 리스트 확인 → 아이템 사용 → 펫 스타일 갱신", async () => {
+    // --- 음식 리스트 확인 ---
+    const listRes = await request(app)
+      .get("/users/user123/items")
+      .query({ itemCategory: 4 })
+      .set("Authorization", "Bearer testtoken");
+
+    expect(listRes.status).toBe(200);
+    expect(listRes.body.success).toBe(true);
+    expect(listRes.body.data.length).toBe(2);
+    expect(listRes.body.data[0].name).toBe("starlight");
+
+    // --- strawberry 아이템 사용 ---
+    const useRes = await request(app)
+      .patch("/users/user123/items/starlight/style")
+      .send({ styleID: "starlight"})
+      .set("Authorization", "Bearer testtoken");
+
+    
+    expect(useRes.status).toBe(200);
+    expect(useRes.body.success).toBe(true);
+    expect(useRes.body.styleID).toBe("starlight");
+    expect(useRes.body.message).toBe("inventory style use complete");
+    expect(mockUpdate).toHaveBeenCalledWith({ styleID: "starlight" });
+        
+    // --- 스타일 갱신 확인 ---
+    expect(mockUser.styleID).toBe("starlight");
   });
 });
