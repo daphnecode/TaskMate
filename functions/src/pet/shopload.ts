@@ -80,6 +80,8 @@ router.post("/items/:userId", async (req, res) => {
 
     const userPoint = snap2.data()?.currentPoint;
     const itemPrice = snap3.data()?.price;
+    console.log("userPoint:", userPoint);
+    console.log("itemPrice:", itemName, itemPrice);
 
     if (userPoint >= itemPrice) {
       await userRef.update({ currentPoint: userPoint - itemPrice });
@@ -105,7 +107,7 @@ router.post("/items/:userId", async (req, res) => {
       });
     }
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: "item purchase complete",
       itemName,

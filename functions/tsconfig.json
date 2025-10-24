@@ -13,5 +13,5 @@
     "types": ["jest"]
   },
   "compileOnSave": true,
-  "include": ["src", "test/integration.test.ts"]
+  "include": ["src", "test/inventory.test.ts"]
 }
