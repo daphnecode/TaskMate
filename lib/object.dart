@@ -120,7 +120,7 @@ class Users {
       setting: {
         'darkMode': map['setting']['darkMode'],
         'listSort': "사전 순",
-        'placeID': "assets/images/prairie.png",
+        'placeID': map['setting']['placeID'],
         'push': map['setting']['push'],
         'sound': map['setting']['sound'],
       },
