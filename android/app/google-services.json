@@ -1,30 +1,30 @@
 {
   "project_info": {
-#    "project_number": "YOUR_SENDER_ID",
-#    "firebase_url": "https://YOUR_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app",
-#    "project_id": "YOUR_PROJECT_ID",
-#    "storage_bucket": "YOUR_PROJECT.appspot.com"
-#  },
-#  "client": [
-#    {
-#      "client_info": {
-#        "mobilesdk_app_id": "YOUR_ANDROID_APP_ID",
-#        "android_client_info": {
-#          "package_name": "com.example.taskmate"
-#        }
-#      },
-#      "oauth_client": [],
-#      "api_key": [
-#        {
-#          "current_key": "YOUR_ANDROID_API_KEY"
-#        }
-#      ],
-#      "services": {
-#        "appinvite_service": {
-#          "other_platform_oauth_client": []
-#        }
-#      }
-#    }
-#  ],
-#  "configuration_version": "1"
+    "project_number": "YOUR_SENDER_ID",
+    "firebase_url": "https://YOUR_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_PROJECT.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "YOUR_ANDROID_APP_ID",
+        "android_client_info": {
+          "package_name": "com.example.taskmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "YOUR_ANDROID_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }

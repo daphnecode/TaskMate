@@ -50,7 +50,7 @@ class Pets {
   int hunger;
   int happy;
   int level;
-  double currentExp;
+  int currentExp;
   String styleID;
 
   Pets({

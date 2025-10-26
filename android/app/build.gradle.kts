@@ -15,24 +15,27 @@ dependencies {
   // When using the BoM, don't specify versions in Firebase dependencies
   implementation("com.google.firebase:firebase-analytics")
 
-
+  implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
+  coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+  implementation("androidx.core:core-ktx:1.12.0")
   // Add the dependencies for any other desired Firebase products
   // https://firebase.google.com/docs/android/setup#available-libraries
 }
 
 android {
     namespace = "com.example.taskmate"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35 
     // ndkVersion = flutter.ndkVersion
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
@@ -41,9 +44,9 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        targetSdk = 35 
+        versionCode = 1 
+        versionName = "1.0" 
     }
 
     buildTypes {
