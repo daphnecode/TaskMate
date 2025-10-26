@@ -46,6 +46,9 @@ dependencies:
   cloud_functions: ^6.0.0
   firebase_auth: ^6.0.1
   http: ^1.1.0
+  firebase_messaging: ^16.0.0
+  flutter_local_notifications: ^13.0.0  # 포그라운드에서 알림 직접표시 원하면 사용
+  timezone: ^0.9.0  # (선택) 로컬 스케줄링 필요시
   
   
 
