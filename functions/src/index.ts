@@ -48,7 +48,9 @@ export const onTaskSubmitted = onDocumentWritten("Users/{userId}/log/{logId}", a
   await handleTaskSubmitted(userId, logId, after);
 });
 
+import { pushNotifications } from "./notification";
 // 기존 export 유지 (ESM 로컬 모듈은 .js 필수)
-export * from "./submitReward.js";
-export { updateStatus } from "./pet/updateStatus.js";
+export * from "./submitReward";
+export { updateStatus } from "./pet/updateStatus";
 export { submitPetExpAN3 } from "./submitPetEXP";
+export { pushNotifications };
