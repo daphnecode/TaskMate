@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, refInventory, refUser, refItem } from "./refAPI";
+import { verifyToken, refInventory, refUser, refItem, refStats } from "./refAPI";
 import { Item } from "../types/api";
 
 const router = express.Router();
@@ -103,7 +103,7 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
     const petData = petSnap.data() ?? {};
     const petHunger = petData["hunger"] ?? 0;
     const petHappy = petData["happy"] ?? 0;
-    const updates: any = {};
+    const updatesPet: any = {};
 
     const itemData = snap.data() ?? {};
     const itemHunger = itemData["hunger"] ?? 0;
@@ -113,11 +113,34 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
     const newHunger = Math.min(petHunger + itemHunger);
     const newHappy = Math.min(petHappy + itemHappy);
 
-    updates.hunger = newHunger;
-    updates.happy = newHappy;
+    updatesPet.hunger = newHunger;
+    updatesPet.happy = newHappy;
 
     // 3️⃣ pets/{nowPet} 문서 업데이트
-    await userRef.collection("pets").doc(nowPet).set(updates, {merge: true});
+    await userRef.collection("pets").doc(nowPet).set(updatesPet, {merge: true});
+
+    const statsRef = refStats(uid);
+    const statsSnap = await statsRef.get();
+    const statsData = statsSnap.data() ?? {};
+    const feeding = statsData["feeding"] ?? 0;
+    const moreHappy = statsData["moreHappy"] ?? 0;
+
+    let newF = feeding;
+    let newMH = moreHappy;
+    if (itemHunger > 0) newF++;
+    if (itemHappy > 0) newMH++;
+
+    await statsRef.update({
+      feeding: newF,
+      moreHappy: newMH,
+    });
+
+    const foodRef = statsRef.collection("foodCount").doc(itemName);
+    const foodSnap = await foodRef.get();
+    const foodData = foodSnap.data() ?? {};
+    const count = foodData["count"];
+
+    await foodRef.update({count: count + 1});
 
     return res.json({
       success: true,

@@ -4,8 +4,7 @@ admin.initializeApp();
 
 export const pushNotifications = onSchedule(
   {
-    // schedule: "0 8,12,18 * * *",
-    schedule: "0 */1 * * *",
+    schedule: "0 8,12,18 * * *",
     timeZone: "Asia/Seoul",
     region: "asia-northeast3",
   },
@@ -15,6 +14,5 @@ export const pushNotifications = onSchedule(
       topic: "dailyReminder",
     });
     console.log("✅ Scheduled notification sent successfully");
-    console.log("sendScheduledNotifications redeploy test", new Date().toISOString());
   }
 );

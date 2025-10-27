@@ -27,3 +27,6 @@ export function refUser(uid: string) {
 export function refPets(uid: string) {
   return db.collection("Users").doc(uid).collection("pets");
 }
+export function refStats(uid: string) {
+  return db.collection("Users").doc(uid).collection("stats").doc("summary");
+}
