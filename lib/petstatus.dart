@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'object.dart';
 import 'tutorial.dart';
 import 'package:taskmate/utils/icon_utis.dart';
+import 'DBtest/api_service.dart';
 
 Row hungerStatus(BuildContext context, int nowHunger) {
   int check = (nowHunger / 20).truncate() + 1;
@@ -102,17 +103,40 @@ class _PetStatAreaState extends State<PetStatArea> {
   }
 }
 
-class PetStatus extends StatelessWidget {
+class PetStatus extends StatefulWidget {
   final Pets? pet;
   final Users user;
   const PetStatus({required this.pet, required this.user, super.key});
 
+  @override
+  State<PetStatus> createState() => _PetStatusState();
+}
+
+class _PetStatusState extends State<PetStatus> {
+  stats? pStats;
   /*
   경험치가 증가하거나 감소했을 때, 레벨 업 혹은 레벨 다운.
   */
   @override
+  void initState() {
+    super.initState();
+    loadStats();
+  }
+
+  Future<void> loadStats() async {
+    final result = await petStatistics();
+    setState(() {
+      pStats = result;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    double progress = pet!.currentExp / petLevelTable[pet!.level - 1].expToNext;
+    if (pStats == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    double progress =
+        widget.pet!.currentExp / petLevelTable[widget.pet!.level - 1].expToNext;
     return Padding(
       padding: EdgeInsets.all(20.0),
       child: Column(
@@ -123,7 +147,7 @@ class PetStatus extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Text(
-                  "LV ${pet!.level}",
+                  "LV ${widget.pet!.level}",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -148,7 +172,7 @@ class PetStatus extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      "${pet!.currentExp}/${petLevelTable[pet!.level - 1].expToNext}",
+                      "${widget.pet!.currentExp}/${petLevelTable[widget.pet!.level - 1].expToNext}",
                     ),
                   ],
                 ),
@@ -160,14 +184,14 @@ class PetStatus extends StatelessWidget {
               Expanded(
                 child: getThemedIcon(context, "assets/icons/icon-heart.png"),
               ),
-              Expanded(child: Text("${pet!.happy}/100")),
+              Expanded(child: Text("${widget.pet!.happy}/100")),
               Expanded(
                 child: getThemedIcon(
                   context,
                   "assets/icons/icon-chickenalt.png",
                 ),
               ),
-              Expanded(child: Text("${pet!.hunger}/100")),
+              Expanded(child: Text("${widget.pet!.hunger}/100")),
             ],
           ),
           SizedBox(height: 40),
@@ -179,7 +203,7 @@ class PetStatus extends StatelessWidget {
               Expanded(child: Text("총 달린 거리", style: TextStyle(fontSize: 16))),
               Expanded(
                 child: Text(
-                  '1600m',
+                  "${pStats!.distance}",
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.end,
                 ),
@@ -193,7 +217,7 @@ class PetStatus extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  '1',
+                  '${pStats!.happyAction}',
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.end,
                 ),
@@ -205,7 +229,7 @@ class PetStatus extends StatelessWidget {
               Expanded(child: Text("먹이 준 횟수", style: TextStyle(fontSize: 16))),
               Expanded(
                 child: Text(
-                  '2',
+                  '${pStats!.feedCount}',
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.end,
                 ),
@@ -219,7 +243,7 @@ class PetStatus extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  "딸기",
+                  pStats!.favorite,
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.end,
                 ),
@@ -233,7 +257,7 @@ class PetStatus extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  "${user.gotPoint}pt",
+                  "${widget.user.gotPoint}pt",
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.end,
                 ),
@@ -247,7 +271,7 @@ class PetStatus extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  "${user.gotPoint - user.currentPoint}pt",
+                  "${widget.user.gotPoint - widget.user.currentPoint}pt",
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.end,
                 ),

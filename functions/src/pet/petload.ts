@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, refUser, refPets } from "./refAPI";
+import { verifyToken, refUser, refPets, refStats } from "./refAPI";
 import { Pet } from "../types/api.js";
 
 
@@ -63,30 +63,39 @@ router.get("/:userId/pets/:petName", async (req, res) => {
 // ---------------------------
 // GET /users/:userId/pets/statistics
 // 펫 통계 조회
-/*
-router.get("/:userId/pets/statistics", async (req, res) => {
+
+router.get("/:userId/statistics", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
     const { userId: uid } = req.params;
     if (decoded.uid !== uid) return res.status(403).json({ success: false, message: "Forbidden" });
 
-    const snap = await refPets(uid).get();
-    if (snap.empty) return res.json({ success: true, message: "no pets found", data: {} });
+    const statsRef = refStats(uid);
+    const statsSnap = await statsRef.get();
+    const statsData = statsSnap.data() ?? {};
+    const update : any = {};
 
-    // 예시: 총 레벨 합, 평균 레벨 계산
-    const pets = snap.docs.map(doc => doc.data() as Pet);
-    const totalLevel = pets.reduce((sum, p) => sum + p.level, 0);
-    const avgLevel = totalLevel / pets.length;
+    const distance = statsData["runningDistance"] ?? 0;
+    const feedCount = statsData["feeding"] ?? 0;
+    const happyAction = statsData["moreHappy"] ?? 0;
+    update.distance = distance;
+    update.feedCount = feedCount;
+    update.happyAction = happyAction;
+
+    const foodRef = statsRef.collection("foodCount");
+    const foodSnap = await foodRef.orderBy("count", "desc").limit(1).get();
+
+    const favorite = foodSnap.docs[0];
+    update.favorite = favorite.id;
 
     return res.json({
       success: true,
       message: "pet statistics read complete",
-      data: { totalLevel, avgLevel, count: pets.length }
+      ...update,
     });
-
   } catch (e: any) {
     return res.status(401).json({ success: false, message: e?.message || "Unauthorized" });
   }
 });
-*/
+
 export default router;

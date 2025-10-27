@@ -135,6 +135,29 @@ class Users {
   };
 }
 
+class stats {
+  final int distance;
+  final int feedCount;
+  final int happyAction;
+  final String favorite;
+
+  stats({
+    required this.distance,
+    required this.feedCount,
+    required this.happyAction,
+    required this.favorite,
+  });
+
+  factory stats.fromMap(Map<String, dynamic> map) {
+    return stats(
+      distance: map['distance'] ?? 0,
+      feedCount: map['feedCount'] ?? 0,
+      happyAction: map['happyAction'] ?? 0,
+      favorite: map['favorite'] ?? "nothing",
+    );
+  }
+}
+
 // 1~100 레벨 데이터 테이블
 const List<PetLevel> petLevelTable = [
   PetLevel(level: 1, expToNext: 5, totalExp: 5),

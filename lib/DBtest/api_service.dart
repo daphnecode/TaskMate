@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:taskmate/DBtest/task.dart';
 import 'package:taskmate/object.dart';
@@ -467,5 +468,26 @@ Future<void> choosePet(String petName) async {
     }
   } catch (e) {
     throw Exception("Error updating pet: $e");
+  }
+}
+
+Future<stats> petStatistics() async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/users/$uid/statistics");
+    final r = await http.get(url, headers: await _authHeaders());
+
+    if (r.statusCode == 200) {
+      final data = jsonDecode(r.body);
+      debugPrint(r.body);
+      final pStats = stats.fromMap(data);
+      return pStats;
+    } else {
+      throw Exception(
+        "Failed to loading statistics: ${r.statusCode}, ${r.body}",
+      );
+    }
+  } catch (e) {
+    throw Exception("Error loading statistics: $e");
   }
 }
