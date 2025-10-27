@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, refUser } from "./refAPI";
+import { verifyToken, refUser, refStats } from "./refAPI";
 
 const router = express.Router();
 
@@ -41,6 +41,20 @@ router.patch("/run/:userId", async (req, res) => {
     const newHunger = Math.max((petData.hunger ?? 0) - 20, 0);
 
     await petRef.update({ happy: newHappy, hunger: newHunger });
+
+    const statsRef = refStats(uid);
+    const statsSnap = await statsRef.get();
+    const statsData = statsSnap.data() ?? {};
+    const runningDistance = statsData["runningDistance"] ?? 0;
+    const moreHappy = statsData["moreHappy"] ?? 0;
+
+    const newR = runningDistance + 300;
+    const newMH = moreHappy + 1;
+
+    await statsRef.update({
+      runningDistance: newR,
+      moreHappy: newMH,
+    });
 
     return res.json({
       success: true,
@@ -94,6 +108,17 @@ router.patch("/clean/:userId", async (req, res) => {
 
     await petRef.update({
       happy: newHappy,
+    });
+
+    const statsRef = refStats(uid);
+    const statsSnap = await statsRef.get();
+    const statsData = statsSnap.data() ?? {};
+    const moreHappy = statsData["moreHappy"] ?? 0;
+
+    const newMH = moreHappy + 1;
+
+    await statsRef.update({
+      moreHappy: newMH,
     });
 
     return res.json({
