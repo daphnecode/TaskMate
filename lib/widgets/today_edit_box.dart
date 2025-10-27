@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:taskmate/DBtest/task.dart';
 
-/// 일일 리스트 편집
+/// ==============================
+/// 일일 리스트 편집 (카드)
+/// ==============================
 class TodayEditBox extends StatefulWidget {
   final List<Task> taskList;
   final void Function(List<Task>) onTaskListUpdated;
@@ -22,47 +24,117 @@ class TodayEditBox extends StatefulWidget {
 
 class _TodayEditBoxState extends State<TodayEditBox> {
   late List<Task> _localTaskList;
-  final List<TextEditingController> _controllers = [];
-  final List<FocusNode> _focusNodes = [];
+
+  // id 기반 영속 관리
+  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, FocusNode> _focusNodes = {};
 
   @override
   void initState() {
     super.initState();
-    _initFromTasks(widget.taskList);
+    _syncWith(widget.taskList);
   }
 
   @override
   void didUpdateWidget(covariant TodayEditBox oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.taskList != widget.taskList) {
-      _initFromTasks(widget.taskList);
+
+    // ✅ 내용이 실제로 달라졌을 때만 동기화
+    final oldIds = oldWidget.taskList.map((t) => t.id).toList(growable: false);
+    final newIds = widget.taskList.map((t) => t.id).toList(growable: false);
+    final shallowEqual = oldIds.length == newIds.length &&
+        List.generate(oldIds.length, (i) => oldIds[i] == newIds[i]).every((b) => b);
+
+    if (!shallowEqual) {
+      _syncWith(widget.taskList);
+    } else {
+      // 같은 항목 구성이면, 포커스 안 잡힌 항목 텍스트만 조용히 맞춰줌
+      for (final t in widget.taskList) {
+        final f = _focusNodes[t.id];
+        if (f != null && !f.hasFocus) {
+          final c = _controllers[t.id];
+          if (c != null && c.text != t.text) {
+            c.text = t.text;
+          }
+        }
+      }
     }
   }
 
-  void _initFromTasks(List<Task> tasks) {
-    // 이전 컨트롤러/포커스 정리
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
-    _controllers.clear();
-    _focusNodes.clear();
+  void _syncWith(List<Task> tasks) {
+    _localTaskList = List<Task>.from(tasks);
 
-    _localTaskList = List.from(tasks);
     for (final t in _localTaskList) {
-      _controllers.add(TextEditingController(text: t.text));
-      _focusNodes.add(FocusNode());
+      _controllers.putIfAbsent(t.id, () => TextEditingController(text: t.text));
+      _focusNodes.putIfAbsent(t.id, () {
+        final f = FocusNode();
+        f.addListener(() {
+          if (!f.hasFocus) _commitIfChanged(t.id);
+        });
+        return f;
+      });
+
+      // 포커스 중 아닐 때만 외부 변경 반영
+      final f = _focusNodes[t.id]!;
+      if (!f.hasFocus) {
+        final c = _controllers[t.id]!;
+        if (c.text != t.text) c.text = t.text;
+      }
     }
+
+    // 제거 정리
+    final alive = _localTaskList.map((e) => e.id).toSet();
+    for (final id in _controllers.keys.toList()) {
+      if (!alive.contains(id)) {
+        _controllers.remove(id)?.dispose();
+        _focusNodes.remove(id)?.dispose();
+      }
+    }
+
     setState(() {});
   }
 
+  void _commitIfChanged(String id) {
+    final idx = _localTaskList.indexWhere((t) => t.id == id);
+    if (idx < 0) return;
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return; // 한글 합성 중 커밋 금지
+
+    final cur = _localTaskList[idx];
+    if (cur.text != c.text) {
+      _localTaskList[idx] = cur.copyWith(text: c.text);
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList)); // 커밋 시에만 상위 반영
+    }
+  }
+
+  void _onChangedLocal(String id, String _) {
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return; // 합성 중
+    final i = _localTaskList.indexWhere((t) => t.id == id);
+    if (i >= 0) {
+      _localTaskList[i] = _localTaskList[i].copyWith(text: c.text);
+    }
+  }
+
   void _addTask() {
+    final newTask = Task(
+      id: generateTaskId(),
+      text: '할 일을 추가해보세요',
+      isChecked: false,
+      point: 0,
+    );
     setState(() {
-      final newTask = Task(text: '할 일을 추가해보세요', isChecked: false, point: 0);
       _localTaskList.add(newTask);
-      _controllers.add(TextEditingController(text: newTask.text));
+      _controllers[newTask.id] = TextEditingController(text: newTask.text);
       final node = FocusNode();
-      _focusNodes.add(node);
-      widget.onTaskListUpdated(_localTaskList);
-      // 프레임 이후 마지막 항목에 포커스
+      node.addListener(() {
+        if (!node.hasFocus) _commitIfChanged(newTask.id);
+      });
+      _focusNodes[newTask.id] = node;
+
+      // 구조 변경은 즉시 알림 (내용은 포커스 아웃/엔터에서 커밋)
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList));
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) FocusScope.of(context).requestFocus(node);
       });
@@ -70,23 +142,19 @@ class _TodayEditBoxState extends State<TodayEditBox> {
   }
 
   void _removeTask(int index) {
+    final id = _localTaskList[index].id;
     setState(() {
       _localTaskList.removeAt(index);
-      _controllers.removeAt(index).dispose();
-      _focusNodes.removeAt(index).dispose();
-      widget.onTaskListUpdated(_localTaskList);
+      _controllers.remove(id)?.dispose();
+      _focusNodes.remove(id)?.dispose();
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList));
     });
-  }
-
-  void _updateTaskText(int index, String newText) {
-    _localTaskList[index] = _localTaskList[index].copyWith(text: newText);
-    widget.onTaskListUpdated(_localTaskList);
   }
 
   @override
   void dispose() {
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _controllers.values) c.dispose();
+    for (final f in _focusNodes.values) f.dispose();
     super.dispose();
   }
 
@@ -130,10 +198,10 @@ class _TodayEditBoxState extends State<TodayEditBox> {
                   onPressed: _addTask,
                   style: OutlinedButton.styleFrom(
                     shape: const CircleBorder(),
-                    side: BorderSide(color: Colors.blue, width: 2),
+                    side: const BorderSide(color: Colors.blue, width: 2),
                     padding: const EdgeInsets.all(8),
                   ),
-                  child: Icon(Icons.add, color: Colors.blue),
+                  child: const Icon(Icons.add, color: Colors.blue),
                 ),
               ],
             ),
@@ -147,17 +215,24 @@ class _TodayEditBoxState extends State<TodayEditBox> {
               child: ListView.builder(
                 itemCount: _localTaskList.length,
                 itemBuilder: (context, index) {
+                  final t = _localTaskList[index];
+                  final c = _controllers[t.id]!;
+                  final f = _focusNodes[t.id]!;
                   return Row(
+                    key: ValueKey(t.id), // 안정 키
                     children: [
                       Expanded(
                         child: TextField(
-                          controller: _controllers[index],
-                          focusNode: _focusNodes[index],
-                          onChanged: (v) => _updateTaskText(index, v),
+                          controller: c,
+                          focusNode: f,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => _commitIfChanged(t.id),
+                          onChanged: (v) => _onChangedLocal(t.id, v),
                           decoration: InputDecoration(
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
+                              horizontal: 12, vertical: 10,
+                            ),
                             fillColor: theme.colorScheme.surfaceVariant,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -184,7 +259,9 @@ class _TodayEditBoxState extends State<TodayEditBox> {
   }
 }
 
-/// 일일 리스트 편집 - 전체 화면(스타일 통일 + 컨트롤러/포커스 유지)
+/// =======================================
+/// 일일 리스트 편집 - 전체 화면
+/// =======================================
 class TodayEditFullScreen extends StatefulWidget {
   final List<Task> taskList;
   final void Function(List<Task>) onTaskListUpdated;
@@ -205,45 +282,95 @@ class TodayEditFullScreen extends StatefulWidget {
 
 class _TodayEditFullScreenState extends State<TodayEditFullScreen> {
   late List<Task> _localTaskList;
-  final List<TextEditingController> _controllers = [];
-  final List<FocusNode> _focusNodes = [];
+
+  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, FocusNode> _focusNodes = {};
 
   @override
   void initState() {
     super.initState();
-    _initFromTasks(widget.taskList);
+    _syncWith(widget.taskList);
   }
 
   @override
   void didUpdateWidget(covariant TodayEditFullScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.taskList != widget.taskList) {
-      _initFromTasks(widget.taskList);
+    if (!identical(oldWidget.taskList, widget.taskList)) {
+      _syncWith(widget.taskList);
     }
   }
 
-  void _initFromTasks(List<Task> tasks) {
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
-    _controllers.clear();
-    _focusNodes.clear();
+  void _syncWith(List<Task> tasks) {
+    _localTaskList = List<Task>.from(tasks);
 
-    _localTaskList = List.from(tasks);
     for (final t in _localTaskList) {
-      _controllers.add(TextEditingController(text: t.text));
-      _focusNodes.add(FocusNode());
+      _controllers.putIfAbsent(t.id, () => TextEditingController(text: t.text));
+      _focusNodes.putIfAbsent(t.id, () {
+        final f = FocusNode();
+        f.addListener(() {
+          if (!f.hasFocus) _commitIfChanged(t.id);
+        });
+        return f;
+      });
+
+      final f = _focusNodes[t.id]!;
+      if (!f.hasFocus) {
+        final c = _controllers[t.id]!;
+        if (c.text != t.text) c.text = t.text;
+      }
     }
+
+    final alive = _localTaskList.map((e) => e.id).toSet();
+    for (final id in _controllers.keys.toList()) {
+      if (!alive.contains(id)) {
+        _controllers.remove(id)?.dispose();
+        _focusNodes.remove(id)?.dispose();
+      }
+    }
+
     setState(() {});
   }
 
+  void _commitIfChanged(String id) {
+    final idx = _localTaskList.indexWhere((t) => t.id == id);
+    if (idx < 0) return;
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return;
+
+    final cur = _localTaskList[idx];
+    if (cur.text != c.text) {
+      _localTaskList[idx] = cur.copyWith(text: c.text);
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList));
+    }
+  }
+
+  void _onChangedLocal(String id, String _) {
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return;
+    final i = _localTaskList.indexWhere((t) => t.id == id);
+    if (i >= 0) {
+      _localTaskList[i] = _localTaskList[i].copyWith(text: c.text);
+    }
+  }
+
   void _addTask() {
+    final newTask = Task(
+      id: generateTaskId(),
+      text: '할 일을 추가해보세요',
+      isChecked: false,
+      point: 0,
+    );
     setState(() {
-      final newTask = Task(text: '할 일을 추가해보세요', isChecked: false, point: 0);
       _localTaskList.add(newTask);
-      _controllers.add(TextEditingController(text: newTask.text));
+      _controllers[newTask.id] = TextEditingController(text: newTask.text);
       final node = FocusNode();
-      _focusNodes.add(node);
-      widget.onTaskListUpdated(_localTaskList);
+      node.addListener(() {
+        if (!node.hasFocus) _commitIfChanged(newTask.id);
+      });
+      _focusNodes[newTask.id] = node;
+
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList));
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) FocusScope.of(context).requestFocus(node);
       });
@@ -251,23 +378,19 @@ class _TodayEditFullScreenState extends State<TodayEditFullScreen> {
   }
 
   void _removeTask(int index) {
+    final id = _localTaskList[index].id;
     setState(() {
       _localTaskList.removeAt(index);
-      _controllers.removeAt(index).dispose();
-      _focusNodes.removeAt(index).dispose();
-      widget.onTaskListUpdated(_localTaskList);
+      _controllers.remove(id)?.dispose();
+      _focusNodes.remove(id)?.dispose();
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList));
     });
-  }
-
-  void _updateTaskText(int index, String newText) {
-    _localTaskList[index] = _localTaskList[index].copyWith(text: newText);
-    widget.onTaskListUpdated(_localTaskList);
   }
 
   @override
   void dispose() {
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _controllers.values) c.dispose();
+    for (final f in _focusNodes.values) f.dispose();
     super.dispose();
   }
 
@@ -313,32 +436,40 @@ class _TodayEditFullScreenState extends State<TodayEditFullScreen> {
                 onPressed: _addTask,
                 style: OutlinedButton.styleFrom(
                   shape: const CircleBorder(),
-                  side: BorderSide(color: Colors.blue, width: 2),
+                  side: const BorderSide(color: Colors.blue, width: 2),
                   padding: const EdgeInsets.all(8),
                 ),
-                child: Icon(Icons.add, color: Colors.blue),
+                child: const Icon(Icons.add, color: Colors.blue),
               ),
             ],
           ),
         ),
 
+        // 전체 편집 리스트
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: ListView.builder(
               itemCount: _localTaskList.length,
               itemBuilder: (context, index) {
+                final t = _localTaskList[index];
+                final c = _controllers[t.id]!;
+                final f = _focusNodes[t.id]!;
                 return Row(
+                  key: ValueKey(t.id), // 안정 키
                   children: [
                     Expanded(
                       child: TextField(
-                        controller: _controllers[index],
-                        focusNode: _focusNodes[index],
-                        onChanged: (v) => _updateTaskText(index, v),
+                        controller: c,
+                        focusNode: f,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _commitIfChanged(t.id),
+                        onChanged: (v) => _onChangedLocal(t.id, v),
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                            horizontal: 12, vertical: 10,
+                          ),
                           fillColor: theme.colorScheme.surfaceVariant,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),

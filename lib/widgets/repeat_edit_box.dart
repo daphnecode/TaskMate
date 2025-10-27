@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:taskmate/DBtest/task.dart';
 
-/// 반복 리스트 편집
+/// ==============================
+/// 반복 리스트 편집 (카드)
+/// ==============================
 class RepeatEditBox extends StatefulWidget {
   final List<Task> taskList;
   final void Function(List<Task>) onTaskListUpdated;
@@ -20,74 +22,150 @@ class RepeatEditBox extends StatefulWidget {
 
 class _RepeatEditBoxState extends State<RepeatEditBox> {
   late List<Task> _localTaskList;
-  final List<TextEditingController> _controllers = [];
-  final List<FocusNode> _focusNodes = [];
+
+  // id 기반 영속 관리
+  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, FocusNode> _focusNodes = {};
 
   @override
   void initState() {
     super.initState();
-    _initFromTasks(widget.taskList);
+    _syncWith(widget.taskList);
   }
 
   @override
   void didUpdateWidget(covariant RepeatEditBox oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 외부에서 리스트가 바뀌면 동기화
-    if (oldWidget.taskList != widget.taskList) {
-      _initFromTasks(widget.taskList);
+
+    // ✅ 구성(항목 id 시퀀스)이 바뀐 경우에만 전체 동기화
+    final oldIds = oldWidget.taskList.map((t) => t.id).toList(growable: false);
+    final newIds = widget.taskList.map((t) => t.id).toList(growable: false);
+    final sameLength = oldIds.length == newIds.length;
+    final sameOrder = sameLength &&
+        List<bool>.generate(oldIds.length, (i) => oldIds[i] == newIds[i])
+            .every((b) => b);
+
+    if (!sameOrder) {
+      _syncWith(widget.taskList);
+    } else {
+      // 구성 동일 → 포커스 없는 항목만 텍스트 싱크
+      for (final t in widget.taskList) {
+        final f = _focusNodes[t.id];
+        if (f != null && !f.hasFocus) {
+          final c = _controllers[t.id];
+          if (c != null && c.text != t.text) c.text = t.text;
+        }
+      }
     }
   }
 
-  void _initFromTasks(List<Task> tasks) {
-    // 기존 컨트롤러/포커스 정리
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
-    _controllers.clear();
-    _focusNodes.clear();
+  void _syncWith(List<Task> tasks) {
+    _localTaskList = List<Task>.from(tasks);
 
-    _localTaskList = List.from(tasks);
     for (final t in _localTaskList) {
-      _controllers.add(TextEditingController(text: t.text));
-      _focusNodes.add(FocusNode());
+      _controllers.putIfAbsent(t.id, () => TextEditingController(text: t.text));
+      _focusNodes.putIfAbsent(t.id, () {
+        final f = FocusNode();
+        f.addListener(() {
+          if (!f.hasFocus) _commitIfChanged(t.id);
+        });
+        return f;
+      });
+
+      // 포커스 중이 아닐 때만 외부 텍스트 반영
+      final f = _focusNodes[t.id]!;
+      if (!f.hasFocus) {
+        final c = _controllers[t.id]!;
+        if (c.text != t.text) c.text = t.text;
+      }
     }
+
+    // 제거 정리
+    final alive = _localTaskList.map((e) => e.id).toSet();
+    for (final id in _controllers.keys.toList()) {
+      if (!alive.contains(id)) {
+        _controllers.remove(id)?.dispose();
+        _focusNodes.remove(id)?.dispose();
+      }
+    }
+
     setState(() {});
   }
 
+  void _commitIfChanged(String id) {
+    final idx = _localTaskList.indexWhere((t) => t.id == id);
+    if (idx < 0) return;
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return; // 한글 합성 중 커밋 금지
+
+    final cur = _localTaskList[idx];
+    if (cur.text != c.text) {
+      _localTaskList[idx] = cur.copyWith(text: c.text);
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList)); // 복제본
+    }
+  }
+
+  // onChanged에서는 로컬 상태만 갱신
+  void _onChangedLocal(String id, String _) {
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return;
+    final i = _localTaskList.indexWhere((t) => t.id == id);
+    if (i >= 0) {
+      _localTaskList[i] = _localTaskList[i].copyWith(text: c.text);
+    }
+  }
+
   void _addTask() {
+    final newTask = Task(
+      id: generateTaskId(),
+      text: '할 일을 추가해보세요',
+      isChecked: false,
+      point: 0,
+    );
+
     setState(() {
-      final newTask = Task(text: '할 일을 추가해보세요', isChecked: false, point: 0);
       _localTaskList.add(newTask);
-      _controllers.add(TextEditingController(text: newTask.text));
+
+      _controllers[newTask.id] = TextEditingController(text: newTask.text);
+
       final node = FocusNode();
-      _focusNodes.add(node);
-      widget.onTaskListUpdated(_localTaskList);
-      // 프레임 후 마지막 항목에 포커스
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(node);
-        }
+      node.addListener(() {
+        if (!node.hasFocus) _commitIfChanged(newTask.id);
       });
+      _focusNodes[newTask.id] = node;
+
+      // 먼저 로컬 UI 렌더 + 포커스
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) FocusScope.of(context).requestFocus(node);
+      });
+    });
+
+    // 부모 반영은 다음 프레임으로 미룸 (되돌림/깜빡임 방지)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList));
     });
   }
 
   void _removeTask(int index) {
+    final id = _localTaskList[index].id;
     setState(() {
       _localTaskList.removeAt(index);
-      _controllers.removeAt(index).dispose();
-      _focusNodes.removeAt(index).dispose();
-      widget.onTaskListUpdated(_localTaskList);
+      _controllers.remove(id)?.dispose();
+      _focusNodes.remove(id)?.dispose();
     });
-  }
 
-  void _updateTaskText(int index, String newText) {
-    _localTaskList[index] = _localTaskList[index].copyWith(text: newText);
-    widget.onTaskListUpdated(_localTaskList);
+    // 삭제도 프레임 뒤에 부모 반영(깜빡임 방지)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      widget.onTaskListUpdated(List<Task>.from(_localTaskList));
+    });
   }
 
   @override
   void dispose() {
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _controllers.values) c.dispose();
+    for (final f in _focusNodes.values) f.dispose();
     super.dispose();
   }
 
@@ -127,10 +205,10 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
                   onPressed: _addTask,
                   style: OutlinedButton.styleFrom(
                     shape: const CircleBorder(),
-                    side: BorderSide(color: Colors.blue, width: 2),
+                    side: const BorderSide(color: Colors.blue, width: 2),
                     padding: const EdgeInsets.all(8),
                   ),
-                  child: Icon(Icons.add, color: Colors.blue),
+                  child: const Icon(Icons.add, color: Colors.blue),
                 ),
               ],
             ),
@@ -144,17 +222,24 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
               child: ListView.builder(
                 itemCount: _localTaskList.length,
                 itemBuilder: (context, index) {
+                  final t = _localTaskList[index];
+                  final c = _controllers[t.id]!;
+                  final f = _focusNodes[t.id]!;
                   return Row(
+                    key: ValueKey(t.id), // 안정 키
                     children: [
                       Expanded(
                         child: TextField(
-                          controller: _controllers[index],
-                          focusNode: _focusNodes[index],
-                          onChanged: (v) => _updateTaskText(index, v),
+                          controller: c,
+                          focusNode: f,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => _commitIfChanged(t.id),
+                          onChanged: (v) => _onChangedLocal(t.id, v),
                           decoration: InputDecoration(
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
+                              horizontal: 12, vertical: 10,
+                            ),
                             fillColor: theme.colorScheme.surfaceVariant,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -181,7 +266,9 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
   }
 }
 
-/// 반복 리스트 편집 - 전체 화면
+/// =======================================
+/// 반복 리스트 편집 - 전체 화면(풀스크린)
+/// =======================================
 class ReapeatEditFullScreen extends StatefulWidget {
   final List<Task> tasklist;
   final void Function(List<Task>) onTaskAListUpdated;
@@ -200,69 +287,142 @@ class ReapeatEditFullScreen extends StatefulWidget {
 
 class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
   late List<Task> _localTaskList;
-  final List<TextEditingController> _controllers = [];
-  final List<FocusNode> _focusNodes = [];
+
+  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, FocusNode> _focusNodes = {};
 
   @override
   void initState() {
     super.initState();
-    _initFromTasks(widget.tasklist);
+    _syncWith(widget.tasklist);
   }
 
   @override
   void didUpdateWidget(covariant ReapeatEditFullScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.tasklist != widget.tasklist) {
-      _initFromTasks(widget.tasklist);
+
+    final oldIds = oldWidget.tasklist.map((t) => t.id).toList(growable: false);
+    final newIds = widget.tasklist.map((t) => t.id).toList(growable: false);
+    final sameLength = oldIds.length == newIds.length;
+    final sameOrder = sameLength &&
+        List<bool>.generate(oldIds.length, (i) => oldIds[i] == newIds[i])
+            .every((b) => b);
+
+    if (!sameOrder) {
+      _syncWith(widget.tasklist);
+    } else {
+      for (final t in widget.tasklist) {
+        final f = _focusNodes[t.id];
+        if (f != null && !f.hasFocus) {
+          final c = _controllers[t.id];
+          if (c != null && c.text != t.text) c.text = t.text;
+        }
+      }
     }
   }
 
-  void _initFromTasks(List<Task> tasks) {
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
-    _controllers.clear();
-    _focusNodes.clear();
+  void _syncWith(List<Task> tasks) {
+    _localTaskList = List<Task>.from(tasks);
 
-    _localTaskList = List.from(tasks);
     for (final t in _localTaskList) {
-      _controllers.add(TextEditingController(text: t.text));
-      _focusNodes.add(FocusNode());
+      _controllers.putIfAbsent(t.id, () => TextEditingController(text: t.text));
+      _focusNodes.putIfAbsent(t.id, () {
+        final f = FocusNode();
+        f.addListener(() {
+          if (!f.hasFocus) _commitIfChanged(t.id);
+        });
+        return f;
+      });
+
+      final f = _focusNodes[t.id]!;
+      if (!f.hasFocus) {
+        final c = _controllers[t.id]!;
+        if (c.text != t.text) c.text = t.text;
+      }
     }
+
+    final alive = _localTaskList.map((e) => e.id).toSet();
+    for (final id in _controllers.keys.toList()) {
+      if (!alive.contains(id)) {
+        _controllers.remove(id)?.dispose();
+        _focusNodes.remove(id)?.dispose();
+      }
+    }
+
     setState(() {});
   }
 
+  void _commitIfChanged(String id) {
+    final idx = _localTaskList.indexWhere((t) => t.id == id);
+    if (idx < 0) return;
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return;
+
+    final cur = _localTaskList[idx];
+    if (cur.text != c.text) {
+      _localTaskList[idx] = cur.copyWith(text: c.text);
+      widget.onTaskAListUpdated(List<Task>.from(_localTaskList));
+    }
+  }
+
+  void _onChangedLocal(String id, String _) {
+    final c = _controllers[id]!;
+    if (c.value.isComposingRangeValid) return;
+    final i = _localTaskList.indexWhere((t) => t.id == id);
+    if (i >= 0) {
+      _localTaskList[i] = _localTaskList[i].copyWith(text: c.text);
+    }
+  }
+
   void _addTask() {
+    final newTask = Task(
+      id: generateTaskId(),
+      text: '할 일을 추가해보세요',
+      isChecked: false,
+      point: 0,
+    );
+
     setState(() {
-      final newTask = Task(text: '할 일을 추가해보세요', isChecked: false, point: 0);
       _localTaskList.add(newTask);
-      _controllers.add(TextEditingController(text: newTask.text));
+      _controllers[newTask.id] = TextEditingController(text: newTask.text);
+
       final node = FocusNode();
-      _focusNodes.add(node);
-      widget.onTaskAListUpdated(_localTaskList);
+      node.addListener(() {
+        if (!node.hasFocus) _commitIfChanged(newTask.id);
+      });
+      _focusNodes[newTask.id] = node;
+
+      // 로컬 먼저 렌더 + 포커스
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) FocusScope.of(context).requestFocus(node);
       });
     });
-  }
 
-  void _removeTask(int index) {
-    setState(() {
-      _localTaskList.removeAt(index);
-      _controllers.removeAt(index).dispose();
-      _focusNodes.removeAt(index).dispose();
-      widget.onTaskAListUpdated(_localTaskList);
+    // 부모 반영은 다음 프레임
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      widget.onTaskAListUpdated(List<Task>.from(_localTaskList));
     });
   }
 
-  void _updateTaskText(int index, String newText) {
-    _localTaskList[index] = _localTaskList[index].copyWith(text: newText);
-    widget.onTaskAListUpdated(_localTaskList);
+  void _removeTask(int index) {
+    final id = _localTaskList[index].id;
+    setState(() {
+      _localTaskList.removeAt(index);
+      _controllers.remove(id)?.dispose();
+      _focusNodes.remove(id)?.dispose();
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      widget.onTaskAListUpdated(List<Task>.from(_localTaskList));
+    });
   }
 
   @override
   void dispose() {
-    for (final c in _controllers) c.dispose();
-    for (final f in _focusNodes) f.dispose();
+    for (final c in _controllers.values) c.dispose();
+    for (final f in _focusNodes.values) f.dispose();
     super.dispose();
   }
 
@@ -304,10 +464,10 @@ class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
                 onPressed: _addTask,
                 style: OutlinedButton.styleFrom(
                   shape: const CircleBorder(),
-                  side: BorderSide(color: Colors.blue, width: 2),
+                  side: const BorderSide(color: Colors.blue, width: 2),
                   padding: const EdgeInsets.all(8),
                 ),
-                child: Icon(Icons.add, color: Colors.blue),
+                child: const Icon(Icons.add, color: Colors.blue),
               ),
             ],
           ),
@@ -320,17 +480,24 @@ class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
             child: ListView.builder(
               itemCount: _localTaskList.length,
               itemBuilder: (context, index) {
+                final t = _localTaskList[index];
+                final c = _controllers[t.id]!;
+                final f = _focusNodes[t.id]!;
                 return Row(
+                  key: ValueKey(t.id), // 안정 키
                   children: [
                     Expanded(
                       child: TextField(
-                        controller: _controllers[index],
-                        focusNode: _focusNodes[index],
-                        onChanged: (v) => _updateTaskText(index, v),
+                        controller: c,
+                        focusNode: f,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _commitIfChanged(t.id),
+                        onChanged: (v) => _onChangedLocal(t.id, v),
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
+                            horizontal: 12, vertical: 10,
+                          ),
                           fillColor: theme.colorScheme.surfaceVariant,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),

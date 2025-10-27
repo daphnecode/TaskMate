@@ -296,24 +296,19 @@ class _PlannerMainState extends State<PlannerMain> {
     api
         .fetchRepeatListEnsured()
         .then((rows) {
-          if (!mounted) return;
-          setState(() {
-            repeatTaskList = rows
-                .map(
-                  (e) => Task(
-                    text: e['text'] ?? '',
-                    point: (e['point'] ?? 0) is int
-                        ? (e['point'] ?? 0) as int
-                        : (e['point'] ?? 0).toInt(),
-                    isChecked: e['isChecked'] ?? false,
-                  ),
-                )
-                .toList();
-          });
-        })
+      if (!mounted) return;
+      setState(() {
+        repeatTaskList = rows.map((e) => Task(
+          id: (e['id'] as String?) ?? generateTaskId(),   // ✅ 보정
+          text: e['text'] ?? '',
+          point: (e['point'] ?? 0) is int ? (e['point'] ?? 0) as int : (e['point'] ?? 0).toInt(),
+          isChecked: e['isChecked'] ?? false,
+        )).toList(); // ✅ List<Task>
+      });
+    })
         .catchError((e) {
-          
-        });
+      
+    });
   }
 
   @override

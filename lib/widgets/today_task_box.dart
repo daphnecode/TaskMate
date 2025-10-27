@@ -31,10 +31,16 @@ class TodayTaskBox extends StatelessWidget {
     final completedTasks = taskList.where((t) => t.isChecked).length;
     final progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
 
-    final tmpList = sorting(taskList, sortingMethod);
-    for (int i = 0; i < taskList.length; i++) {
-      taskList[i] = tmpList[i].copyWith();
-    }
+    // ✅ 편집 중엔 정렬 잠깐 OFF (포커스 보호)
+    final isEditingAny = taskList.any((t) => t.isEditing);
+
+    // ✅ 원본은 절대 건드리지 말고 뷰 전용 정렬본 사용
+    final viewList = isEditingAny ? taskList : sorting(taskList, sortingMethod);
+
+    // ✅ id -> 원본 인덱스 매핑
+    final idToIndex = {
+      for (int i = 0; i < taskList.length; i++) taskList[i].id: i,
+    };
 
     return Card(
       elevation: 1,
@@ -80,18 +86,22 @@ class TodayTaskBox extends StatelessWidget {
             SizedBox(
               height: 140,
               child: ListView.builder(
-                itemCount: taskList.length > 3 ? 3 : taskList.length,
+                itemCount: viewList.length > 3 ? 3 : viewList.length,
                 itemBuilder: (context, index) {
-                  final task = taskList[index];
-                  return ChecklistItem(
-                    index: index,
-                    task: task.text,
-                    isChecked: task.isChecked,
-                    point: task.point,
-                    isEditing: task.isEditing,
-                    onChanged: (_) => onToggleCheck(index),
-                    onStartEditing: (_) => onStartEditing(index),
-                    onEditPoint: (newPoint) => onEditPoint(index, newPoint),
+                  final task = viewList[index];
+                  final originalIndex = idToIndex[task.id]!;
+                  return KeyedSubtree(
+                    key: ValueKey(task.id),
+                    child: ChecklistItem(
+                      index: originalIndex, // ✅ 원본 인덱스 기준
+                      task: task.text,
+                      isChecked: task.isChecked,
+                      point: task.point,
+                      isEditing: task.isEditing,
+                      onChanged: (_) => onToggleCheck(originalIndex),
+                      onStartEditing: (_) => onStartEditing(originalIndex),
+                      onEditPoint: (newPoint) => onEditPoint(originalIndex, newPoint),
+                    ),
                   );
                 },
               ),
@@ -113,9 +123,7 @@ class TodayTaskBox extends StatelessWidget {
                       value: progress,
                       minHeight: 10,
                       backgroundColor: theme.colorScheme.surfaceVariant,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.blue,
-                      ),
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
                     ),
                   ),
                 ),
@@ -203,15 +211,18 @@ class TodayTaskFullScreen extends StatelessWidget {
               itemCount: taskList.length,
               itemBuilder: (context, index) {
                 final task = taskList[index];
-                return ChecklistItem(
-                  index: index,
-                  task: task.text,
-                  isChecked: task.isChecked,
-                  point: task.point,
-                  isEditing: task.isEditing,
-                  onChanged: (_) => onToggleCheck(index),
-                  onStartEditing: (_) => onStartEditing(index),
-                  onEditPoint: (newPoint) => onEditPoint(index, newPoint),
+                return KeyedSubtree(
+                  key: ValueKey(task.id),
+                  child: ChecklistItem(
+                    index: index,
+                    task: task.text,
+                    isChecked: task.isChecked,
+                    point: task.point,
+                    isEditing: task.isEditing,
+                    onChanged: (_) => onToggleCheck(index),
+                    onStartEditing: (_) => onStartEditing(index),
+                    onEditPoint: (newPoint) => onEditPoint(index, newPoint),
+                  ),
                 );
               },
             ),
@@ -234,9 +245,7 @@ class TodayTaskFullScreen extends StatelessWidget {
                         value: progress,
                         minHeight: 10,
                         backgroundColor: theme.colorScheme.surfaceVariant,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.blue,
-                        ),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
                       ),
                     ),
                   ),
