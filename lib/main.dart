@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
 import 'dart:async';
+import 'features/notifications/fcm_service.dart';
 import 'features/notifications/local_notif_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -27,6 +28,14 @@ void main() async {
   await LocalNotifService.init();
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    await FcmService().init(uid: user.uid);
+    
+  } else {
+    
+  }
 
   runApp(const Root());
 }

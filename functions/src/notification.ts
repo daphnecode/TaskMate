@@ -4,7 +4,8 @@ admin.initializeApp();
 
 export const pushNotifications = onSchedule(
   {
-    schedule: "0 8,12,18 * * *",
+    // schedule: "0 8,12,18 * * *",
+    schedule: "0 */1 * * *",
     timeZone: "Asia/Seoul",
     region: "asia-northeast3",
   },

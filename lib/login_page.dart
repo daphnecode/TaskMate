@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'features/notifications/fcm_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -228,11 +227,6 @@ class _LoginPageState extends State<LoginPage> {
             code: 'unknown',
             message: '로그인 실패: 사용자 없음',
           );
-        }
-
-        final uid = cred.user?.uid;
-        if (uid != null) {
-          await FcmService().init(uid: uid);
         }
 
         await user.reload().timeout(const Duration(seconds: 10));

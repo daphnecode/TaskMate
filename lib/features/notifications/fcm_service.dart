@@ -19,10 +19,24 @@ class FcmService {
     );
     
 
-    // 2) 토큰 발급 및 저장
-    String? token = await _fm.getToken();
-    if (token != null) {
-      await saveTokenToFirestore(uid, token);
+    // 토큰 발급
+    try {
+      String? token = await _fm.getToken();
+      
+
+      if (token != null && uid.isNotEmpty) {
+        // Firestore 저장
+        await saveTokenToFirestore(uid, token);
+
+        // 토픽 구독
+        await _fm.subscribeToTopic('dailyReminder');
+        
+      } else {
+        
+      }
+    } catch (e, s) {
+      
+      
     }
 
     // 3) 토큰 변경 시 업데이트
@@ -40,7 +54,6 @@ class FcmService {
     // 5) 백그라운드에서 클릭하여 앱 열림 처리
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       
-      // 딥링크/네비게이션 처리 (앱의 navigatorKey 등으로 처리)
       handleMessageNavigation(message.data);
     });
 
@@ -52,30 +65,23 @@ class FcmService {
   }
 
   Future<void> saveTokenToFirestore(String uid, String token) async {
-    final tokenDoc = _fs
-        .collection('Users')
-        .doc(uid)
-        .collection('fcmTokens')
-        .doc(token);
-    await tokenDoc.set({
-      'token': token,
+    final userDoc = _fs.collection('Users').doc(uid);
+    await userDoc.set({
+      'fcmToken': token,
       'platform': Platform.isAndroid ? 'android' : 'other',
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-    debugPrint('Saved token for $uid: $token');
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    debugPrint('Saved latest token for $uid: $token');
   }
 
   void handleMessageNavigation(Map<String, dynamic> data) {
-    // 예: data['screen'] == 'task_detail' && data['taskId'] 존재하면 네비게이션
-    // 앱 네비게이션 코드에 맞게 구현하세요.
     
   }
 
-  // Background handler must be a top-level function — 아래와 같이 외부에 함수로 정의 가능
   static Future<void> firebaseMessagingBackgroundHandler(
     RemoteMessage message,
   ) async {
-    // 백그라운드에서 도착한 메시지 처리 (필요시 로컬 노티로 표시)
     await LocalNotifService.showFromRemote(message);
   }
 }
