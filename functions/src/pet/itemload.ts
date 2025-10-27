@@ -83,6 +83,42 @@ router.patch("/:userId/items/:itemName", async (req, res) => {
     const newCount = (currentCount > 0) ? currentCount - 1 : 0;
     await itemRef.update({ count: newCount });
 
+    // 1️⃣ 유저 문서 참조
+    const userRef = refUser(uid);
+    const userSnap = await userRef.get();
+
+    if (!userSnap.exists) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // 2️⃣ nowPet 가져오기
+    const nowPet = userSnap.data()?.nowPet;
+    if (!nowPet) {
+      return res.status(400).json({ success: false, message: "nowPet not set" });
+    }
+
+    const petRef = userRef.collection("pets").doc(nowPet);
+    const petSnap = await petRef.get();
+
+    const petData = petSnap.data() ?? {};
+    const petHunger = petData["hunger"] ?? 0;
+    const petHappy = petData["happy"] ?? 0;
+    const updates: any = {};
+
+    const itemData = snap.data() ?? {};
+    const itemHunger = itemData["hunger"] ?? 0;
+    const itemHappy = itemData["happy"] ?? 0;
+
+    // Hunger 감소
+    const newHunger = Math.min(petHunger + itemHunger);
+    const newHappy = Math.min(petHappy + itemHappy);
+
+    updates.hunger = newHunger;
+    updates.happy = newHappy;
+
+    // 3️⃣ pets/{nowPet} 문서 업데이트
+    await userRef.collection("pets").doc(nowPet).set(updates, {merge: true});
+
     return res.json({
       success: true,
       message: "inventory use complete",
@@ -163,8 +199,6 @@ router.patch("/:userId/items/:itemName/style", async (req, res) => {
     }
 
     // 3️⃣ pets/{nowPet} 문서 업데이트
-    // const petRef = await refPets(uid);
-    // await petRef.doc(nowPet).update({ styleID });
     await userRef.collection("pets").doc(nowPet).update({ styleID });
 
     return res.json({
