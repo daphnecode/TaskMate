@@ -1,6 +1,6 @@
-import { onSchedule } from "firebase-functions/v2/scheduler";
+import {onSchedule} from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
-import { db } from "./firebase"; // ✅ 당신이 만든 firebase.ts 사용
+import {db} from "./firebase"; // ✅ 당신이 만든 firebase.ts 사용
 
 export const pushNotifications = onSchedule(
   {
@@ -16,16 +16,25 @@ export const pushNotifications = onSchedule(
         .where("setting.push", "==", true)
         .get();
 
-      const tokens: string[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.fcmToken) tokens.push(data.fcmToken);
-      });
+      const androidTokens: string[] = [];
+      const webTokens: string[] = [];
 
-      if (tokens.length === 0) {
-        console.log("❌ No valid tokens found.");
-        return;
+      for (const doc of snapshot.docs) {
+        const tokenSnapshot = await db
+          .collection(`Users/${doc.id}/fcmTokens`)
+          .get();
+
+        tokenSnapshot.forEach((tDoc) => {
+          const tokenData = tDoc.data();
+          const token = tDoc.id; // 문서 ID가 토큰
+          if (tokenData.platform === "android") {
+            androidTokens.push(token);
+          } else if (tokenData.platform === "web") {
+            webTokens.push(token);
+          }
+        });
       }
+
 
       const message = {
         notification: {
@@ -34,15 +43,29 @@ export const pushNotifications = onSchedule(
         },
       };
 
-      const chunkSize = 500;
-      for (let i = 0; i < tokens.length; i += chunkSize) {
-        const chunk = tokens.slice(i, i + chunkSize);
-        const response = await admin.messaging().sendEachForMulticast({
+      // Android 알림 전송
+      for (let i = 0; i < androidTokens.length; i += 500) {
+        const chunk = androidTokens.slice(i, i + 500);
+        const res = await admin.messaging().sendEachForMulticast({
           ...message,
           tokens: chunk,
         });
         console.log(
-          `📩 Sent batch ${i / chunkSize + 1}: ${response.successCount} success, ${response.failureCount} failed`
+          `📱 Android batch ${i / 500 + 1}: ${res.successCount} 
+          success, ${res.failureCount} failed`
+        );
+      }
+
+      // Web 알림 전송
+      for (let i = 0; i < webTokens.length; i += 500) {
+        const chunk = webTokens.slice(i, i + 500);
+        const res = await admin.messaging().sendEachForMulticast({
+          ...message,
+          tokens: chunk,
+        });
+        console.log(
+          `🌐 Web batch ${i / 500 + 1}: ${res.successCount} 
+          success, ${res.failureCount} failed`
         );
       }
 

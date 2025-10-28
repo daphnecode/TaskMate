@@ -1,16 +1,28 @@
 // lib/features/notifications/fcm_service.dart
-import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'local_notif_service.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class FcmService {
+  static final FcmService _instance = FcmService._internal();
+  factory FcmService() => _instance;
+  FcmService._internal();
+
   final FirebaseMessaging _fm = FirebaseMessaging.instance;
   final FirebaseFirestore _fs = FirebaseFirestore.instance;
 
   // 호출 위치: 앱 초기화 시 (예: main.dart의 init)
   Future<void> init({required String uid}) async {
+    if (kIsWeb) {
+      await _initWeb(uid);
+    } else {
+      await _initMobile(uid);
+    }
+  }
+
+  Future<void> _initMobile(String uid) async {
+    // Android/iOS: 권한 요청, 토큰 발급, Firestore 저장
     // 1) 권한 요청 (안드로이드 13 이상에서는 필요)
     NotificationSettings settings = await _fm.requestPermission(
       alert: true,
@@ -26,7 +38,7 @@ class FcmService {
 
       if (token != null && uid.isNotEmpty) {
         // Firestore 저장
-        await saveTokenToFirestore(uid, token);
+        await saveTokenToFirestore(uid, token, 'android');
 
         // 토픽 구독
         await _fm.subscribeToTopic('dailyReminder');
@@ -41,7 +53,7 @@ class FcmService {
 
     // 3) 토큰 변경 시 업데이트
     _fm.onTokenRefresh.listen((newToken) async {
-      await saveTokenToFirestore(uid, newToken);
+      await saveTokenToFirestore(uid, newToken, 'android');
     });
 
     // 4) 포그라운드 메시지 처리
@@ -64,15 +76,32 @@ class FcmService {
     }
   }
 
-  Future<void> saveTokenToFirestore(String uid, String token) async {
-    final userDoc = _fs.collection('Users').doc(uid);
-    await userDoc.set({
-      'fcmToken': token,
-      'platform': Platform.isAndroid ? 'android' : 'other',
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+  Future<void> _initWeb(String uid) async {
+    // Web: 권한 요청, 토큰 발급, Firestore 저장
+    final status = await _fm.requestPermission();
+    if (status.authorizationStatus != AuthorizationStatus.authorized) return;
+    final token = await _fm.getToken(
+      vapidKey:
+          'YOUR_VAPID_KEY',
+    );
+    if (token != null) await saveTokenToFirestore(uid, token, 'web');
+  }
 
-    debugPrint('Saved latest token for $uid: $token');
+  Future<void> saveTokenToFirestore(
+    String uid,
+    String token,
+    String platform,
+  ) async {
+    await _fs
+        .collection('Users')
+        .doc(uid)
+        .collection('fcmTokens')
+        .doc(token)
+        .set({
+          'token': token,
+          'platform': platform,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
   }
 
   void handleMessageNavigation(Map<String, dynamic> data) {
