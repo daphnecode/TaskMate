@@ -3,6 +3,7 @@ import 'package:flame/game.dart';
 import 'obstacle.dart';
 import 'dino.dart';
 import 'background.dart';
+import '../DBtest/api_service.dart';
 
 class RunGame extends FlameGame with HasCollisionDetection {
   Dino? _dino;
@@ -18,16 +19,16 @@ class RunGame extends FlameGame with HasCollisionDetection {
   final double _speedIncreaseRate = 20; // 초당 증가량
 
   double elapsedDistance = 0; // 현재 경과 시간 (초 단위)
-  double maxDistance = 0;  // 클리어 기준 시간 (예: 30초)
+  double maxDistance = 0; // 클리어 기준 시간 (예: 30초)
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     groundY = size.y - 128;
-    
+
     _dino = Dino(this, groundY: groundY)
-        ..y = 0
-        ..x = 50;
+      ..y = 0
+      ..x = 50;
     await add(_dino!);
     // add(Ground(this));
     background = Background();
@@ -42,7 +43,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
     super.onGameResize(size);
     if (background != null) background!.resize(size);
     if (_dino != null) _dino!.resize(size);
-    
+
     for (final obstacle in obstacles) {
       // 예: width와 height를 화면 크기에 비례
       obstacle.resize(size);
@@ -60,9 +61,9 @@ class RunGame extends FlameGame with HasCollisionDetection {
     isGameRunning = true;
     elapsedDistance = _dino!.travelDistance;
     maxDistance = distance;
-    
+
     // 예: dino 달리기 애니메이션 시작, 장애물 주기적 생성 등
-    _dino!.run(); 
+    _dino!.run();
     // 장애물 타이머 등 추가 가능
   }
 
@@ -85,9 +86,10 @@ class RunGame extends FlameGame with HasCollisionDetection {
     if (_dino!.travelDistance >= targetDistance) {
       stopGame();
       overlays.add('ClearPopup'); // 클리어 팝업
+      gameRunReward(targetDistance);
     }
     elapsedDistance += _dino!.speed * dt;
-    
+
     _currentSpeed += _speedIncreaseRate * dt;
     obstacleTimer.update(dt);
   }

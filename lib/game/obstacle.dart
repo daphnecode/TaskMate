@@ -7,9 +7,9 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
   final RunGame game;
   final double groundY;
   final double speed;
-  late int upDown;
+  int upDown = 0;
   Obstacle(this.game, {required this.groundY, required this.speed})
-      : super(size: Vector2(32, 32)); // 선인장 등 크기 설정
+    : super(size: Vector2(32, 32)); // 선인장 등 크기 설정
 
   @override
   Future<void> onLoad() async {
@@ -34,7 +34,7 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
   void update(double dt) {
     super.update(dt);
     if (!game.isGameRunning) return;
-    
+
     position.x -= speed * dt;
 
     if (position.x < -size.x) {

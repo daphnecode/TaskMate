@@ -6,7 +6,6 @@ import 'package:taskmate/game/background.dart';
 import 'package:taskmate/utils/bgm_manager.dart';
 import 'main.dart';
 import 'object.dart';
-import 'package:taskmate/DBtest/api_service.dart';
 
 class RunGameScreen extends StatefulWidget {
   final void Function(int) onNext;
@@ -15,7 +14,8 @@ class RunGameScreen extends StatefulWidget {
   final String uid;
   final String petId;
 
-  const RunGameScreen({super.key,
+  const RunGameScreen({
+    super.key,
     required this.onNext,
     required this.soundEffectsOn,
     required this.pet,
@@ -34,7 +34,6 @@ class _RunGameScreenState extends State<RunGameScreen> {
   //중복 보상 방지
   bool _rewardApplied = false;
 
-
   @override
   void initState() {
     super.initState();
@@ -42,8 +41,8 @@ class _RunGameScreenState extends State<RunGameScreen> {
     // 효과음이 켜져 있으면 놀이 BGM 재생
     final rootState = context.findAncestorStateOfType<RootState>();
     if (rootState != null && rootState.user.setting['sound']) {
-      BgmManager.stopBgm();                // 이전 브금 정지
-      BgmManager.playBgm('bgm1.mp3');   // 놀이 브금 재생
+      BgmManager.stopBgm(); // 이전 브금 정지
+      BgmManager.playBgm('bgm1.mp3'); // 놀이 브금 재생
     }
     Timer.periodic(const Duration(milliseconds: 100), (_) {
       if (mounted) setState(() {}); // elapsedTime 업데이트 반영
@@ -57,7 +56,6 @@ class _RunGameScreenState extends State<RunGameScreen> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,8 +65,7 @@ class _RunGameScreenState extends State<RunGameScreen> {
           // 🔹 게임 영역
           Expanded(
             flex: 6,
-            child: 
-            AspectRatio(
+            child: AspectRatio(
               aspectRatio: 1 / 1,
               child: Stack(
                 children: [
@@ -82,23 +79,16 @@ class _RunGameScreenState extends State<RunGameScreen> {
 
                           _game.overlays.remove('ClearPopup');
 
-
                           // 1) 로컬 반영 (즉시 체감)
                           setState(() {
                             _isPlaying = false; // 다시 거리 버튼 보이도록
-                            widget.pet!.happy =
-                                (widget.pet!.happy + 10).clamp(0, 100);
-                            widget.pet!.hunger =
-                                (widget.pet!.hunger - 10).clamp(0, 100);
+                            widget.pet!.happy = (widget.pet!.happy + 10).clamp(
+                              0,
+                              100,
+                            );
+                            widget.pet!.hunger = (widget.pet!.hunger - 10)
+                                .clamp(0, 100);
                           });
-
-                          // 2) DB 반영
-                          try {
-                            // await petSaveDB(widget.uid, widget.petId, widget.pet);
-                            await gameRunReward();
-                          } catch (e) {
-
-                          }
 
                           // 3) 부모에 변경 신호(true) 주고 닫기
                           if (mounted) Navigator.pop(context, true);
@@ -116,12 +106,11 @@ class _RunGameScreenState extends State<RunGameScreen> {
                     initialActiveOverlays: const [],
                   ),
                   Positioned(
-                    child: 
-                    ProgressBarOverlay(
+                    child: ProgressBarOverlay(
                       elapsedTime: _game.elapsedDistance,
                       totalTime: _game.maxDistance,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -137,82 +126,85 @@ class _RunGameScreenState extends State<RunGameScreen> {
                 children: [
                   Icon(Icons.home, color: Colors.white),
                   SizedBox(width: 10),
-                  Text("놀이",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white)),
+                  Text(
+                    "놀이",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
           Expanded(
             flex: 3,
-            child: _isPlaying ?
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  _game.jump(); // 점프 처리 함수 예시
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(240, 120),
-                  backgroundColor: Colors.green,
-                ),
-                child: Text("Jump", style: TextStyle(fontSize: 24)),
-              ),
-            ) : 
-            Container(
-              color: Colors.grey[200],
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _game.startGame(100);  // 100m 시작
-                      setState(() {
-                        _isPlaying = true;
-                      });
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(100, 200),
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+            child: _isPlaying
+                ? Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _game.jump(); // 점프 처리 함수 예시
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(240, 120),
+                        backgroundColor: Colors.green,
+                      ),
+                      child: Text("Jump", style: TextStyle(fontSize: 24)),
                     ),
-                    child: Text("100m"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _game.startGame(300);  // 100m 시작
-                      setState(() {
-                        _isPlaying = true;
-                      });
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(100, 200),
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
+                  )
+                : Container(
+                    color: Colors.grey[200],
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            _game.startGame(100); // 100m 시작
+                            setState(() {
+                              _isPlaying = true;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(100, 200),
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text("100m"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            _game.startGame(300); // 100m 시작
+                            setState(() {
+                              _isPlaying = true;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(100, 200),
+                            backgroundColor: Colors.orange,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text("300m"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            _game.startGame(1000); // 100m 시작
+                            setState(() {
+                              _isPlaying = true;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(100, 200),
+                            backgroundColor: Colors.yellow,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text("1km"),
+                        ),
+                      ],
                     ),
-                    child: Text("300m"),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _game.startGame(1000);  // 100m 시작
-                      setState(() {
-                        _isPlaying = true;
-                      });
-                    }, 
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(100, 200),
-                      backgroundColor: Colors.yellow,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text("1km"),
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
@@ -238,7 +230,8 @@ class _RunGameScreenState extends State<RunGameScreen> {
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: () {
-                  widget.onNext(6);},
+                  widget.onNext(6);
+                },
               ),
             ],
           ),
@@ -268,8 +261,10 @@ class ClearPopup extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("CLEAR!",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text(
+                "CLEAR!",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 12),
               const Text("행복도 +10 포만도 -10"),
               const SizedBox(height: 12),
@@ -302,8 +297,10 @@ class FailPopup extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("FAIL",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text(
+                "FAIL",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 12),
               const Text("다시 도전해요!"),
               const SizedBox(height: 12),

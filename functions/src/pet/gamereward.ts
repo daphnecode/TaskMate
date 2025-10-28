@@ -9,38 +9,39 @@ router.patch("/run/:userId", async (req, res) => {
     const decoded = await verifyToken(req);
 
     const uid = decoded.uid;
-    const { userId } = req.params;
+    const {userId} = req.params;
+    const runnedDistance = req.body.runnedDistance;
 
     if (uid !== userId) {
-      return res.status(403).json({ success: false, message: "Forbidden" });
+      return res.status(403).json({success: false, message: "Forbidden"});
     }
 
     const userRef = refUser(uid);
     const userSnap = await userRef.get();
 
     if (!userSnap.exists) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({success: false, message: "User not found"});
     }
 
     const nowPet = userSnap.data()?.nowPet;
 
     if (!nowPet) {
-      return res.status(400).json({ success: false, message: "nowPet not set" });
+      return res.status(400).json({success: false, message: "nowPet not set"});
     }
 
     const petRef = userRef.collection("pets").doc(nowPet);
     const petSnap = await petRef.get();
 
     if (!petSnap.exists) {
-      return res.status(404).json({ success: false, message: "Pet not found" });
+      return res.status(404).json({success: false, message: "Pet not found"});
     }
 
     const petData = petSnap.data() || {};
 
-    const newHappy = Math.min((petData.happy ?? 0) + 20, 100);
-    const newHunger = Math.max((petData.hunger ?? 0) - 20, 0);
+    const newHappy = Math.min((petData.happy ?? 0) + 10, 100);
+    const newHunger = Math.max((petData.hunger ?? 0) - 10, 0);
 
-    await petRef.update({ happy: newHappy, hunger: newHunger });
+    await petRef.update({happy: newHappy, hunger: newHunger});
 
     const statsRef = refStats(uid);
     const statsSnap = await statsRef.get();
@@ -48,7 +49,7 @@ router.patch("/run/:userId", async (req, res) => {
     const runningDistance = statsData["runningDistance"] ?? 0;
     const moreHappy = statsData["moreHappy"] ?? 0;
 
-    const newR = runningDistance + 300;
+    const newR = runningDistance + runnedDistance;
     const newMH = moreHappy + 1;
 
     await statsRef.update({
@@ -58,13 +59,13 @@ router.patch("/run/:userId", async (req, res) => {
 
     return res.json({
       success: true,
-      message: "hunger -20, happy +20",
+      message: "hunger -10, happy +10",
       currentHunger: newHunger,
-      currentHappy: newHappy
+      currentHappy: newHappy,
     });
-
   } catch (e: any) {
-    return res.status(500).json({ success: false, message: e?.message || "Server error" });
+    return res.status(500).json({
+      success: false, message: e?.message || "Server error"});
   }
 });
 

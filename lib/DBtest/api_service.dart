@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:taskmate/DBtest/task.dart';
 import 'package:taskmate/object.dart';
@@ -419,11 +418,15 @@ Future<void> buyItem(String itemName) async {
   }
 }
 
-Future<void> gameRunReward() async {
+Future<void> gameRunReward(double runnedDistance) async {
   try {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final url = Uri.parse("$baseUrl/game/run/$uid");
-    final r = await http.patch(url, headers: await _authHeaders());
+    final r = await http.patch(
+      url,
+      headers: await _authHeaders(),
+      body: json.encode({"runnedDistance": runnedDistance}),
+    );
 
     if (r.statusCode == 200) {
       return jsonDecode(r.body);
@@ -479,7 +482,6 @@ Future<stats> petStatistics() async {
 
     if (r.statusCode == 200) {
       final data = jsonDecode(r.body);
-      debugPrint(r.body);
       final pStats = stats.fromMap(data);
       return pStats;
     } else {
