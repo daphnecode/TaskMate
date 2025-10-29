@@ -173,6 +173,9 @@ class _ItemlistPage1State extends State<ItemlistPage1> {
                                           item.count--;
                                           widget.pet!.hunger += item.hunger;
                                           widget.pet!.happy += item.happy;
+                                          if (item.count == 0) {
+                                            inventory!.removeAt(index);
+                                          }
                                         });
                                         // ✅ 현재 로그인한 사용자 uid 사용
                                         final uid = FirebaseAuth

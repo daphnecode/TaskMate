@@ -24,6 +24,8 @@ router.get("/:userId/items", async (req, res) => {
 
     // 2. Firestore 참조 (예시 함수 - 직접 구현 필요)
     const snap = await query.get();
+    const filtered = snap.docs.filter(doc => doc.data().count !== 0);
+
     if (snap.empty) {
       return res.json({
         success: true,
@@ -33,7 +35,7 @@ router.get("/:userId/items", async (req, res) => {
     }
 
     // 3. 데이터 정규화
-    const inventory = snap.docs.map((doc) => {
+    const inventory = filtered.map((doc) => {
       const d = doc.data() as Item; // 🔑 QueryDocumentSnapshot<DocumentData> → data() OK
       return {
         icon: d.icon,
