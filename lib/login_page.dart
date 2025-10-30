@@ -31,9 +31,7 @@ class _LoginPageState extends State<LoginPage> {
   /// - 신규 계정: 기본 문서/컬렉션 시드 생성
   /// - 기존 계정: lastLoginAt 갱신 + 누락 필드만 보완(덮어쓰기 금지)
   Future<void> _bootstrapUserDoc(User user, {required String provider}) async {
-    final usersDoc = FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user.uid);
+    final usersDoc = FirebaseFirestore.instance.collection('Users').doc(user.uid);
     final snap = await usersDoc.get().timeout(const Duration(seconds: 10));
 
     if (!snap.exists) {
@@ -59,6 +57,9 @@ class _LoginPageState extends State<LoginPage> {
 
       // 누락 필드만 보완(중복 안전)
       await ensureUserStructureSafe(user.uid);
+
+      // ✅ summary 누락 필드 + foodCount 시드 (신규)
+      await ensureStatsAndFoodCount(user.uid);
     } else {
       // ✅ 기존 계정 → 덮어쓰기 금지(숫자 필드 절대 건드리지 않음). 메타만 갱신.
       await usersDoc.set({
@@ -69,6 +70,9 @@ class _LoginPageState extends State<LoginPage> {
       // “없을 때만” 생성하는 시드 & 안전 보강
       await _seedUserCollections(user.uid);
       await ensureUserStructureSafe(user.uid);
+
+      // ✅ summary 누락 필드 + foodCount 시드 (기존)
+      await ensureStatsAndFoodCount(user.uid);
     }
   }
 
@@ -90,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
         'styleID': 'basic',
       });
     }
+
     // pets/unicon
     final unicon = userRef.collection('pets').doc('unicon');
     if (!(await unicon.get()).exists) {
@@ -120,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
 
-    // stats/summary (없을 때만)
+    // stats/summary (없을 때만) — 기본틀만, 상세 보강은 ensureStatsAndFoodCount가 담당
     final statsSummary = userRef.collection('stats').doc('summary');
     if (!(await statsSummary.get()).exists) {
       await statsSummary.set({
@@ -150,16 +155,18 @@ class _LoginPageState extends State<LoginPage> {
     if (!setting.containsKey('push')) settingPatch['push'] = false;
     if (!setting.containsKey('listSort')) settingPatch['listSort'] = 'default';
     if (!setting.containsKey('sound')) settingPatch['sound'] = true;
-    if (!setting.containsKey('placeID'))
+    if (!setting.containsKey('placeID')) {
       settingPatch['placeID'] = 'assets/images/prairie.png';
-    if (settingPatch.isNotEmpty)
+    }
+    if (settingPatch.isNotEmpty) {
       patch['setting'] = {...setting, ...settingPatch};
+    }
 
     if (patch.isNotEmpty) {
       await userDoc.set(patch, SetOptions(merge: true));
     }
 
-    // stats/summary는 “없을 때만” 시드. 기존이면 건드리지 않음.
+    // stats/summary 생성은 여기서 최소만 — 상세 필드 보강은 ensureStatsAndFoodCount가 전담
     final statsSummary = userDoc.collection('stats').doc('summary');
     if (!(await statsSummary.get()).exists) {
       await statsSummary.set({
@@ -171,6 +178,75 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  /// ✅ 핵심: 기존/신규 모두에 대해
+  /// - stats/summary의 누락 필드(feeding/moreHappy/runningDistance 등)만 안전 보완
+  /// - stats/summary/foodCount/{itemId} 없으면 {name, count:0}로 시드
+  Future<void> ensureStatsAndFoodCount(String uid) async {
+    final fs = FirebaseFirestore.instance;
+    final summaryRef = fs.collection('Users').doc(uid).collection('stats').doc('summary');
+
+    final snap = await summaryRef.get();
+
+    if (!snap.exists) {
+      // 신규: summary 생성 + 기본 키들 세팅
+      await summaryRef.set({
+        'feeding': 0,
+        'moreHappy': 0,
+        'runningDistance': 0,
+        'totalCompleted': 0,
+        'streakDays': 0,
+        'lastUpdatedDateStr': null,
+        'lastUpdated': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } else {
+      // 기존: 누락된 숫자 3종은 increment(0)으로 안전 생성
+      await summaryRef.set({
+        'feeding': FieldValue.increment(0),
+        'moreHappy': FieldValue.increment(0),
+        'runningDistance': FieldValue.increment(0),
+      }, SetOptions(merge: true));
+
+      // 그 외 누락 키만 보완
+      final d = snap.data() ?? <String, dynamic>{};
+      final patch = <String, dynamic>{};
+      if (!d.containsKey('totalCompleted')) patch['totalCompleted'] = 0;
+      if (!d.containsKey('streakDays')) patch['streakDays'] = 0;
+      if (!d.containsKey('lastUpdatedDateStr')) patch['lastUpdatedDateStr'] = null;
+      if (!d.containsKey('lastUpdated')) patch['lastUpdated'] = FieldValue.serverTimestamp();
+      if (patch.isNotEmpty) {
+        await summaryRef.set(patch, SetOptions(merge: true));
+      }
+    }
+
+    // foodCount 하위 문서들: 없으면 {name, count:0}로 생성
+    await _ensureFoodCountDocs(uid, const [
+      'cookie',
+      'mushroomStew',
+      'pudding',
+      'strawberry',
+      'tuna',
+    ]);
+  }
+
+  Future<void> _ensureFoodCountDocs(String uid, List<String> itemIds) async {
+    final fs = FirebaseFirestore.instance;
+    final col = fs
+        .collection('Users')
+        .doc(uid)
+        .collection('stats')
+        .doc('summary')
+        .collection('foodCount'); // /Users/{uid}/stats/summary/foodCount
+
+    final batch = fs.batch();
+    for (final id in itemIds) {
+      final ref = col.doc(id); // /foodCount/{itemId}
+      if (!(await ref.get()).exists) {
+        batch.set(ref, {'name': id, 'count': 0}); // 새로 생성 (덮어쓰기 없음)
+      }
+    }
+    await batch.commit();
+  }
+
   void _showError(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
@@ -178,9 +254,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInAnonymously() async {
     setState(() => isLoading = true);
     try {
-      final cred = await _auth.signInAnonymously().timeout(
-        const Duration(seconds: 10),
-      );
+      final cred = await _auth.signInAnonymously().timeout(const Duration(seconds: 10));
       final user = cred.user;
       if (user == null) {
         throw FirebaseAuthException(code: 'unknown', message: '익명 로그인 실패');
@@ -287,9 +361,7 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text('이메일 인증이 필요합니다'),
           content: Text(
             emailSent
@@ -406,13 +478,8 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: _inputDeco(
                             '비밀번호',
                             suffix: IconButton(
-                              icon: Icon(
-                                _obscure
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () =>
-                                  setState(() => _obscure = !_obscure),
+                              icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                              onPressed: () => setState(() => _obscure = !_obscure),
                               tooltip: _obscure ? '표시' : '숨기기',
                             ),
                           ),
@@ -420,7 +487,7 @@ class _LoginPageState extends State<LoginPage> {
                           onSubmitted: (_) => _submitEmail(),
                         ),
                         const SizedBox(height: 16),
-                        if (isLoading) const CircularProgressIndicator(),
+                        if (isLoading) const CircularProgressIndicator(), // ✅ 고친 부분
                         if (!isLoading) ...[
                           SizedBox(
                             width: double.infinity,
@@ -449,16 +516,13 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             height: 48,
                             child: OutlinedButton(
-                              onPressed: () =>
-                                  setState(() => isLogin = !isLogin),
+                              onPressed: () => setState(() => isLogin = !isLogin),
                               style: OutlinedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
                                 ),
                                 side: BorderSide(
-                                  color: base.colorScheme.primary.withOpacity(
-                                    0.35,
-                                  ),
+                                  color: base.colorScheme.primary.withOpacity(0.35),
                                 ),
                               ),
                               child: Text(
