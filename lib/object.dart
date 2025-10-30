@@ -119,7 +119,7 @@ class Users {
       nowPet: map['nowPet'],
       setting: {
         'darkMode': map['setting']['darkMode'],
-        'listSort': "사전 순",
+        'listSort': map['setting']['listSort'],
         'placeID': map['setting']['placeID'],
         'push': map['setting']['push'],
         'sound': map['setting']['sound'],
