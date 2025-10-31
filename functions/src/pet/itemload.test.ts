@@ -1,26 +1,27 @@
-import express from 'express';
-import request from 'supertest';
-import * as router from './itemload';
+import express from "express";
+import request from "supertest";
+import * as router from "./itemload";
 
 // ✅ verifyToken, refInventory, refUser, refPets를 mock 처리
-jest.mock('./refAPI', () => ({
+jest.mock("./refAPI", () => ({
   verifyToken: jest.fn(),
   refInventory: jest.fn(),
   refUser: jest.fn(),
   refItem: jest.fn(),
+  refStats: jest.fn(),
+  refPets: jest.fn(),
 }));
 
-import { verifyToken, refInventory, refUser, refItem } from './refAPI';
+import {verifyToken, refInventory, refUser, refItem, refStats, refPets} from "./refAPI";
 
 const app = express();
 app.use(express.json());
-app.use('/users', router.default);
+app.use("/users", router.default);
 
 describe("GET /users/:userID/items", () => {
-
   beforeAll(() => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(console, "log").mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation();
+    jest.spyOn(console, "log").mockImplementation();
   });
 
   afterAll(() => {
@@ -91,7 +92,7 @@ describe("GET /users/:userID/items", () => {
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
     expect(res.body.message).toBe("Invalid token");
-  });  
+  });
 
   it("❌ 서버 응답 오류", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
@@ -113,8 +114,8 @@ describe("GET /users/:userID/items", () => {
 
 describe("PATCH /users/:userId/items/:itemName", () => {
   beforeAll(() => {
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    jest.spyOn(console, "log").mockImplementation(() => {});
+    jest.spyOn(console, "error").mockImplementation();
+    jest.spyOn(console, "log").mockImplementation();
   });
 
   afterAll(() => {
@@ -130,7 +131,39 @@ describe("PATCH /users/:userId/items/:itemName", () => {
   it("✅소비형 아이템 사용하기", async () => {
     (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
 
-    const mockSnap = { exists: true, 
+    const mockPetSnap = {
+      exists: true,
+      data: () => ({happy: 30, hunger: 50}),
+    };
+    const mockPetRef = {
+      get: jest.fn().mockResolvedValue(mockPetSnap),
+      update: jest.fn(),
+      set: jest.fn(),
+    };
+    (refPets as jest.Mock).mockReturnValue(mockPetRef);
+
+    const mockUserSnap = {
+      exists: true, data: () => ({nowPet: "petA"}),
+    };
+
+    const mockUserRef = {
+      get: jest.fn().mockResolvedValue(mockUserSnap),
+      collection: jest.fn().mockImplementation((collectionName: string) => {
+        if (collectionName === "pets") {
+          return {
+            doc: jest.fn().mockImplementation((petId: string) => mockPetRef),
+          };
+        }
+        // 다른 컬렉션 대비 안전장치
+        return {
+          doc: jest.fn().mockReturnValue({ get: jest.fn(), update: jest.fn() }),
+        };
+      }),
+      doc: jest.fn().mockReturnValue(mockPetRef),
+    };
+    (refUser as jest.Mock).mockReturnValue(mockUserRef);
+
+    const mockSnap = { exists: true,
       data: () => ({ icon: "assets/icons/icon-strawberry.png", name: "strawberry", category: 1, count: 5, happy: 5, hunger: 0, price: 10, itemText: "sweet and sour" })
     };
     const mockItemRef = {
@@ -138,6 +171,40 @@ describe("PATCH /users/:userId/items/:itemName", () => {
       update: jest.fn().mockResolvedValue(undefined),
     };
     (refItem as jest.Mock).mockReturnValue(mockItemRef);
+
+    const mockFoodDocRef = {
+      get: jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({ count: 1 }),
+      }),
+      update: jest.fn(),
+    };
+
+    const mockStatsSnap = {
+      exists: true,
+      data: () => ({ feeding: 5, moreHappy: 10 }),
+    };
+
+    const mockStatsRef = {
+      get: jest.fn().mockResolvedValue(mockStatsSnap),
+      update: jest.fn(),
+      collection: jest.fn().mockImplementation((collectionName: string) => {
+        if (collectionName === "foodCount") {
+          return {
+            doc: jest.fn().mockImplementation(
+              (itemName: string) => mockFoodDocRef),
+          };
+        }
+        // 다른 컬렉션 대비 안전장치
+        return {
+          doc: jest.fn().mockReturnValue({ get: jest.fn(), update: jest.fn() }),
+        };
+      }),
+    };
+    (refStats as jest.Mock).mockReturnValue(mockStatsRef);
+
+    const testRef = mockStatsRef.collection("foodCount").doc("apple");
+    console.log(typeof testRef.get);
 
     const res = await request(app)
       .patch("/users/user123/items/strawberry")
