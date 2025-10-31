@@ -35,6 +35,19 @@ class _TodayEditBoxState extends State<TodayEditBox> {
     _syncWith(widget.taskList);
   }
 
+  // TodayEditBoxState / _RepeatEditBoxState 공통으로 추가
+  void commitAll() {
+    // 포커스 다 내리고
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    // 로컬 편집 내용을 전부 한 번에 커밋
+    for (final id in _controllers.keys) {
+      _commitIfChanged(id);
+    }
+    // 마지막으로 상위에 확실히 알림 (중복 호출 무해)
+    widget.onTaskListUpdated(List<Task>.from(_localTaskList));
+  }
+
   @override
   void didUpdateWidget(covariant TodayEditBox oldWidget) {
     super.didUpdateWidget(oldWidget);

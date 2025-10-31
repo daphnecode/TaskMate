@@ -8,7 +8,7 @@ import 'package:taskmate/widgets/today_edit_box.dart';
 
 class DailyTaskEditPage extends StatefulWidget {
   final Map<String, List<Task>> dailyTaskMap;
-  final DateTime selectedDate;
+  final DateTime selectedDate; // ← PlannerEditPage가 넘긴 앵커 기준의 시작 날짜
   final void Function(Map<String, List<Task>>) onUpdateDailyTaskMap;
 
   const DailyTaskEditPage({
@@ -29,10 +29,11 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
 
   Timer? _saveDailyDebounce;
 
+  // ✅ TodayEditBox commitAll() 호출용 키 (타입 없이)
+  final GlobalKey _todayEditKey = GlobalKey();
+
   String _dateKey(DateTime d) =>
       "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
-
-  DateTime getKstNow() => DateTime.now().toUtc().add(const Duration(hours: 9));
 
   Future<void> _loadTasksForDate(DateTime date) async {
     final key = _dateKey(date);
@@ -42,6 +43,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
       setState(() {
         _dailyTaskMap[key] = list;
       });
+      widget.onUpdateDailyTaskMap(_dailyTaskMap);
     } catch (e) {
       
       
@@ -49,6 +51,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
       setState(() {
         _dailyTaskMap[key] = _dailyTaskMap[key] ?? [];
       });
+      widget.onUpdateDailyTaskMap(_dailyTaskMap);
     }
   }
 
@@ -56,7 +59,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     _saveDailyDebounce?.cancel();
     _saveDailyDebounce = Timer(const Duration(milliseconds: 400), () async {
       try {
-        await api.saveDaily(key, list);     // ✅ dailyTasks 저장
+        await api.saveDaily(key, list); // ✅ dailyTasks 저장
       } catch (e) {
         
         
@@ -69,8 +72,25 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     setState(() {
       _dailyTaskMap[key] = updatedList;
     });
-    _saveDailyDebounced(key, updatedList); // ✅ 디바운스로 서버 저장
     widget.onUpdateDailyTaskMap(_dailyTaskMap);
+    _saveDailyDebounced(key, updatedList); // ✅ 디바운스로 서버 저장
+  }
+
+  Map<String, dynamic> _buildResultPayload() {
+    return {
+      'map': _dailyTaskMap,
+      'selectedDate': _dateKey(_selectedDate), // 참고용으로만 보내고, 상위는 앵커 유지
+    };
+  }
+
+  Future<void> _saveCurrentDateNow() async {
+    final key = _dateKey(_selectedDate);
+    try {
+      await api.saveDaily(key, _dailyTaskMap[key] ?? const <Task>[]);
+    } catch (e) {
+      
+      
+    }
   }
 
   @override
@@ -107,54 +127,69 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     final key = _dateKey(_selectedDate);
     final list = _dailyTaskMap[key] ?? [];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('일일 리스트 편집'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () async {
-              try {
-                await api.saveDaily(key, list);
-              } catch (e) {
-                
-                
-              }
-              if (!mounted) return;
-              widget.onUpdateDailyTaskMap(_dailyTaskMap);
-              Navigator.pop(context, _dailyTaskMap);
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TableCalendar(
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _selectedDate,
-              selectedDayPredicate: (day) => isSameDay(_selectedDate, day),
-              onDaySelected: (selectedDay, focusedDay) async {
-                setState(() {
-                  _selectedDate = selectedDay;
-                  final k = _dateKey(selectedDay);
-                  _dailyTaskMap[k] = _dailyTaskMap[k] ?? []; // ✅ 로컬 임시 보강
-                });
-                await _loadTasksForDate(selectedDay);
+    return WillPopScope(
+      onWillPop: () async {
+        // 뒤로가기 시 현재 입력 커밋 + 저장 후 payload 반환
+        (_todayEditKey.currentState as dynamic?)?.commitAll();
+        await _saveCurrentDateNow();
+        Navigator.pop(context, _buildResultPayload());
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('일일 리스트 편집'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: () async {
+                (_todayEditKey.currentState as dynamic?)?.commitAll(); // ✅ 커밋
+                try {
+                  await api.saveDaily(key, _dailyTaskMap[key] ?? const <Task>[]);
+                } catch (e) {
+                  
+                  
+                }
+                if (!mounted) return;
+                widget.onUpdateDailyTaskMap(_dailyTaskMap);
+                Navigator.pop(context, _buildResultPayload());
               },
             ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TodayEditBox(
-                taskList: list,
-                onTaskListUpdated: _updateTaskList, // ✅ 변경 → 서버 저장
-                selectedDate: _selectedDate,
-                onExpand: () {},
-              ),
-            ),
           ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              TableCalendar(
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: _selectedDate,
+                selectedDayPredicate: (day) => isSameDay(_selectedDate, day),
+                onDaySelected: (selectedDay, focusedDay) async {
+                  // 날짜 변경 전에 현재 날짜 커밋 + 즉시 저장
+                  (_todayEditKey.currentState as dynamic?)?.commitAll();
+                  await _saveCurrentDateNow();
+
+                  setState(() {
+                    _selectedDate = selectedDay;
+                    final k = _dateKey(selectedDay);
+                    _dailyTaskMap[k] = _dailyTaskMap[k] ?? []; // 로컬 임시 보강
+                  });
+                  await _loadTasksForDate(selectedDay);
+                },
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TodayEditBox(
+                  key: _todayEditKey, // ✅ 커밋용 키 연결
+                  taskList: list,
+                  onTaskListUpdated: _updateTaskList, // 변경 → 서버 저장(디바운스)
+                  selectedDate: _selectedDate,
+                  onExpand: () {},
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
