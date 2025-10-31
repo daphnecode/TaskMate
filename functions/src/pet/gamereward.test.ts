@@ -55,7 +55,6 @@ describe("장애물 달리기 경주 보상", () => {
       };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
       const mockStatsSnap = {
-        exists: true,
         data: () => ({runningDistance: 300, moreHappy: 2}),
       };
       const mockStatsRef = {
@@ -64,13 +63,10 @@ describe("장애물 달리기 경주 보상", () => {
       };
       (refStats as jest.Mock).mockReturnValue(mockStatsRef);
 
-      const res = await request(app).patch(
-        `/game/run/${mockUserId}`
-      ).send(
-        {"runnedDistance": 100}
-      ).set(
-        "Authorization", "Bearer testtoken"
-      );
+      const res = await request(app)
+        .patch(`/game/run/${mockUserId}`)
+        .send({"runnedDistance": 100})
+        .set("Authorization", "Bearer testtoken");
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -84,13 +80,10 @@ describe("장애물 달리기 경주 보상", () => {
 
     it("❌ 사용자 id 불일치로 접근 금지", async () => {
       (verifyToken as jest.Mock).mockResolvedValue({uid: "wrongUser"});
-      const res = await request(app).patch(
-        `/game/run/${mockUserId}`
-      ).send(
-        {"runnedDistance": 200}
-      ).set(
-        "Authorization", "Bearer testtoken"
-      );
+      const res = await request(app)
+        .patch(`/game/run/${mockUserId}`)
+        .send({"runnedDistance": 200})
+        .set("Authorization", "Bearer testtoken");
       expect(res.status).toBe(403);
       expect(res.body.message).toBe("Forbidden");
     });
@@ -102,13 +95,10 @@ describe("장애물 달리기 경주 보상", () => {
       };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
-      const res = await request(app).patch(
-        `/game/run/${mockUserId}`
-      ).send(
-        {"runnedDistance": 300}
-      ).set(
-        "Authorization", "Bearer testtoken"
-      );
+      const res = await request(app)
+        .patch(`/game/run/${mockUserId}`)
+        .send({"runnedDistance": 300})
+        .set("Authorization", "Bearer testtoken");
       expect(res.status).toBe(400);
       expect(res.body.message).toBe("nowPet not set");
     });
@@ -124,26 +114,20 @@ describe("장애물 달리기 경주 보상", () => {
       };
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
-      const res = await request(app).patch(
-        `/game/run/${mockUserId}`
-      ).send(
-        {"runnedDistance": 100}
-      ).set(
-        "Authorization", "Bearer testtoken"
-      );
+      const res = await request(app)
+        .patch(`/game/run/${mockUserId}`)
+        .send({"runnedDistance": 100})
+        .set("Authorization", "Bearer testtoken");
       expect(res.status).toBe(404);
       expect(res.body.message).toBe("Pet not found");
     });
 
     it("❌ 사용자 인증 실패", async () => {
       (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
-      const res = await request(app).patch(
-        `/game/run/${mockUserId}`
-      ).send(
-        {"runnedDistance": 100}
-      ).set(
-        "Authorization", "Bearer testtoken"
-      );
+      const res = await request(app)
+        .patch(`/game/run/${mockUserId}`)
+        .send({"runnedDistance": 100})
+        .set("Authorization", "Bearer testtoken");
       expect(res.status).toBe(500);
       expect(res.body.message).toBe("Invalid token");
     });
@@ -167,7 +151,9 @@ describe("장애물 달리기 경주 보상", () => {
       mockPetRef.get = jest.fn().mockResolvedValue(mockPetSnap);
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
 
-      const res = await request(app).patch(`/game/clean/${mockUserId}`);
+      const res = await request(app)
+        .patch(`/game/clean/${mockUserId}`)
+        .set("Authorization", "Bearer testtoken");
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -178,14 +164,18 @@ describe("장애물 달리기 경주 보상", () => {
     it("❌ 사용자가 없을 때", async () => {
       const mockUserRef = {get: jest.fn().mockResolvedValue({exists: false})};
       (refUser as jest.Mock).mockReturnValue(mockUserRef);
-      const res = await request(app).patch(`/game/clean/${mockUserId}`);
+      const res = await request(app)
+        .patch(`/game/clean/${mockUserId}`)
+        .set("Authorization", "Bearer testtoken");
       expect(res.status).toBe(404);
       expect(res.body.message).toBe("User not found");
     });
 
     it("❌ 사용자 인증 실패", async () => {
       (verifyToken as jest.Mock).mockRejectedValue(new Error("Invalid token"));
-      const res = await request(app).patch(`/game/clean/${mockUserId}`);
+      const res = await request(app)
+        .patch(`/game/clean/${mockUserId}`)
+        .set("Authorization", "Bearer testtoken");
       expect(res.status).toBe(500);
       expect(res.body.message).toBe("Invalid token");
     });

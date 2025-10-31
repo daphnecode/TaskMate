@@ -75,10 +75,10 @@ router.patch("/clean/:userId", async (req, res) => {
     // 1️⃣ 인증 토큰 검증
     const decoded = await verifyToken(req);
     const uid = decoded.uid;
-    const { userId } = req.params;
+    const {userId} = req.params;
 
     if (uid !== userId) {
-      return res.status(403).json({ success: false, message: "Forbidden" });
+      return res.status(403).json({success: false, message: "Forbidden"});
     }
 
     // 2️⃣ user 문서에서 nowPet 필드 읽기
@@ -86,20 +86,26 @@ router.patch("/clean/:userId", async (req, res) => {
     const userSnap = await userRef.get();
 
     if (!userSnap.exists) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({
+        success: false, message: "User not found",
+      });
     }
 
     const nowPet = userSnap.data()?.nowPet;
     if (!nowPet) {
-      return res.status(400).json({ success: false, message: "nowPet not set" });
+      return res.status(400).json({
+        success: false, message: "nowPet not set",
+      });
     }
 
     // 3️⃣ pet 문서 불러오기
-    const petRef = userRef.collection("pets").doc(nowPet);   
+    const petRef = userRef.collection("pets").doc(nowPet);
     const petSnap = await petRef.get();
 
     if (!petSnap.exists) {
-      return res.status(404).json({ success: false, message: "Pet not found" });
+      return res.status(404).json({
+        success: false, message: "Pet not found",
+      });
     }
 
     const petData = petSnap.data() || {};
@@ -125,14 +131,15 @@ router.patch("/clean/:userId", async (req, res) => {
     return res.json({
       success: true,
       message: "happy +10",
-      currentHappy: newHappy
+      currentHappy: newHappy,
     });
-
   } catch (e: any) {
     console.error(e);
-    return res.status(500).json({ success: false, message: e?.message || "Server error" });
+    return res.status(500).json({
+      success: false, message: e?.message || "Server error",
+    });
   }
 });
 
 // Firebase에 배포
-export default router; 
+export default router;

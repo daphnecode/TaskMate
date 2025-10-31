@@ -1,6 +1,6 @@
 import express from "express";
-import { verifyToken, refUser, refItem, refShop, refShopItem } from "./refAPI";
-import { Item } from "../types/api";
+import {verifyToken, refUser, refItem, refShop, refShopItem} from "./refAPI";
+import {Item} from "../types/api";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/items", async (req, res) => {
   try {
     // 인증 확인
-    const { category } = req.query;
+    const {category} = req.query;
     if (!category) {
       return res.status(400).json({
         success: false,
@@ -62,15 +62,17 @@ router.get("/items", async (req, res) => {
 router.post("/items/:userId", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
-    const { itemName } = req.body;
+    const {itemName} = req.body;
     const uid = decoded.uid;
 
     if (decoded.uid !== uid) {
-      return res.status(403).json({ success: false, message: "Forbidden" });
+      return res.status(403).json({success: false, message: "Forbidden"});
     }
 
     if (!itemName) {
-      return res.status(400).json({ success: false, message: "itemName is required" });
+      return res.status(400).json({
+        success: false, message: "itemName is required",
+      });
     }
 
     const userRef = refUser(uid);
@@ -84,14 +86,14 @@ router.post("/items/:userId", async (req, res) => {
     console.log("itemPrice:", itemName, itemPrice);
 
     if (userPoint >= itemPrice) {
-      await userRef.update({ currentPoint: userPoint - itemPrice });
+      await userRef.update({currentPoint: userPoint - itemPrice});
 
       const itemRef = refItem(uid, itemName);
       const snap1 = await itemRef.get();
       if (snap1.exists) {
         // 이미 존재하면 count 1 증가
         const currentCount = snap1.data()?.count ?? 0;
-        await itemRef.update({ count: currentCount + 1 });
+        await itemRef.update({count: currentCount + 1});
       } else {
         // 존재하지 않으면 새로 생성
         const itemData = snap3.data();
@@ -112,10 +114,11 @@ router.post("/items/:userId", async (req, res) => {
       message: "item purchase complete",
       itemName,
     });
-
   } catch (e: any) {
     console.error(e);
-    return res.status(500).json({ success: false, message: e?.message || "Server error" });
+    return res.status(500).json({
+      success: false, message: e?.message || "Server error",
+    });
   }
 });
 

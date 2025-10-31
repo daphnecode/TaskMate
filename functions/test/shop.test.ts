@@ -26,7 +26,7 @@ describe("🐾 [INTEGRATION] 상점 아이템 로딩 & 구매", () => {
     // ✅ 상점 아이템 mock
     const shopItem = [
       { data: () => ({ icon: "assets/icons/icon-chicken.png", name: "cookie", category: 1, count: 0, happy: 4, hunger: 15, price: 40, itemText: "yum" }) },
-      { data: () => ({ icon: "assets/icons/icon-strawberry.png", name: "mushroomStew", category: 1, count: 0, happy: 0, hunger: 5, price: 10, itemText: "good" }) },
+      { data: () => ({ icon: "assets/icons/icon-soup.png", name: "mushroomStew", category: 1, count: 0, happy: 0, hunger: 5, price: 10, itemText: "good" }) },
       { data: () => ({ icon: "assets/icons/icon-cupcake.png", name: "pudding", category: 1, count: 0, happy: 8, hunger: 10, price: 40, itemText: "something here" }) },
       { data: () => ({ icon: "assets/icons/icon-strawberry.png", name: "strawberry", category: 1, count: 5, happy: 5, hunger: 0, price: 10, itemText: "sweet and sour" }) },
       { data: () => ({ icon: "assets/icons/icon-chicken.png", name: "tuna", category: 1, count: 0, happy: 20, hunger: 50, price: 150, itemText: "wow" }) },
@@ -87,21 +87,23 @@ describe("🐾 [INTEGRATION] 상점 아이템 로딩 & 구매", () => {
     // --- 아이템 구매 POST ---
     const buyRes = await request(app)
       .post("/shop/items/user123")
-      .send({ itemName: "strawberry" })
+      .send({ itemName: listRes.body.data[0].name })
       .set("Authorization", "Bearer testtoken");
 
     expect(buyRes.status).toBe(200);
     expect(buyRes.body.success).toBe(true);
-    expect(buyRes.body.itemName).toBe("strawberry");
+    expect(buyRes.body.itemName).toBe("cookie");
 
     // ✅ 유저 포인트 차감 확인
-    expect(mockUserRef.update).toHaveBeenCalledWith({ currentPoint: 90 });
+    expect(mockUserRef.update).toHaveBeenCalledWith({ currentPoint: 60 });
 
     // ✅ 아이템 생성 확인
-    expect(mockItemRef.set).toHaveBeenCalledWith(expect.objectContaining({
-      name: "strawberry",
-      count: 2,
-    }));
+    expect(mockItemRef.set).toHaveBeenCalledWith({
+      icon: "assets/icons/icon-chicken.png",
+      name: "cookie", category: 1,
+      count: 1, happy: 4, hunger: 15,
+      price: 40, itemText: "yum",
+    });
   });
 
   it("포인트 부족 시 구매 실패", async () => {
