@@ -12,7 +12,9 @@ jest.mock("./refAPI", () => ({
   refPets: jest.fn(),
 }));
 
-import {verifyToken, refInventory, refUser, refItem, refStats, refPets} from "./refAPI";
+import {
+  verifyToken, refInventory, refUser, refItem, refStats, refPets,
+} from "./refAPI";
 
 const app = express();
 app.use(express.json());
@@ -36,7 +38,7 @@ describe("GET /users/:userID/items", () => {
   // ✅ [GET] /users/:userId/items
   it("✅사용자 음식 아이템 인벤토리 리스트 불러오기", async () => {
     // mock verifyToken
-    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
+    (verifyToken as jest.Mock).mockResolvedValue({uid: "user123"});
 
     // mock refInventory().get()
     const mockDocs = [

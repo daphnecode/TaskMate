@@ -8,99 +8,176 @@ jest.mock("../src/pet/refAPI", () => ({
   verifyToken: jest.fn(),
   refItem: jest.fn(),
   refUser: jest.fn(),
+  refPets: jest.fn(),
+  refStats: jest.fn(),
   refInventory: jest.fn(),
 }));
 
-import { verifyToken, refInventory, refItem, refUser } from "../src/pet/refAPI";
+import { verifyToken, refInventory, refItem, refUser, refPets, refStats } from "../src/pet/refAPI";
 
 describe("🐾 [INTEGRATION] 사용자 인벤토리 및 아이템 사용 통합 시나리오", () => {
   let app: express.Express;
   let mockInventory: any[];
-  let mockUser: any;
-  let mockItemRef: any;
   let mockUserRef: any;
-  let mockQuery: any;
-  let mockUpdate: jest.Mock;
+  let mockItemRef: any;
+  let mockPetRef: any;
+  
 
   beforeEach(() => {
     app = express();
     app.use(express.json());
     app.use("/users", itemRouter);
 
-    // 초기 인벤토리 세팅
+    (verifyToken as jest.Mock).mockResolvedValue({ uid: "user123" });
     mockInventory = [
-      { name: "strawberry", category: 1, count: 5, happy: 5, hunger: 0 },
-      { name: "pudding", category: 1, count: 1, happy: 8, hunger: 10 },
-      { name: "ball", category: 2, count: 3, happy: 6, hunger: 0 },
-      { name: "beach", category: 3, count: 1, happy: 0, hunger: 0 },
-      { name: "starlight", category: 4, count: 1, happy: 0, hunger: 0 },
-      { name: "bubble", category: 4, count: 1, happy: 0, hunger: 0 },
+     {data: () => ({
+        icon: "assets/icons/icon-chicken.png",
+        name: "cookie", category: 1,
+        count: 1, happy: 4, hunger: 15,
+        price: 40, itemText: "yum",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-strawberry.png",
+        name: "mushroomStew", category: 1,
+        count: 1, happy: 0, hunger: 5,
+        price: 10, itemText: "good",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-cupcake.png",
+        name: "pudding", category: 1,
+        count: 1, happy: 8, hunger: 10,
+        price: 40, itemText: "something here",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-strawberry.png",
+        name: "strawberry", category: 1,
+        count: 5, happy: 5, hunger: 0,
+        price: 10, itemText: "sweet and sour",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-chicken.png",
+        name: "tuna", category: 1,
+        count: 1, happy: 20, hunger: 50,
+        price: 150, itemText: "wow",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-chicken.png",
+        name: "cookie", category: 2,
+        count: 1, happy: 4, hunger: 15,
+        price: 40, itemText: "yum",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-strawberry.png",
+        name: "mushroomStew", category: 2,
+        count: 1, happy: 0, hunger: 5,
+        price: 10, itemText: "good",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-cupcake.png",
+        name: "pudding", category: 2,
+        count: 1, happy: 8, hunger: 10,
+        price: 40, itemText: "something here",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-strawberry.png",
+        name: "starlight", category: 4,
+        count: 1, happy: 5, hunger: 0,
+        price: 10, itemText: "sweet and sour",
+      })},
+      {data: () => ({
+        icon: "assets/icons/icon-chicken.png",
+        name: "beach", category: 3,
+        count: 1, happy: 20, hunger: 50,
+        price: 150, itemText: "wow",
+      })}, 
     ];
+    // 전체 데이터를 반환하는 get()
+    const mockGetAll = jest.fn().mockResolvedValue({ empty: false, docs: mockInventory });
 
-    mockUser = {
-      nowPet: "unicon",
-      setting: {placeID: "default"},
-    };
-
-    // ✅ update mock
-    mockUpdate = jest.fn((data) => {
-      mockUser.styleID = data.styleID; // 상태 저장
-      return Promise.resolve();
-    });
-
-    // ✅ collection, doc mock
-    mockUser.collection = jest.fn(() => ({
-      doc: jest.fn((petId: string) => ({
-        update: mockUpdate,
-      })),
-    }));
-
-    // verifyToken mock
-    (verifyToken as jest.Mock).mockImplementation(async (req: any) => ({
-      uid: req.params.userId, // req.params.userId를 반환
-    }));
-
-    // refInventory mock
-    const mockDocs = mockInventory.map((i) => ({ data: () => i }));
-    const mockGetAll = jest.fn().mockResolvedValue({ empty: false, docs: mockDocs });
+    // where("category", "==", value) 호출 시 필터링된 mockDocs만 반환
     const mockWhere = jest.fn((field: string, op: string, value: number) => {
-      const filtered = mockInventory.filter((i) => i.category === value);
-      return { get: jest.fn().mockResolvedValue({ empty: false, docs: filtered.map((i) => ({ data: () => i })) }) };
+      const filteredInventory = mockInventory.filter((d) => d.data().category === value);
+      return { get: jest.fn().mockResolvedValue({ empty: false, docs: filteredInventory }) };
     });
-    mockQuery = { get: mockGetAll, where: mockWhere };
+
+    const mockQuery = { get: mockGetAll, where: mockWhere };
     (refInventory as jest.Mock).mockReturnValue(mockQuery);
 
-    // refItem mock
+    const mockPetSnap = {
+      exists: true,
+      data: () => ({styleID: "default",happy: 30, hunger: 50}),
+    };
+    
+    mockPetRef = {
+      get: jest.fn().mockResolvedValue(mockPetSnap),
+      update: jest.fn(),
+      set: jest.fn(),
+    };
+    (refPets as jest.Mock).mockReturnValue(mockPetRef);
+
+    const mockUserSnap = {
+      exists: true, data: () => ({nowPet: "petA", setting: {placeID: "default"}}),
+    };
+
+    mockUserRef = {
+      get: jest.fn().mockResolvedValue(mockUserSnap),
+      collection: jest.fn().mockImplementation((collectionName: string) => {
+        if (collectionName === "pets") {
+          return {
+            doc: jest.fn().mockImplementation((petId: string) => mockPetRef),
+          };
+        }
+        // 다른 컬렉션 대비 안전장치
+        return {
+          doc: jest.fn().mockReturnValue({ get: jest.fn(), update: jest.fn() }),
+        };
+      }),
+      update: jest.fn().mockResolvedValue(undefined),
+      doc: jest.fn().mockReturnValue(mockPetRef),
+    };
+    (refUser as jest.Mock).mockReturnValue(mockUserRef);
+ 
+    
+    const mockSnap = { exists: true,
+      data: () => ({ icon: "assets/icons/icon-strawberry.png", name: "strawberry", category: 1, count: 5, happy: 5, hunger: 0, price: 10, itemText: "sweet and sour" })
+    };
     mockItemRef = {
-      get: jest.fn((itemName: string) => {
-        // const found = mockInventory.find((i) => i.name === itemName);
-        // 위 코드를 사용하는 것이 옳은 로직. 하지만 에러가 발생해서 하드코딩으로 변경
-        const found = mockInventory.find((i) => i.name === "strawberry");
-        if (!found) return Promise.resolve({ exists: false });
-        return Promise.resolve({ exists: true, data: () => found });
-      }),
-      update: jest.fn((updateData: any) => {
-        const target = mockInventory.find((i) => i.name === "strawberry");
-        if (target) target.count = updateData.count;
-        return Promise.resolve(undefined);
-      }),
+      get: jest.fn().mockResolvedValue(mockSnap),
+      update: jest.fn().mockResolvedValue(undefined), 
     };
     (refItem as jest.Mock).mockReturnValue(mockItemRef);
 
-    mockUserRef = {
-      get: jest.fn(() =>
-        Promise.resolve({
-          exists: true,
-          data: () => mockUser,
-        })
-      ),
-      update: jest.fn((something: string) => {
-        mockUser.setting["placeID"] = something;
-        return Promise.resolve(undefined);
+    const mockFoodDocRef = {
+      get: jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({ count: 1 }),
       }),
-      collection: mockUser.collection,
+      update: jest.fn(),
     };
-    (refUser as jest.Mock).mockReturnValue(mockUserRef);
+
+    const mockStatsSnap = {
+      exists: true,
+      data: () => ({ feeding: 5, moreHappy: 10 }),
+    };
+
+    const mockStatsRef = {
+      get: jest.fn().mockResolvedValue(mockStatsSnap),
+      update: jest.fn(),
+      collection: jest.fn().mockImplementation((collectionName: string) => {
+        if (collectionName === "foodCount") {
+          return {
+            doc: jest.fn().mockImplementation(
+              (itemName: string) => mockFoodDocRef),
+          };
+        }
+        // 다른 컬렉션 대비 안전장치
+        return {
+          doc: jest.fn().mockReturnValue({ get: jest.fn(), update: jest.fn() }),
+        };
+      }),
+    };
+    (refStats as jest.Mock).mockReturnValue(mockStatsRef);
+
   });
 
   
@@ -113,8 +190,8 @@ describe("🐾 [INTEGRATION] 사용자 인벤토리 및 아이템 사용 통합 
 
     expect(listRes.status).toBe(200);
     expect(listRes.body.success).toBe(true);
-    expect(listRes.body.data.length).toBe(2);
-    expect(listRes.body.data[0].name).toBe("strawberry");
+    expect(listRes.body.data.length).toBe(5);
+    expect(listRes.body.data[0].name).toBe("cookie");
 
     // --- strawberry 아이템 사용 ---
     const useRes = await request(app)
@@ -126,9 +203,6 @@ describe("🐾 [INTEGRATION] 사용자 인벤토리 및 아이템 사용 통합 
     expect(useRes.body.itemCount).toBe(4);
     expect(mockItemRef.update).toHaveBeenCalledWith({ count: 4 });
 
-    // --- 인벤토리 갱신 확인 ---
-    const updated = mockInventory.find((i) => i.name === "strawberry");
-    expect(updated?.count).toBe(4);
   });
 
   it("✅ 시나리오 2: 배경 리스트 확인 → 아이템 사용 → 배경 갱신", async () => {
@@ -154,8 +228,6 @@ describe("🐾 [INTEGRATION] 사용자 인벤토리 및 아이템 사용 통합 
     expect(useRes.body.message).toBe("inventory place use complete");
     expect(mockUserRef.update).toHaveBeenCalledWith({ "setting.placeID": "beach" });
     
-    // --- 배경 갱신 확인 ---
-    expect(mockUser.setting.placeID).toBe("beach");
   });
 
   it("✅ 시나리오 3: 스타일 리스트 확인 → 아이템 사용 → 펫 스타일 갱신", async () => {
@@ -167,7 +239,7 @@ describe("🐾 [INTEGRATION] 사용자 인벤토리 및 아이템 사용 통합 
 
     expect(listRes.status).toBe(200);
     expect(listRes.body.success).toBe(true);
-    expect(listRes.body.data.length).toBe(2);
+    expect(listRes.body.data.length).toBe(1);
     expect(listRes.body.data[0].name).toBe("starlight");
 
     // --- strawberry 아이템 사용 ---
@@ -181,9 +253,7 @@ describe("🐾 [INTEGRATION] 사용자 인벤토리 및 아이템 사용 통합 
     expect(useRes.body.success).toBe(true);
     expect(useRes.body.styleID).toBe("starlight");
     expect(useRes.body.message).toBe("inventory style use complete");
-    expect(mockUpdate).toHaveBeenCalledWith({ styleID: "starlight" });
+    expect(mockPetRef.update).toHaveBeenCalledWith({ styleID: "starlight" });
         
-    // --- 스타일 갱신 확인 ---
-    expect(mockUser.styleID).toBe("starlight");
   });
 });
