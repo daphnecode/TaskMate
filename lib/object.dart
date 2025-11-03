@@ -7,6 +7,7 @@ class Item {
   int count;
   final int price;
   final String itemText;
+  bool owned = false;
 
   Item({
     required this.icon,
@@ -28,6 +29,7 @@ class Item {
     'count': count,
     'price': price,
     'itemText': itemText,
+    'owned': owned,
   };
 
   factory Item.fromMap(Map<String, dynamic> map) {

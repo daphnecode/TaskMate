@@ -1146,7 +1146,15 @@ class _ShoplistPage3State extends State<ShoplistPage3> {
   }
 
   Future<void> _loadItems() async {
-    final result = await readShopList(3);
+    final shopItems = await readShopList(3);
+    final userItems = await readItemList(3);
+
+    final result = shopItems.map((item) {
+      final owned = userItems.any((inv) => inv.name == item.name);
+      final map = Item.fromMap(item.toMap());
+      map.owned = owned;
+      return map;
+    }).toList();
     setState(() {
       inventory = result;
     });
@@ -1225,17 +1233,16 @@ class _ShoplistPage3State extends State<ShoplistPage3> {
                       itemCount: inventory!.length,
                       itemBuilder: (context, index) {
                         final item = inventory![index];
-                        final check = (item.count != 0);
 
                         return Container(
-                          color: check
+                          color: item.owned
                               ? (Theme.of(context).brightness == Brightness.dark
                                     ? Colors.grey
                                     : Colors.red)
                               : Colors.transparent,
                           child: ListTile(
                             onTap: () {
-                              if (!check) {
+                              if (!item.owned) {
                                 showDialog(
                                   context: context,
                                   builder: (_) => AlertDialog(
@@ -1269,6 +1276,7 @@ class _ShoplistPage3State extends State<ShoplistPage3> {
                                             setState(() {
                                               widget.user.currentPoint -=
                                                   item.price;
+                                              item.owned = true;
                                             });
                                             // ✅ 현재 로그인한 사용자 uid 사용
                                             await buyItem(item.name);
@@ -1568,7 +1576,15 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
   }
 
   Future<void> _loadItems() async {
-    final result = await readShopList(4);
+    final shopItems = await readShopList(4);
+    final userItems = await readItemList(4);
+
+    final result = shopItems.map((item) {
+      final owned = userItems.any((inv) => inv.name == item.name);
+      final map = Item.fromMap(item.toMap());
+      map.owned = owned;
+      return map;
+    }).toList();
     setState(() {
       inventory = result;
     });
@@ -1643,16 +1659,16 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
                       itemCount: inventory!.length,
                       itemBuilder: (context, index) {
                         final item = inventory![index];
-                        final check = (item.count != 0);
+
                         return Container(
-                          color: check
+                          color: item.owned
                               ? (Theme.of(context).brightness == Brightness.dark
                                     ? Colors.grey
                                     : Colors.red)
                               : Colors.transparent,
                           child: ListTile(
                             onTap: () {
-                              if (!check) {
+                              if (!item.owned) {
                                 showDialog(
                                   context: context,
                                   builder: (_) => AlertDialog(
@@ -1686,6 +1702,7 @@ class _ShoplistPage4State extends State<ShoplistPage4> {
                                             setState(() {
                                               widget.user.currentPoint -=
                                                   item.price;
+                                              item.owned = true;
                                             });
                                             await buyItem(item.name);
                                           }
