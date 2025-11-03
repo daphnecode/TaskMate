@@ -1989,7 +1989,6 @@ class _ItemCategoryState extends State<ItemCategory> {
               IconButton(
                 icon: Icon(Icons.settings),
                 onPressed: () {
-                  Navigator.pop(context);
                   widget.onNext(6);
                 },
               ),
@@ -2247,7 +2246,6 @@ class _ShopCategoryState extends State<ShopCategory> {
               IconButton(
                 icon: Icon(Icons.settings),
                 onPressed: () {
-                  Navigator.pop(context);
                   widget.onNext(6);
                 },
               ),
