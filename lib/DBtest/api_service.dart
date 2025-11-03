@@ -438,14 +438,14 @@ Future<void> gameRunReward(double runnedDistance) async {
   }
 }
 
-Future<void> gameCleanReward() async {
+Future<Map<String, dynamic>> gameCleanReward() async {
   try {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final url = Uri.parse("$baseUrl/game/clean/$uid");
     final r = await http.patch(url, headers: await _authHeaders());
 
     if (r.statusCode == 200) {
-      return jsonDecode(r.body);
+      return Map<String, dynamic>.from(jsonDecode(r.body));
     } else {
       throw Exception("Failed to get reward: ${r.statusCode}, ${r.body}");
     }

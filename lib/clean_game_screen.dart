@@ -34,6 +34,7 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
   bool _rewardApplied = false; // 이미 보상 실행?
   bool _playedOnce = false;    // 유저가 실제 버튼 눌렀나?
   bool _completed = false;     // 보상 절대 1회만
+  bool _saving = false;        // 서버 호출 중(버튼 스팸 방지)
 
   @override
   void initState() {
@@ -49,12 +50,12 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
     _rewardApplied = false;
     _playedOnce = false;
     _completed = false;
+    _saving = false;
 
     // 🔒 시작 시에는 게임이 스스로 팝업 못 띄우게 게이트 닫기
     _game.allowClearOverlay(false);
 
-    // 🔧 혹시 CleanGame이 onLoad 직후 팝업을 띄워버리면(레벨이 이미 클리어 상태 등)
-    //    첫 프레임에 유저 조작 전이면 팝업을 제거하는 안전망
+    // 🔧 onLoad 직후 레벨이 이미 클리어 상태여서 팝업이 뜨는 경우를 대비한 안전망
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_playedOnce && _game.overlays.isActive('ClearPopup')) {
         _game.overlays.remove('ClearPopup');
@@ -68,28 +69,41 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
     super.dispose();
   }
 
-  // ── 보상은 이 함수 "단 한 곳"에서만 실행 ────────────────────────
+  // ── 보상은 이 함수에서만 실행 ────────────────────────
   Future<void> _applyRewardOnce() async {
     if (_completed || _rewardApplied) return; // 재진입/중복 클릭 방지
     _completed = true;
     _rewardApplied = true;
 
-    // 로컬 즉시 반영 (null 안전)
-    if (widget.pet != null) {
-      setState(() {
-        widget.pet!.happy = (widget.pet!.happy + 10).clamp(0, 9999);
-      });
-    }
-
-    // 서버 반영 (실패해도 UX 흐름은 유지)
     try {
-      await gameCleanReward();
-      // 필요 시: await petSaveDB(widget.uid, widget.petId, widget.pet);
-    } catch (_) {
-      // TODO: 스낵바/토스트 등 안내 원하면 여기
+      // 🔹 서버 호출
+      final res = await gameCleanReward();
+      final delta = (res["happyDelta"] ?? 0) as int;
+      final current = res["currentHappy"] as int?;
+      final msg = res["message"] as String? ?? "";
+
+      // 🔹 서버 응답 기준으로 로컬 상태 갱신
+      if (delta > 0 && current != null && widget.pet != null) {
+        setState(() {
+          widget.pet!.happy = current; // 서버값으로 정합성 유지
+        });
+      }
+
+      // 🔹 스낵바로 메시지 표시
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("보상 처리 중 오류 발생: $e")),
+        );
+      }
     }
 
-    // 팝업 닫고, 부모에 변경됨(true) 전달
+    // 팝업 닫기 + 부모 페이지로 돌아가기
     _game.overlays.remove('ClearPopup');
     if (mounted) {
       Navigator.pop(context, true);
@@ -162,10 +176,12 @@ class _CleanGameScreenState extends State<CleanGameScreen> {
 
                   // 🧹 정사각형 치우기 버튼 (아이콘 + 텍스트)
                   SizedBox(
-                    width: 100, // ✅ 정사각형 크기 지정
+                    width: 100,
                     height: 100,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: _saving
+                          ? null // 저장 중엔 비활성화 → 스팸 방지
+                          : () {
                         _playedOnce = true;
                         _game.allowClearOverlay(true);
                         _game.tryClean();
