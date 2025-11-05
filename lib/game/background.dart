@@ -2,11 +2,13 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 class Background extends SpriteComponent {
-  Background() : super(anchor: Anchor.topLeft);
+  final String imagePath;
+  Background({required this.imagePath}) : super(anchor: Anchor.topLeft);
 
   @override
   Future<void> onLoad() async {
-    sprite = await Sprite.load('beach.png');
+    String imageName = imagePath.split('/').last;
+    sprite = await Sprite.load(imageName);
   }
 
   void resize(Vector2 gameSize) {

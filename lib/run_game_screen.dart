@@ -13,6 +13,7 @@ class RunGameScreen extends StatefulWidget {
   final Pets? pet;
   final String uid;
   final String petId;
+  final String placeID;
 
   const RunGameScreen({
     super.key,
@@ -21,6 +22,7 @@ class RunGameScreen extends StatefulWidget {
     required this.pet,
     required this.uid,
     required this.petId,
+    required this.placeID,
   });
 
   @override
@@ -28,7 +30,7 @@ class RunGameScreen extends StatefulWidget {
 }
 
 class _RunGameScreenState extends State<RunGameScreen> {
-  final RunGame _game = RunGame();
+  late RunGame _game;
   bool _isPlaying = false;
 
   //중복 보상 방지
@@ -37,6 +39,7 @@ class _RunGameScreenState extends State<RunGameScreen> {
   @override
   void initState() {
     super.initState();
+    _game = RunGame(imagePath:widget.placeID);
 
     // 효과음이 켜져 있으면 놀이 BGM 재생
     final rootState = context.findAncestorStateOfType<RootState>();

@@ -357,6 +357,7 @@ class _PetmainState extends State<Petmain> {
                                         soundEffectsOn: widget.soundEffectsOn,
                                         uid: uid, // ✅ 하드코딩 제거
                                         petId: petId,
+                                        placeID: widget.user.setting['placeID'],
                                       ),
                                     ),
                                   );

@@ -9,6 +9,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
   Dino? _dino;
   Background? background;
   final List<Obstacle> obstacles = [];
+  final String imagePath;
   bool isGameRunning = false;
   double targetDistance = 0;
   late Timer obstacleTimer;
@@ -21,6 +22,8 @@ class RunGame extends FlameGame with HasCollisionDetection {
   double elapsedDistance = 0; // 현재 경과 시간 (초 단위)
   double maxDistance = 0; // 클리어 기준 시간 (예: 30초)
 
+  RunGame({required this.imagePath});
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -31,7 +34,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
       ..x = 50;
     await add(_dino!);
     // add(Ground(this));
-    background = Background();
+    background = Background(imagePath: imagePath);
     await add(background!);
 
     obstacleTimer = Timer(2, onTick: spawnObstacle, repeat: true);
