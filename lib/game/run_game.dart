@@ -60,10 +60,10 @@ class RunGame extends FlameGame with HasCollisionDetection {
   }
 
   void startGame(double distance) {
-    targetDistance = distance;
+    targetDistance = (distance == 100) ? 200 : distance;
     isGameRunning = true;
     elapsedDistance = _dino!.travelDistance;
-    maxDistance = distance;
+    maxDistance = targetDistance;
 
     // 예: dino 달리기 애니메이션 시작, 장애물 주기적 생성 등
     _dino!.run();
@@ -89,7 +89,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
     if (_dino!.travelDistance >= targetDistance) {
       stopGame();
       overlays.add('ClearPopup'); // 클리어 팝업
-      gameRunReward(targetDistance);
+      gameRunReward((targetDistance==200) ? 100 : targetDistance);
     }
     elapsedDistance += _dino!.speed * dt;
 
