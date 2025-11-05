@@ -5,7 +5,7 @@ import 'obstacle.dart';
 
 class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   final RunGame game;
-  Dino(this.game, {required this.groundY}) : super(size: Vector2(128, 128), priority: 10, anchor: Anchor.bottomLeft);
+  Dino(this.game, {required this.petPath ,required this.groundY}) : super(size: Vector2(128, 128), priority: 10, anchor: Anchor.bottomLeft);
 
   double travelDistance = 0.0; // 진행 거리 (미터)
   double speed = 25;    // 초당 100미터 속도
@@ -15,12 +15,14 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
   double jumpForce = -500; // 점프 시 초기 속도 (음수: 위로)
 
   double groundY;
+  final String petPath;
 
   bool isJumping = false;
 
   @override
   Future<void> onLoad() async {
-    final image = await game.images.load('unicon.png');
+    String imageName = petPath.split('/').last;
+    final image = await game.images.load(imageName);
     animation = SpriteAnimation.fromFrameData(
       image,
       SpriteAnimationData.sequenced(

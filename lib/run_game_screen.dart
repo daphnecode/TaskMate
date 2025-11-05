@@ -39,7 +39,7 @@ class _RunGameScreenState extends State<RunGameScreen> {
   @override
   void initState() {
     super.initState();
-    _game = RunGame(imagePath:widget.placeID);
+    _game = RunGame(imagePath:widget.placeID, petPath: widget.pet!.image);
 
     // 효과음이 켜져 있으면 놀이 BGM 재생
     final rootState = context.findAncestorStateOfType<RootState>();
