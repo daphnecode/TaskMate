@@ -48,6 +48,9 @@ export const onTaskSubmitted = onDocumentWritten("Users/{userId}/log/{logId}", a
   await handleTaskSubmitted(userId, logId, after);
 });
 
+// ===== 인증 레이어 (동시 로그인 차단/세션 관리) =====
+export { acquireSession, heartbeatSession } from "./login/singleSession.js";
+
 import { pushNotifications } from "./notification";
 // 기존 export 유지 (ESM 로컬 모듈은 .js 필수)
 export * from "./submitReward";

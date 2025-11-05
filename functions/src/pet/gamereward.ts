@@ -197,7 +197,7 @@ router.patch("/clean/:userId", async (req, res) => {
 
       return {
         success: true,
-        message: "happy +10",
+        message: "행복도 +10",
         currentHappy: nextHappy,
         happyDelta: 10,
         loggedToday: true,
