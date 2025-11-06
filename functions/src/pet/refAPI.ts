@@ -30,3 +30,8 @@ export function refPets(uid: string) {
 export function refStats(uid: string) {
   return db.collection("Users").doc(uid).collection("stats").doc("summary");
 }
+
+export function refToken(uid: string) {
+  return db.collection('Users').doc(uid).collection('fcmTokens').doc(token);
+}
+

@@ -1,8 +1,8 @@
 // lib/features/notifications/fcm_service.dart
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'local_notif_service.dart';
 import 'package:flutter/foundation.dart';
+import '../../DBtest/api_service.dart';
 
 class FcmService {
   static final FcmService _instance = FcmService._internal();
@@ -10,7 +10,6 @@ class FcmService {
   FcmService._internal();
 
   final FirebaseMessaging _fm = FirebaseMessaging.instance;
-  final FirebaseFirestore _fs = FirebaseFirestore.instance;
 
   // 호출 위치: 앱 초기화 시 (예: main.dart의 init)
   Future<void> init({required String uid}) async {
@@ -38,7 +37,7 @@ class FcmService {
 
       if (token != null && uid.isNotEmpty) {
         // Firestore 저장
-        await saveTokenToFirestore(uid, token, 'android');
+        await saveToken(token, 'android');
 
         // 토픽 구독
         await _fm.subscribeToTopic('dailyReminder');
@@ -53,7 +52,7 @@ class FcmService {
 
     // 3) 토큰 변경 시 업데이트
     _fm.onTokenRefresh.listen((newToken) async {
-      await saveTokenToFirestore(uid, newToken, 'android');
+      await saveToken(newToken, 'android');
     });
 
     // 4) 포그라운드 메시지 처리
@@ -84,24 +83,7 @@ class FcmService {
       vapidKey:
           'YOUR_VAPID_KEY',
     );
-    if (token != null) await saveTokenToFirestore(uid, token, 'web');
-  }
-
-  Future<void> saveTokenToFirestore(
-    String uid,
-    String token,
-    String platform,
-  ) async {
-    await _fs
-        .collection('Users')
-        .doc(uid)
-        .collection('fcmTokens')
-        .doc(token)
-        .set({
-          'token': token,
-          'platform': platform,
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
+    if (token != null) await saveToken(token, 'web');
   }
 
   void handleMessageNavigation(Map<String, dynamic> data) {
