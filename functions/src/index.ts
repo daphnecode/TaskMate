@@ -13,6 +13,7 @@ import petRouter from "./pet/petload.js";
 import itemRouter from "./pet/itemload.js";
 import shopRouter from "./pet/shopload.js";
 import gameRouter from "./pet/gamereward.js";
+import tokenRouter from "./tokenSave.js";
 
 // 통계 핸들러
 import { handleTaskSubmitted } from "./stats/handleTaskSubmitted.js";
@@ -34,6 +35,7 @@ app.use("/daily", dailyRouter);
 app.use("/repeatList", repeatRouter);
 app.use("/users", petRouter);
 app.use("/users", itemRouter);
+app.use("/users", tokenRouter);
 app.use("/shop", shopRouter);
 app.use("/game", gameRouter);
 

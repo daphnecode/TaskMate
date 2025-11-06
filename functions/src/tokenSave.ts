@@ -1,13 +1,12 @@
 import express from "express";
-import {verifyToken, refToken} from "./refAPI";
+import {verifyToken, refToken} from "./pet/refAPI";
 
 const router = express.Router();
 
 router.post("/:userId/token", async (req, res) => {
   try {
     const decoded = await verifyToken(req);
-    const {token} = req.body.token;
-    const {platform} = req.body.platform;
+    const { token, platform } = req.body;
     const uid = decoded.uid;
 
     if (decoded.uid !== uid) {
@@ -26,18 +25,16 @@ router.post("/:userId/token", async (req, res) => {
       });
     }
 
-    const tokenRef = refToken(uid);
+    const tokenRef = refToken(uid, token);
     
     await tokenRef.set({
-      'token': token,
-      'platform': platform,
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true);
+          'token': token,
+          'platform': platform,
+        }, {merge: true});
 
     return res.status(200).json({
       success: true,
       message: "token save complete",
-      itemName,
     });
   } catch (e: any) {
     console.error(e);
@@ -47,4 +44,4 @@ router.post("/:userId/token", async (req, res) => {
   }
 });
 
-
+export default router;

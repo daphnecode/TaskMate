@@ -31,7 +31,7 @@ export function refStats(uid: string) {
   return db.collection("Users").doc(uid).collection("stats").doc("summary");
 }
 
-export function refToken(uid: string) {
+export function refToken(uid: string,token: string) {
   return db.collection('Users').doc(uid).collection('fcmTokens').doc(token);
 }
 
