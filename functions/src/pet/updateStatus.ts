@@ -43,6 +43,7 @@ export const updateStatus = onSchedule(
         const petHappy = petData["happy"] ?? 0;
         const petExp = petData["currentExp"] ?? 0;
         const petLevel = petData["level"] ?? 0;
+        let petPath = petData["image"] ?? "";
 
         // 3. 상태 감소 로직 (예: hunger -24, happy -30)
         /*
@@ -85,6 +86,17 @@ export const updateStatus = onSchedule(
           updates.level = newLevel;
         } else {
           updates.currentExp = newExp;
+        }
+
+        if (newLevel != petLevel) {
+          if (newLevel < 50) {
+            petPath = "assets/images/dragon.png";
+          } else {
+            if (newLevel < 80) {
+              petPath = "assets/images/dragon1.png";
+            }
+          }
+          updates.image = petPath;
         }
 
         await petRef.set(updates, {merge: true});
