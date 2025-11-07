@@ -1,7 +1,7 @@
 // src/index.ts
 import {onSchedule} from "firebase-functions/v2/scheduler";
-import { db } from "../firebase.js";
-import { getLevelExp } from "./levelExp.js";
+import {db} from "../firebase.js";
+import {getLevelExp} from "./levelExp.js";
 
 // 매일 새벽 0시 (UTC 기준) 실행
 export const updateStatus = onSchedule(

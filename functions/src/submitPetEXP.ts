@@ -55,6 +55,7 @@ export const submitPetExpAN3 = onCall(
 
         let lvl = Number(petSnap.data()?.level ?? 1);
         let exp = Number(petSnap.data()?.currentExp ?? 0);
+        let petPath = petSnap.data()?.image ?? "";
         const before = { lvl, exp };
 
         exp += earned;
@@ -69,7 +70,17 @@ export const submitPetExpAN3 = onCall(
           ups += 1;
         }
 
-        tx.set(petRef, { level: lvl, currentExp: exp }, { merge: true });
+        if (ups > 0) {
+          if (lvl >= 80) {
+            petPath = "assets/images/dragon3.png";
+          } else {
+            if (lvl >= 50) {
+              petPath = "assets/images/dragon1.png";
+            }
+          }
+        }
+
+        tx.set(petRef, { level: lvl, currentExp: exp, image: petPath }, { merge: true });
         out.steps.push(`petRefPath=${petRef.path}`);
         out.steps.push(
           `pet updated: before=${JSON.stringify(before)} after={"lvl":${lvl},"exp":${exp},"ups":${ups}}`,
