@@ -493,3 +493,23 @@ Future<stats> petStatistics() async {
     throw Exception("Error loading statistics: $e");
   }
 }
+
+Future<void> saveToken(String token, String platform) async {
+  try {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final url = Uri.parse("$baseUrl/users/$uid/token");
+    final r = await http.post(url, 
+      body: json.encode({"token": token, "platform": platform}),
+      headers: await _authHeaders());
+
+    if (r.statusCode == 200) {
+      return jsonDecode(r.body);
+    } else {
+      throw Exception(
+        "Failed to save token: ${r.statusCode}, ${r.body}",
+      );
+    }
+  } catch (e) {
+    throw Exception("Error save token: $e");
+  }
+}
