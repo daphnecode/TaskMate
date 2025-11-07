@@ -20,7 +20,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   // 최근 4주 뷰 지표(Users/{uid}/log)
   double weeklyAchievementRate = 0; // 이번 주 달성률(%)
-  int visitedDays = 0;              // 최근 8주 중 방문일수(참고)
+  int visitedDays = 0; // 최근 8주 중 방문일수(참고)
   Map<String, double> weeklyData = {}; // 파이차트용(최근 4주만)
 
   // ── Time helpers (KST 기준)
@@ -43,17 +43,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
         // 로그인 전 접근 보호
         setState(() => isLoading = false);
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('로그인 후 이용할 수 있습니다.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('로그인 후 이용할 수 있습니다.')));
         return;
       }
 
       final userRef = FirebaseFirestore.instance.collection('Users').doc(uid);
 
       // 1) summary(요약) 값 읽기: totalCompleted, streakDays
-      final summarySnap =
-      await userRef.collection('stats').doc('summary').get();
+      final summarySnap = await userRef
+          .collection('stats')
+          .doc('summary')
+          .get();
       int sumTotal = 0;
       int sumStreak = 0;
       if (summarySnap.exists) {
@@ -80,8 +82,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
       final Map<String, double> weekData = {};
 
       // 이번 주 범위(Mon~Sun)
-      final weekStart =
-      _onlyDate(todayKST.subtract(Duration(days: todayKST.weekday - 1)));
+      final weekStart = _onlyDate(
+        todayKST.subtract(Duration(days: todayKST.weekday - 1)),
+      );
       final weekEnd = _onlyDate(weekStart.add(const Duration(days: 6)));
 
       for (final doc in logsSnap.docs) {
@@ -102,8 +105,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
         }
 
         // 파이차트: 주간 버킷 누적
-        final ws = _onlyDate(date.subtract(Duration(days: date.weekday - 1))); // Mon
-        final we = _onlyDate(ws.add(const Duration(days: 6)));                 // Sun
+        final ws = _onlyDate(
+          date.subtract(Duration(days: date.weekday - 1)),
+        ); // Mon
+        final we = _onlyDate(ws.add(const Duration(days: 6))); // Sun
         final key =
             "${DateFormat('M/d').format(ws)}~${DateFormat('M/d').format(we)}";
         weekData[key] = (weekData[key] ?? 0) + completed.toDouble();
@@ -111,10 +116,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
       // 🔹 파이차트에는 "최근 4주만" 남기기
       // key는 "M/d~M/d" 형식. 시작일 쪽(M/d)을 DateTime으로 변환해 정렬 후 최근 4개만 유지.
-      DateTime _parseRangeStart(String k) =>
+      DateTime parseRangeStart(String k) =>
           DateFormat('M/d').parse(k.split('~').first);
       final sortedKeys = weekData.keys.toList()
-        ..sort((a, b) => _parseRangeStart(a).compareTo(_parseRangeStart(b)));
+        ..sort((a, b) => parseRangeStart(a).compareTo(parseRangeStart(b)));
       final last4Keys = sortedKeys.length > 4
           ? sortedKeys.sublist(sortedKeys.length - 4)
           : sortedKeys;
@@ -130,8 +135,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
         // 최근 로그 기반 뷰 값
         visitedDays = visitedCount;
-        weeklyAchievementRate =
-        weekTotal == 0 ? 0 : (weekCompleted / weekTotal * 100);
+        weeklyAchievementRate = weekTotal == 0
+            ? 0
+            : (weekCompleted / weekTotal * 100);
         weeklyData = filteredLast4.isEmpty ? {"데이터 없음": 1} : filteredLast4;
 
         isLoading = false;
@@ -140,18 +146,16 @@ class _StatisticsPageState extends State<StatisticsPage> {
       if (!mounted) return;
       setState(() => isLoading = false);
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('통계를 불러오지 못했습니다: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('통계를 불러오지 못했습니다: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -195,8 +199,10 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("가장 바빴던 주(최근 4주)", // 제목 명확화
-                          style: Theme.of(context).textTheme.bodyLarge),
+                      Text(
+                        "가장 바빴던 주(최근 4주)", // 제목 명확화
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                       const SizedBox(height: 8),
                       Expanded(
                         child: PieChart(
@@ -249,10 +255,9 @@ class StatCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               value,
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
           ],
         ),

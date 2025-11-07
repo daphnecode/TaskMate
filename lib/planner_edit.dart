@@ -15,7 +15,8 @@ class PlannerEditPage extends StatefulWidget {
   final void Function(int) onNext;
   final List<Task> repeatTaskList;
   final List<Task> todayTaskList;
-  final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList) onUpdateTasks;
+  final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList)
+  onUpdateTasks;
   final Map<String, List<Task>> dailyTaskMap;
   final DateTime selectedDate; // ← 편집 시작 앵커 날짜
   final void Function(Map<String, List<Task>>) onDailyMapChanged;
@@ -148,16 +149,16 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     } catch (e) {
       
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('저장 실패: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('저장 실패: $e')));
     }
   }
 
   /// 부모에 커밋 + 저장 + 이동 처리
   Future<void> saveAndNavigate(int target) async {
     // ✅ 먼저 포커스/로컬 편집 내용 모두 커밋
-    (_todayEditKey.currentState as dynamic?)?.commitAll();
+    (_todayEditKey.currentState as dynamic)?.commitAll();
 
     final key = _dateKey(selectedDate);
     final newMap = Map<String, List<Task>>.from(dailyTaskMap);
@@ -175,7 +176,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
 
     // 이동
     if (target == 0) {
-      widget.onNext(0);      // 홈
+      widget.onNext(0); // 홈
     } else if (target == 1) {
       widget.onBackToMain(); // 플래너 메인
     }
@@ -193,7 +194,9 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       setState(() {
         dailyTaskMap = result;
         // 돌아와서도 오늘(또는 편집 시작일) 박스만 보여주기
-        todayTaskList = List<Task>.from(dailyTaskMap[anchorKey] ?? const <Task>[]);
+        todayTaskList = List<Task>.from(
+          dailyTaskMap[anchorKey] ?? const <Task>[],
+        );
         selectedDate = widget.selectedDate; // 내부 selectedDate도 앵커로 복귀
       });
       widget.onDailyMapChanged(Map<String, List<Task>>.from(dailyTaskMap));
@@ -210,17 +213,22 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             casted[k] = List<Task>.from(v);
           } else if (v is List) {
             try {
-              casted[k] = v.map((e) {
-                if (e is Task) return e;
-                if (e is Map<String, dynamic>) return Task.fromJson(e);
-                return null;
-              }).whereType<Task>().toList();
+              casted[k] = v
+                  .map((e) {
+                    if (e is Task) return e;
+                    if (e is Map<String, dynamic>) return Task.fromJson(e);
+                    return null;
+                  })
+                  .whereType<Task>()
+                  .toList();
             } catch (_) {}
           }
         });
         setState(() {
           dailyTaskMap = casted;
-          todayTaskList = List<Task>.from(dailyTaskMap[anchorKey] ?? const <Task>[]);
+          todayTaskList = List<Task>.from(
+            dailyTaskMap[anchorKey] ?? const <Task>[],
+          );
           selectedDate = widget.selectedDate; // 내부 selectedDate도 앵커로 복귀
         });
         widget.onDailyMapChanged(Map<String, List<Task>>.from(dailyTaskMap));
@@ -231,90 +239,92 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(actions: [
-        IconButton(
-          icon: const Icon(Icons.calendar_today),
-          onPressed: () async {
-            // ✅ 커밋 후 저장
-            (_todayEditKey.currentState as dynamic?)?.commitAll();
-            await saveCurrentTasks();
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: () async {
+              // ✅ 커밋 후 저장
+              (_todayEditKey.currentState as dynamic)?.commitAll();
+              await saveCurrentTasks();
 
-            // 현재 상태를 보존한 맵으로 전달
-            final key = _dateKey(selectedDate);
-            final outbound = Map<String, List<Task>>.from(dailyTaskMap);
-            outbound[key] = List<Task>.from(todayTaskList);
+              // 현재 상태를 보존한 맵으로 전달
+              final key = _dateKey(selectedDate);
+              final outbound = Map<String, List<Task>>.from(dailyTaskMap);
+              outbound[key] = List<Task>.from(todayTaskList);
 
-            if (!mounted) return;
+              if (!mounted) return;
 
-            // DailyTaskEditPage로 이동
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DailyTaskEditPage(
-                  dailyTaskMap: outbound,
-                  selectedDate: selectedDate,
-                  onUpdateDailyTaskMap: (updatedMap) {
-                    // 실시간 신호만 받을 수 있으므로 여기서는 저장 X
-                  },
+              // DailyTaskEditPage로 이동
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DailyTaskEditPage(
+                    dailyTaskMap: outbound,
+                    selectedDate: selectedDate,
+                    onUpdateDailyTaskMap: (updatedMap) {
+                      // 실시간 신호만 받을 수 있으므로 여기서는 저장 X
+                    },
+                  ),
                 ),
-              ),
-            );
+              );
 
-            // 돌아오면 결과 흡수 (앵커 유지)
-            _absorbCalendarResult(result);
-          },
-        )
-      ]),
+              // 돌아오면 결과 흡수 (앵커 유지)
+              _absorbCalendarResult(result);
+            },
+          ),
+        ],
+      ),
       body: showFullRepeat
           ? ReapeatEditFullScreen(
-        tasklist: repeatTaskList,
-        onTaskAListUpdated: (updated) => updateTasks(0, updated),
-        onCollapse: () {
-          setState(() {
-            showFullRepeat = false;
-          });
-        },
-      )
+              tasklist: repeatTaskList,
+              onTaskAListUpdated: (updated) => updateTasks(0, updated),
+              onCollapse: () {
+                setState(() {
+                  showFullRepeat = false;
+                });
+              },
+            )
           : showFullToday
           ? TodayEditFullScreen(
-        taskList: todayTaskList,
-        onTaskListUpdated: (updated) => updateTasks(1, updated),
-        onCollapse: () {
-          setState(() {
-            showFullToday = false;
-          });
-        },
-        selectedDate: selectedDate,
-      )
+              taskList: todayTaskList,
+              onTaskListUpdated: (updated) => updateTasks(1, updated),
+              onCollapse: () {
+                setState(() {
+                  showFullToday = false;
+                });
+              },
+              selectedDate: selectedDate,
+            )
           : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              RepeatEditBox(
-                taskList: repeatTaskList,
-                onTaskListUpdated: (updated) => updateTasks(0, updated),
-                onExpand: () {
-                  setState(() {
-                    showFullRepeat = true;
-                  });
-                },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    RepeatEditBox(
+                      taskList: repeatTaskList,
+                      onTaskListUpdated: (updated) => updateTasks(0, updated),
+                      onExpand: () {
+                        setState(() {
+                          showFullRepeat = true;
+                        });
+                      },
+                    ),
+                    TodayEditBox(
+                      key: _todayEditKey, // ✅ 커밋용 키 연결
+                      taskList: todayTaskList,
+                      onTaskListUpdated: (updated) => updateTasks(1, updated),
+                      onExpand: () {
+                        setState(() {
+                          showFullToday = true;
+                        });
+                      },
+                      selectedDate: selectedDate,
+                    ),
+                  ],
+                ),
               ),
-              TodayEditBox(
-                key: _todayEditKey, // ✅ 커밋용 키 연결
-                taskList: todayTaskList,
-                onTaskListUpdated: (updated) => updateTasks(1, updated),
-                onExpand: () {
-                  setState(() {
-                    showFullToday = true;
-                  });
-                },
-                selectedDate: selectedDate,
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).cardColor,
         elevation: 0,

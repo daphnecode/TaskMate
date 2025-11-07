@@ -130,7 +130,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
     return WillPopScope(
       onWillPop: () async {
         // 뒤로가기 시 현재 입력 커밋 + 저장 후 payload 반환
-        (_todayEditKey.currentState as dynamic?)?.commitAll();
+        (_todayEditKey.currentState as dynamic)?.commitAll();
         await _saveCurrentDateNow();
         Navigator.pop(context, _buildResultPayload());
         return false;
@@ -142,9 +142,12 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
             IconButton(
               icon: const Icon(Icons.save),
               onPressed: () async {
-                (_todayEditKey.currentState as dynamic?)?.commitAll(); // ✅ 커밋
+                (_todayEditKey.currentState as dynamic)?.commitAll(); // ✅ 커밋
                 try {
-                  await api.saveDaily(key, _dailyTaskMap[key] ?? const <Task>[]);
+                  await api.saveDaily(
+                    key,
+                    _dailyTaskMap[key] ?? const <Task>[],
+                  );
                 } catch (e) {
                   
                   
@@ -166,7 +169,7 @@ class _DailyTaskEditPageState extends State<DailyTaskEditPage> {
                 selectedDayPredicate: (day) => isSameDay(_selectedDate, day),
                 onDaySelected: (selectedDay, focusedDay) async {
                   // 날짜 변경 전에 현재 날짜 커밋 + 즉시 저장
-                  (_todayEditKey.currentState as dynamic?)?.commitAll();
+                  (_todayEditKey.currentState as dynamic)?.commitAll();
                   await _saveCurrentDateNow();
 
                   setState(() {

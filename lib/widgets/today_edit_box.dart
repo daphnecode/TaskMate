@@ -55,8 +55,12 @@ class _TodayEditBoxState extends State<TodayEditBox> {
     // ✅ 내용이 실제로 달라졌을 때만 동기화
     final oldIds = oldWidget.taskList.map((t) => t.id).toList(growable: false);
     final newIds = widget.taskList.map((t) => t.id).toList(growable: false);
-    final shallowEqual = oldIds.length == newIds.length &&
-        List.generate(oldIds.length, (i) => oldIds[i] == newIds[i]).every((b) => b);
+    final shallowEqual =
+        oldIds.length == newIds.length &&
+        List.generate(
+          oldIds.length,
+          (i) => oldIds[i] == newIds[i],
+        ).every((b) => b);
 
     if (!shallowEqual) {
       _syncWith(widget.taskList);
@@ -166,8 +170,12 @@ class _TodayEditBoxState extends State<TodayEditBox> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) c.dispose();
-    for (final f in _focusNodes.values) f.dispose();
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    for (final f in _focusNodes.values) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -244,9 +252,11 @@ class _TodayEditBoxState extends State<TodayEditBox> {
                           decoration: InputDecoration(
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10,
+                              horizontal: 12,
+                              vertical: 10,
                             ),
-                            fillColor: theme.colorScheme.surfaceVariant,
+                            fillColor:
+                                theme.colorScheme.surfaceContainerHighest,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -402,8 +412,12 @@ class _TodayEditFullScreenState extends State<TodayEditFullScreen> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) c.dispose();
-    for (final f in _focusNodes.values) f.dispose();
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    for (final f in _focusNodes.values) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -481,9 +495,10 @@ class _TodayEditFullScreenState extends State<TodayEditFullScreen> {
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10,
+                            horizontal: 12,
+                            vertical: 10,
                           ),
-                          fillColor: theme.colorScheme.surfaceVariant,
+                          fillColor: theme.colorScheme.surfaceContainerHighest,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,

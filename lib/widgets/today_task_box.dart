@@ -100,7 +100,8 @@ class TodayTaskBox extends StatelessWidget {
                       isEditing: task.isEditing,
                       onChanged: (_) => onToggleCheck(originalIndex),
                       onStartEditing: (_) => onStartEditing(originalIndex),
-                      onEditPoint: (newPoint) => onEditPoint(originalIndex, newPoint),
+                      onEditPoint: (newPoint) =>
+                          onEditPoint(originalIndex, newPoint),
                     ),
                   );
                 },
@@ -111,7 +112,9 @@ class TodayTaskBox extends StatelessWidget {
             // 진행도
             Text(
               'Progress',
-              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 6),
             Row(
@@ -122,13 +125,19 @@ class TodayTaskBox extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 10,
-                      backgroundColor: theme.colorScheme.surfaceVariant,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.blue,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text('${(progress * 100).round()}%', style: theme.textTheme.bodyMedium),
+                Text(
+                  '${(progress * 100).round()}%',
+                  style: theme.textTheme.bodyMedium,
+                ),
               ],
             ),
           ],
@@ -234,7 +243,12 @@ class TodayTaskFullScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Progress', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text(
+                'Progress',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const SizedBox(height: 6),
               Row(
                 children: [
@@ -244,13 +258,19 @@ class TodayTaskFullScreen extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: progress,
                         minHeight: 10,
-                        backgroundColor: theme.colorScheme.surfaceVariant,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          Colors.blue,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text('${(progress * 100).round()}%', style: theme.textTheme.bodyMedium),
+                  Text(
+                    '${(progress * 100).round()}%',
+                    style: theme.textTheme.bodyMedium,
+                  ),
                 ],
               ),
             ],

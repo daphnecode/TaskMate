@@ -43,8 +43,14 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('로그아웃'),
         content: const Text('정말 로그아웃하시겠습니까?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('로그아웃')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('로그아웃'),
+          ),
         ],
       ),
     );
@@ -54,9 +60,9 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await FirebaseAuth.instance.signOut();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('로그아웃되었습니다.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('로그아웃되었습니다.')));
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } finally {
@@ -71,10 +77,12 @@ class _SettingsPageState extends State<SettingsPage> {
         return SimpleDialog(
           title: const Text('정렬 방법 선택'),
           children: _sortOptions
-              .map((option) => SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, option),
-            child: Text(option),
-          ))
+              .map(
+                (option) => SimpleDialogOption(
+                  onPressed: () => Navigator.pop(context, option),
+                  child: Text(option),
+                ),
+              )
               .toList(),
         );
       },
@@ -94,10 +102,9 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Text(
               '설정',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
@@ -159,7 +166,9 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text(
                 _signingOut ? '로그아웃 중…' : '로그아웃',
                 style: const TextStyle(
-                    color: Colors.redAccent, fontWeight: FontWeight.w600),
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               onTap: _signingOut ? null : _confirmAndSignOut,
               shape: RoundedRectangleBorder(
@@ -198,7 +207,7 @@ class _SettingsPageState extends State<SettingsPage> {
 }
 
 class CreditsPage extends StatelessWidget {
-  CreditsPage({super.key}); // const 제거
+  const CreditsPage({super.key}); // const 제거
 
   @override
   Widget build(BuildContext context) {
@@ -215,14 +224,14 @@ class CreditsPage extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               "• 아이콘: WebHostingHub Glyphs\n"
-                  "  출처: https://www.webhostinghub.com/glyphs\n"
-                  "  라이선스: SIL Open Font License 1.1",
+              "  출처: https://www.webhostinghub.com/glyphs\n"
+              "  라이선스: SIL Open Font License 1.1",
               style: TextStyle(fontSize: 14),
             ),
             SizedBox(height: 20),
             Text(
               "아이콘의 저작권은 WebHostingHub에 있으며, 본 앱은 "
-                  "SIL Open Font License 1.1에 따라 해당 아이콘을 사용합니다.",
+              "SIL Open Font License 1.1에 따라 해당 아이콘을 사용합니다.",
               style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
             ),
             SizedBox(height: 20),

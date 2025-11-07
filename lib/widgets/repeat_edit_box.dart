@@ -54,9 +54,12 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
     final oldIds = oldWidget.taskList.map((t) => t.id).toList(growable: false);
     final newIds = widget.taskList.map((t) => t.id).toList(growable: false);
     final sameLength = oldIds.length == newIds.length;
-    final sameOrder = sameLength &&
-        List<bool>.generate(oldIds.length, (i) => oldIds[i] == newIds[i])
-            .every((b) => b);
+    final sameOrder =
+        sameLength &&
+        List<bool>.generate(
+          oldIds.length,
+          (i) => oldIds[i] == newIds[i],
+        ).every((b) => b);
 
     if (!sameOrder) {
       _syncWith(widget.taskList);
@@ -177,8 +180,12 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) c.dispose();
-    for (final f in _focusNodes.values) f.dispose();
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    for (final f in _focusNodes.values) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -251,9 +258,11 @@ class _RepeatEditBoxState extends State<RepeatEditBox> {
                           decoration: InputDecoration(
                             isDense: true,
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10,
+                              horizontal: 12,
+                              vertical: 10,
                             ),
-                            fillColor: theme.colorScheme.surfaceVariant,
+                            fillColor:
+                                theme.colorScheme.surfaceContainerHighest,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
@@ -317,9 +326,12 @@ class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
     final oldIds = oldWidget.tasklist.map((t) => t.id).toList(growable: false);
     final newIds = widget.tasklist.map((t) => t.id).toList(growable: false);
     final sameLength = oldIds.length == newIds.length;
-    final sameOrder = sameLength &&
-        List<bool>.generate(oldIds.length, (i) => oldIds[i] == newIds[i])
-            .every((b) => b);
+    final sameOrder =
+        sameLength &&
+        List<bool>.generate(
+          oldIds.length,
+          (i) => oldIds[i] == newIds[i],
+        ).every((b) => b);
 
     if (!sameOrder) {
       _syncWith(widget.tasklist);
@@ -434,8 +446,12 @@ class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
 
   @override
   void dispose() {
-    for (final c in _controllers.values) c.dispose();
-    for (final f in _focusNodes.values) f.dispose();
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    for (final f in _focusNodes.values) {
+      f.dispose();
+    }
     super.dispose();
   }
 
@@ -509,9 +525,10 @@ class _ReapeatEditFullScreenState extends State<ReapeatEditFullScreen> {
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10,
+                            horizontal: 12,
+                            vertical: 10,
                           ),
-                          fillColor: theme.colorScheme.surfaceVariant,
+                          fillColor: theme.colorScheme.surfaceContainerHighest,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,

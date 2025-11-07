@@ -28,11 +28,4 @@ class CursorComponent extends PositionComponent {
       ),
     );
   }
-
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    // 필요시 애니메이션 처리 가능
-  }
 }
