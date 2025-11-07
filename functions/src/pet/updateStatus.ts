@@ -90,10 +90,10 @@ export const updateStatus = onSchedule(
 
         if (newLevel != petLevel) {
           if (newLevel < 50) {
-            petPath = "assets/images/dragon.png";
+            petPath = `assets/images/${nowPetId}1.png`;
           } else {
             if (newLevel < 80) {
-              petPath = "assets/images/dragon1.png";
+              petPath = `assets/images/${nowPetId}2.png`;
             }
           }
           updates.image = petPath;

@@ -72,10 +72,10 @@ export const submitPetExpAN3 = onCall(
 
         if (ups > 0) {
           if (lvl >= 80) {
-            petPath = "assets/images/dragon3.png";
+            petPath = `assets/images/${nowPet}3.png`;
           } else {
             if (lvl >= 50) {
-              petPath = "assets/images/dragon1.png";
+              petPath = `assets/images/${nowPet}2.png`;
             }
           }
         }
