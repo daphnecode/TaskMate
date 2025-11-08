@@ -1366,7 +1366,6 @@ class ItemlistPage4 extends StatefulWidget {
 }
 
 class _ItemlistPage4State extends State<ItemlistPage4> {
-  String usedItem = "beach";
   List<Item>? inventory; // null이면 아직 로딩 중
 
   @override
@@ -1438,7 +1437,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                       itemCount: inventory!.length,
                       itemBuilder: (context, index) {
                         final item = inventory![index];
-                        final isHighlighted = item.name == usedItem;
+                        final isHighlighted = item.name == widget.pet!.styleID;
 
                         return Container(
                           color: isHighlighted
@@ -1478,7 +1477,7 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                                         child: Text('사용'),
                                         onPressed: () async {
                                           setState(() {
-                                            usedItem = item.name;
+                                            widget.pet!.styleID = item.name;
                                           });
                                           // ✅ 현재 로그인한 사용자 uid 사용
                                           await useStyleItem(item.name);
@@ -1499,10 +1498,6 @@ class _ItemlistPage4State extends State<ItemlistPage4> {
                             title: Text(
                               item.name,
                               style: TextStyle(fontSize: 18),
-                            ),
-                            trailing: Text(
-                              '${item.count}',
-                              style: TextStyle(fontSize: 16),
                             ),
                           ),
                         );
