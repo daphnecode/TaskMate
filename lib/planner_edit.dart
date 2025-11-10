@@ -15,8 +15,7 @@ class PlannerEditPage extends StatefulWidget {
   final void Function(int) onNext;
   final List<Task> repeatTaskList;
   final List<Task> todayTaskList;
-  final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList)
-  onUpdateTasks;
+  final void Function(List<Task> updatedRepeatList, List<Task> updatedTodayList) onUpdateTasks;
   final Map<String, List<Task>> dailyTaskMap;
   final DateTime selectedDate; // ← 편집 시작 앵커 날짜
   final void Function(Map<String, List<Task>>) onDailyMapChanged;
@@ -55,7 +54,8 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
   Timer? _saveRepeatDebounce;
   Timer? _saveTodayDebounce;
 
-  // ✅ TodayEditBox의 commitAll() 호출용 키 (타입 없이 사용)
+  // ✅ commitAll() 호출용 키들 (타입 없이 사용)
+  final GlobalKey _repeatEditKey = GlobalKey();
   final GlobalKey _todayEditKey = GlobalKey();
 
   void _saveRepeatDebounced(List<Task> list) {
@@ -149,16 +149,23 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
     } catch (e) {
       
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('저장 실패: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('저장 실패: $e')),
+      );
     }
+  }
+
+  /// 모든 입력을 강제 커밋
+  void _commitAllEditors() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    (_repeatEditKey.currentState as dynamic?)?.commitAll();
+    (_todayEditKey.currentState  as dynamic?)?.commitAll();
   }
 
   /// 부모에 커밋 + 저장 + 이동 처리
   Future<void> saveAndNavigate(int target) async {
     // ✅ 먼저 포커스/로컬 편집 내용 모두 커밋
-    (_todayEditKey.currentState as dynamic)?.commitAll();
+    _commitAllEditors();
 
     final key = _dateKey(selectedDate);
     final newMap = Map<String, List<Task>>.from(dailyTaskMap);
@@ -215,10 +222,10 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             try {
               casted[k] = v
                   .map((e) {
-                    if (e is Task) return e;
-                    if (e is Map<String, dynamic>) return Task.fromJson(e);
-                    return null;
-                  })
+                if (e is Task) return e;
+                if (e is Map<String, dynamic>) return Task.fromJson(e);
+                return null;
+              })
                   .whereType<Task>()
                   .toList();
             } catch (_) {}
@@ -245,7 +252,7 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
             icon: const Icon(Icons.calendar_today),
             onPressed: () async {
               // ✅ 커밋 후 저장
-              (_todayEditKey.currentState as dynamic)?.commitAll();
+              _commitAllEditors();
               await saveCurrentTasks();
 
               // 현재 상태를 보존한 맵으로 전달
@@ -277,54 +284,55 @@ class _PlannerEditPageState extends State<PlannerEditPage> {
       ),
       body: showFullRepeat
           ? ReapeatEditFullScreen(
-              tasklist: repeatTaskList,
-              onTaskAListUpdated: (updated) => updateTasks(0, updated),
-              onCollapse: () {
-                setState(() {
-                  showFullRepeat = false;
-                });
-              },
-            )
+        tasklist: repeatTaskList,
+        onTaskAListUpdated: (updated) => updateTasks(0, updated),
+        onCollapse: () {
+          setState(() {
+            showFullRepeat = false;
+          });
+        },
+      )
           : showFullToday
           ? TodayEditFullScreen(
-              taskList: todayTaskList,
-              onTaskListUpdated: (updated) => updateTasks(1, updated),
-              onCollapse: () {
-                setState(() {
-                  showFullToday = false;
-                });
-              },
-              selectedDate: selectedDate,
-            )
+        taskList: todayTaskList,
+        onTaskListUpdated: (updated) => updateTasks(1, updated),
+        onCollapse: () {
+          setState(() {
+            showFullToday = false;
+          });
+        },
+        selectedDate: selectedDate,
+      )
           : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    RepeatEditBox(
-                      taskList: repeatTaskList,
-                      onTaskListUpdated: (updated) => updateTasks(0, updated),
-                      onExpand: () {
-                        setState(() {
-                          showFullRepeat = true;
-                        });
-                      },
-                    ),
-                    TodayEditBox(
-                      key: _todayEditKey, // ✅ 커밋용 키 연결
-                      taskList: todayTaskList,
-                      onTaskListUpdated: (updated) => updateTasks(1, updated),
-                      onExpand: () {
-                        setState(() {
-                          showFullToday = true;
-                        });
-                      },
-                      selectedDate: selectedDate,
-                    ),
-                  ],
-                ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              RepeatEditBox(
+                key: _repeatEditKey, // ✅ 커밋용 키 연결
+                taskList: repeatTaskList,
+                onTaskListUpdated: (updated) => updateTasks(0, updated),
+                onExpand: () {
+                  setState(() {
+                    showFullRepeat = true;
+                  });
+                },
               ),
-            ),
+              TodayEditBox(
+                key: _todayEditKey, // ✅ 커밋용 키 연결
+                taskList: todayTaskList,
+                onTaskListUpdated: (updated) => updateTasks(1, updated),
+                onExpand: () {
+                  setState(() {
+                    showFullToday = true;
+                  });
+                },
+                selectedDate: selectedDate,
+              ),
+            ],
+          ),
+        ),
+      ),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).cardColor,
         elevation: 0,
