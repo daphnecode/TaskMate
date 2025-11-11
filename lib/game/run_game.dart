@@ -32,7 +32,8 @@ class RunGame extends FlameGame with HasCollisionDetection {
 
     _dino = Dino(this, groundY: groundY, petPath: petPath)
       ..y = 0
-      ..x = 50;
+      ..x = 100;
+    _dino!.flipHorizontally();
     await add(_dino!);
     // add(Ground(this));
     background = Background(imagePath: imagePath);
@@ -90,7 +91,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
     if (_dino!.travelDistance >= targetDistance) {
       stopGame();
       overlays.add('ClearPopup'); // 클리어 팝업
-      gameRunReward((targetDistance==200) ? 100 : targetDistance);
+      gameRunReward((targetDistance == 200) ? 100 : targetDistance);
     }
     elapsedDistance += _dino!.speed * dt;
 

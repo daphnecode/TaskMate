@@ -5,6 +5,7 @@ import 'run_game.dart';
 
 class Obstacle extends SpriteComponent with CollisionCallbacks {
   final RunGame game;
+  final Random _random = Random();
   final double groundY;
   final double speed;
   int upDown = 0;
@@ -13,14 +14,21 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
 
   @override
   Future<void> onLoad() async {
-    sprite = await game.loadSprite('dragon.png');
-    if (Random().nextInt(9) % 2 == 1) {
-      upDown = 200;
-    } else {
-      upDown = 0;
-    }
+    sprite = await game.loadSprite('icon_brickwall_f.png');
+    // 1️⃣ 랜덤으로 위/아래 장애물 구분
+    final bool isUpperObstacle = _random.nextBool();
 
-    position = Vector2(game.size.x, groundY - upDown + 50); // 오른쪽에서 시작
+    // 2️⃣ 장애물 종류에 따라 스프라이트 지정
+    final spritePath = isUpperObstacle
+        ? 'icon_ghost_f.png' // 위 장애물
+        : 'icon_brickwall_f.png'; // 아래 장애물
+
+    sprite = await Sprite.load(spritePath);
+
+    // 3️⃣ 위치 지정
+    upDown = isUpperObstacle ? 150 : 0;
+
+    position = Vector2(game.size.x, groundY - upDown); // 오른쪽에서 시작
 
     add(RectangleHitbox());
   }

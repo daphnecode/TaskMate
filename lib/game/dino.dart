@@ -3,12 +3,13 @@ import 'package:flame/collisions.dart';
 import 'run_game.dart';
 import 'obstacle.dart';
 
-class Dino extends SpriteAnimationComponent with CollisionCallbacks{
+class Dino extends SpriteAnimationComponent with CollisionCallbacks {
   final RunGame game;
-  Dino(this.game, {required this.petPath ,required this.groundY}) : super(size: Vector2(128, 128), priority: 10, anchor: Anchor.bottomLeft);
+  Dino(this.game, {required this.petPath, required this.groundY})
+    : super(size: Vector2(128, 128), priority: 10, anchor: Anchor.bottomLeft);
 
   double travelDistance = 0.0; // 진행 거리 (미터)
-  double speed = 25;    // 초당 100미터 속도
+  double speed = 25; // 초당 100미터 속도
 
   double velocityY = 0.0;
   double gravity = 800; // 중력 (픽셀/초²)
@@ -31,9 +32,8 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
         textureSize: Vector2(128, 128),
       ),
     );
-    
+
     size = Vector2(128, 128);
-    
 
     add(RectangleHitbox());
   }
@@ -42,12 +42,12 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
     size = Vector2.all(128) * (gameSize.y / 600); // 예: 기본 600px 기준 스케일
     groundY = gameSize.y - size.y + 50;
   }
-  
+
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     if (!game.isGameRunning) return;
-    
+
     if (other is Obstacle) {
       // 충돌 시 게임 오버 처리
       
@@ -64,8 +64,6 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks{
     velocityY += gravity * dt;
     // 점프, 중력 등 처리
     position.y += velocityY * dt;
-
-    
 
     // 바닥에 도달하면 멈춤
     if (position.y >= groundY) {
