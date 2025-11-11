@@ -105,8 +105,8 @@ class MovingPet extends StatefulWidget {
 
 class _MovingPetState extends State<MovingPet> {
   final Random random = Random();
-  double x = Random().nextDouble();
-  double y = Random().nextDouble();
+  double x = Random().nextDouble() * 100;
+  double y = Random().nextDouble() * 100;
   double dx = 1; // x축 방향 속도
   double dy = 1; // y축 방향 속도
 
@@ -115,6 +115,7 @@ class _MovingPetState extends State<MovingPet> {
     final double maxY = widget.h - widget.h * 0.7; // 펫 세로 크기 고려
     setState(() {
       x += dx * 30;
+      y += dy * 40;
 
       // 화면 경계에서 반전
       if (x <= 0) {
