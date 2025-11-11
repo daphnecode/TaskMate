@@ -12,8 +12,8 @@ class Dino extends SpriteAnimationComponent with CollisionCallbacks {
   double speed = 25; // 초당 100미터 속도
 
   double velocityY = 0.0;
-  double gravity = 800; // 중력 (픽셀/초²)
-  double jumpForce = -500; // 점프 시 초기 속도 (음수: 위로)
+  double gravity = 900; // 중력 (픽셀/초²)
+  double jumpForce = -600; // 점프 시 초기 속도 (음수: 위로)
 
   double groundY;
   final String petPath;

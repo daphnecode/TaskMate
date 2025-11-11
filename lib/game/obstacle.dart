@@ -8,7 +8,7 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
   final Random _random = Random();
   final double groundY;
   final double speed;
-  int upDown = 0;
+  double upDown = 0;
   Obstacle(this.game, {required this.groundY, required this.speed})
     : super(size: Vector2(32, 32)); // 선인장 등 크기 설정
 
@@ -26,7 +26,7 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
     sprite = await Sprite.load(spritePath);
 
     // 3️⃣ 위치 지정
-    upDown = isUpperObstacle ? 150 : 0;
+    upDown = isUpperObstacle ? game.size.y * 0.3 : 0;
 
     position = Vector2(game.size.x, groundY - upDown); // 오른쪽에서 시작
 
@@ -35,7 +35,7 @@ class Obstacle extends SpriteComponent with CollisionCallbacks {
 
   void resize(Vector2 gameSize) {
     size = Vector2(gameSize.x * 0.05, gameSize.y * 0.05);
-    position.y = groundY - upDown + 50;
+    position.y = groundY - upDown;
   }
 
   @override

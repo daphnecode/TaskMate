@@ -38,7 +38,7 @@ class _Subarea1State extends State<Subarea1> {
           child: ElevatedButton(
             onPressed: () async {
               await choosePet("dragon");
-              Navigator.pop(context); // ✅ Pets로 pop
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red[100]),
             child: Center(
@@ -58,10 +58,10 @@ class _Subarea1State extends State<Subarea1> {
               await choosePet("unicon");
               Navigator.pop(context);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100]),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[50]),
             child: Center(
               child: Image.asset(
-                "assets/images/unicon2.png",
+                "assets/images/unicon1.png",
                 fit: BoxFit.cover,
                 height: 100.0,
                 width: 100.0,

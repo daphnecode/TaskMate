@@ -18,7 +18,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
   late double groundY;
 
   double _currentSpeed = 150;
-  final double _speedIncreaseRate = 20; // 초당 증가량
+  final double _speedIncreaseRate = 10; // 초당 증가량
 
   double elapsedDistance = 0; // 현재 경과 시간 (초 단위)
   double maxDistance = 0; // 클리어 기준 시간 (예: 30초)
@@ -32,7 +32,7 @@ class RunGame extends FlameGame with HasCollisionDetection {
 
     _dino = Dino(this, groundY: groundY, petPath: petPath)
       ..y = 0
-      ..x = 100;
+      ..x = 120;
     _dino!.flipHorizontally();
     await add(_dino!);
     // add(Ground(this));

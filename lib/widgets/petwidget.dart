@@ -77,8 +77,8 @@ class _FloatingPetState extends State<FloatingPet>
         return Transform.translate(offset: Offset(0, offsetY), child: child);
       },
       child: SizedBox(
-        width: widget.w,
-        height: widget.h,
+        width: widget.w * 0.5,
+        height: widget.h * 0.5,
         child: Stack(
           clipBehavior: Clip.none,
           children: [styleWidget, petWidget],
@@ -104,16 +104,35 @@ class MovingPet extends StatefulWidget {
 }
 
 class _MovingPetState extends State<MovingPet> {
-  double x = 100;
-  double y = 100;
   final Random random = Random();
+  double x = Random().nextDouble();
+  double y = Random().nextDouble();
+  double dx = 1; // x축 방향 속도
+  double dy = 1; // y축 방향 속도
 
   void _moveRandomly() {
-    final double maxX = 300 - widget.w * 0.5; // 펫 가로 크기 고려
-    final double maxY = 300 - widget.h * 0.5; // 펫 세로 크기 고려
+    final double maxX = widget.w - widget.w * 0.7; // 펫 가로 크기 고려
+    final double maxY = widget.h - widget.h * 0.7; // 펫 세로 크기 고려
     setState(() {
-      x = random.nextDouble() * maxX; // 0~200 범위 이동
-      y = random.nextDouble() * maxY;
+      x += dx * 30;
+
+      // 화면 경계에서 반전
+      if (x <= 0) {
+        x = 0;
+        dx = dx.abs();
+      }
+      if (x >= maxX) {
+        x = maxX;
+        dx = -dx.abs();
+      }
+      if (y <= 0) {
+        y = 0;
+        dy = dy.abs();
+      }
+      if (y >= maxY) {
+        y = maxY;
+        dy = -dy.abs();
+      }
     });
   }
 
@@ -125,6 +144,8 @@ class _MovingPetState extends State<MovingPet> {
       await Future.delayed(const Duration(seconds: 5));
       if (!mounted) return false;
       _moveRandomly();
+      
+      
       return true;
     });
   }
@@ -135,14 +156,17 @@ class _MovingPetState extends State<MovingPet> {
       width: widget.w,
       height: widget.h,
       child: Stack(
-        clipBehavior: Clip.none,
         children: [
           AnimatedPositioned(
-            duration: const Duration(seconds: 2),
+            duration: const Duration(seconds: 5),
             curve: Curves.easeInOut,
             left: x,
             top: y,
-            child: FloatingPet(w: widget.w, h: widget.h, pet: widget.pet),
+            child: Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()..scale(dx <= 0 ? 1.0 : -1.0, 1.0),
+              child: FloatingPet(w: widget.w, h: widget.h, pet: widget.pet),
+            ),
           ),
         ],
       ),
