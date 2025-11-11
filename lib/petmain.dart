@@ -6,6 +6,7 @@ import 'widgets/button.dart';
 import 'object.dart';
 import 'petchoose.dart';
 import 'petstatus.dart';
+import 'package:taskmate/widgets/petwidget.dart';
 
 // 청소게임
 import 'clean_game_screen.dart';
@@ -50,8 +51,6 @@ class _MainareaState extends State<Mainarea> {
   @override
   Widget build(BuildContext context) {
     final String placeAsset = (widget.user.setting['placeID'] ?? '') as String;
-    final String petAsset = widget.pet!.image;
-    final String styleAsset = 'assets/images/${widget.pet!.styleID}.png';
 
     return Column(
       children: [
@@ -103,37 +102,9 @@ class _MainareaState extends State<Mainarea> {
                     );
                   }
 
-                  Widget styleWidget = const SizedBox.shrink();
-                  if (styleAsset.isNotEmpty) {
-                    styleWidget = Positioned(
-                      left: w * 0.4,
-                      top: h * 0.5,
-                      child: Image.asset(
-                        key: ValueKey(widget.pet!.styleID),
-                        styleAsset,
-                        fit: BoxFit.cover,
-                        height: h * 0.5,
-                        width: w * 0.5,
-                      ),
-                    );
-                  }
+                  MovingPet pet = MovingPet(w: w, h: h, pet: widget.pet);
 
-                  Widget petWidget = const SizedBox.shrink();
-                  if (petAsset.isNotEmpty) {
-                    petWidget = Positioned(
-                      left: w * 0.5,
-                      top: h * 0.6,
-                      child: Image.asset(
-                        key: ValueKey(widget.pet!.name),
-                        petAsset,
-                        fit: BoxFit.cover,
-                        height: h * 0.3,
-                        width: w * 0.3,
-                      ),
-                    );
-                  }
-
-                  return Stack(children: [background, styleWidget, petWidget]);
+                  return Stack(children: [background, pet]);
                 },
               ),
             ),
