@@ -17,7 +17,7 @@ String generateTaskId() {
 /// Task 모델
 /// ==========================
 class Task {
-  final String id;        // ✅ 안정 키
+  final String id; // ✅ 안정 키
   final String text;
   final bool isChecked;
   final int point;
@@ -49,7 +49,7 @@ class Task {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,                 // ✅ 저장 시 id 포함
+      'id': id, // ✅ 저장 시 id 포함
       'text': text,
       'isChecked': isChecked,
       'point': point,
@@ -84,7 +84,7 @@ List<Task> sorting(List<Task> tasks, String sortingMethod) {
       list.sort((a, b) => b.point.compareTo(a.point));
       break;
     default:
-      list.sort((a, b) => a.text.compareTo(b.text));
+      // 등록 순은 입력받은 데이터 그대로.
       break;
   }
   return list;
@@ -95,5 +95,7 @@ List<Task> sorting(List<Task> tasks, String sortingMethod) {
 /// ==========================
 /// Firestore에서 id 없이 내려온 과거 Task들을 즉시 보정
 List<Task> ensureIds(List<Task> list) {
-  return list.map((t) => (t.id.isEmpty) ? t.copyWith(id: generateTaskId()) : t).toList();
+  return list
+      .map((t) => (t.id.isEmpty) ? t.copyWith(id: generateTaskId()) : t)
+      .toList();
 }
