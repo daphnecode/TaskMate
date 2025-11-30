@@ -1,8 +1,0 @@
-{
-    "image": "assets/images/dragon.png",
-    "name": "드래곤",
-    "hunger": 53,
-    "happy": 70,
-    "level": 33,
-    "currentExp": 50.0
-}
