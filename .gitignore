@@ -1,4 +1,6 @@
-# Miscellaneous
+# ======================================
+# OS / Editor / Miscellaneous
+# ======================================
 *.class
 *.log
 *.pyc
@@ -10,47 +12,101 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ/VS Code
+# IntelliJ / VS Code
 *.iml
 *.ipr
 *.iws
 .idea/
+.vscode/
+*.code-workspace
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# ======================================
+# Flutter / Dart / Pub
+# ======================================
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
-build/
+.buildlog/
+.metadata
 
-# Android Studio build artifacts
+build/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+
+# Symbolication / Obfuscation
+app.*.symbols
+app.*.map.json
+
+# ======================================
+# Android
+# ======================================
 /android/app/build/
 /android/app/debug
 /android/app/profile
 /android/app/release
 /android/.gradle/
 
-# iOS build artifacts / Pods
-/ios/Pods/
-/ios/Runner.xcworkspace/
-/ios/Flutter/Flutter.framework
-/ios/Flutter/Flutter.podspec
+# Keystore (ABSOLUTELY CONFIDENTIAL)
+*.keystore
 
-# Symbolication / Obfuscation
-app.*.symbols
-app.*.map.json
 
-# FVM Version Cache
-.fvm/
+# ======================================
+# Firebase Root Project
+# ======================================
+.firebase/
+.firebaserc
+firebase-debug.log
 
-# Generated web files (웹 중심 프로젝트 시)
+
+# Firebase config files (EXCEPT the required ones)
+*.json
+!firebase.json
+!firestore.rules
+!firestore.indexes.json
+
+# ======================================
+# Firebase Functions (Node.js)
+# ======================================
+functions/node_modules/
+functions/.env
+functions/.runtimeconfig.json
+functions/lib/
+functions/firebase-debug.log
+
+# ======================================
+# Assets (Include only if intended)
+# 기본적으로 전체 제거 후 필요한 것만 예외 처리 권장
+# ======================================
+assets/**
+!assets/icons/OFL.txt
+
+# ======================================
+# Web
+# (Flutter Web에서 자동 생성되는 일부 파일은 제외해도 됨)
+# ======================================
 web/manifest.json
 web/favicon.png
 
+# ======================================
 # Environment / Secrets
+# ======================================
 .env
-*.keystore
+.env.*
+*.key
+*.pem
+secrets.json
+config.json
 
+# ======================================
+# Node global
+# ======================================
+node_modules/
+
+# ======================================
+# Locks (optional)
+# ======================================
+*.lock
