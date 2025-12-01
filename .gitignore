@@ -100,6 +100,12 @@ web/favicon.png
 *.pem
 secrets.json
 config.json
+*.keystore
+
+# Firebase sensitive configs
+android/app/google-services.json
+lib/firebase_options.dart
+
 
 # ======================================
 # Node global
