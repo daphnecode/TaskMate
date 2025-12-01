@@ -336,16 +336,13 @@ class _PlannerMainState extends State<PlannerMain> {
     }
 
     // 오늘 리스트 + 제출 여부
-    api
-        .readDailyWithMeta(dateKey)
-        .then((res) {
+    api.readDailyWithMeta(dateKey).then((res) {
       if (!mounted) return;
       setState(() {
         todayTaskList = res.tasks;
         _isSubmitted = res.submitted;
       });
-    })
-        .catchError((e) {
+    }).catchError((e) {
       
     });
 
@@ -358,9 +355,7 @@ class _PlannerMainState extends State<PlannerMain> {
         .set({'visited': true}, SetOptions(merge: true));
 
     // 반복 리스트 로드
-    api
-        .fetchRepeatListEnsured()
-        .then((rows) {
+    api.fetchRepeatListEnsured().then((rows) {
       if (!mounted) return;
       setState(() {
         repeatTaskList = rows
@@ -381,6 +376,7 @@ class _PlannerMainState extends State<PlannerMain> {
 
   @override
   Widget build(BuildContext context) {
+    // NOTE: 메인 화면에서는 오늘 날짜 기준으로만 사용
     selectedDate = getKstNow();
 
     if (isEditMode) {
@@ -450,107 +446,195 @@ class _PlannerMainState extends State<PlannerMain> {
           ),
         ],
       ),
-      body: showFullRepeat
-          ? RepeatTaskFullScreen(
-        taskList: repeatTaskList,
-        onToggleCheck: (index) {
-          if (!_isSubmitted) {
-            toggleCheck(repeatTaskList, index);
-          }
-        },
-        onCollapse: () {
-          setState(() {
-            showFullRepeat = false;
-          });
-        },
-        onEditPoints: () => toggleEditingMode(repeatTaskList),
-        onEditPoint: (index, newPoint) =>
-            updatePoint(repeatTaskList, index, newPoint),
-        onStartEditing: (index) {
-          setState(() {
-            repeatTaskList[index] =
-                repeatTaskList[index].copyWith(isEditing: true);
-          });
-        },
-      )
-          : showFullToday
-          ? TodayTaskFullScreen(
-        taskList: todayTaskList,
-        onToggleCheck: (index) {
-          if (!_isSubmitted) {
-            toggleCheck(todayTaskList, index);
-          }
-        },
-        onCollapse: () {
-          setState(() {
-            showFullToday = false;
-          });
-        },
-        onEditPoints: () => toggleEditingMode(todayTaskList),
-        onEditPoint: (index, newPoint) =>
-            updatePoint(todayTaskList, index, newPoint),
-        onStartEditing: (index) {
-          setState(() {
-            todayTaskList[index] =
-                todayTaskList[index].copyWith(isEditing: true);
-          });
-        },
-      )
-          : Column(
-        children: [
-          Expanded(
-            flex: 2,
-            child: RepeatTaskBox(
-              taskList: repeatTaskList,
-              onToggleCheck: (index) {
-                if (!_isSubmitted) {
-                  toggleCheck(repeatTaskList, index);
-                }
-              },
-              onExpand: () {
-                setState(() {
-                  showFullRepeat = true;
-                });
-              },
-              onEditPoints: () => toggleEditingMode(repeatTaskList),
-              onEditPoint: (index, newPoint) =>
-                  updatePoint(repeatTaskList, index, newPoint),
-              onStartEditing: (index) {
-                setState(() {
-                  repeatTaskList[index] = repeatTaskList[index]
-                      .copyWith(isEditing: true);
-                });
-              },
-              sortingMethod: widget.sortingMethod,
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: TodayTaskBox(
-              taskList: todayTaskList,
-              onToggleCheck: (index) {
-                if (!_isSubmitted) {
-                  toggleCheck(todayTaskList, index);
-                }
-              },
-              onExpand: () {
-                setState(() {
-                  showFullToday = true;
-                });
-              },
-              onEditPoints: () => toggleEditingMode(todayTaskList),
-              onEditPoint: (index, newPoint) =>
-                  updatePoint(todayTaskList, index, newPoint),
-              onStartEditing: (index) {
-                setState(() {
-                  todayTaskList[index] = todayTaskList[index]
-                      .copyWith(isEditing: true);
-                });
-              },
-              sortingMethod: widget.sortingMethod,
-            ),
-          ),
-        ],
+
+      // ✅ 작은 화면에서도 잘리지 않도록 SafeArea + LayoutBuilder 로 반응형 처리
+      body: SafeArea(
+        child: showFullRepeat
+            ? RepeatTaskFullScreen(
+          taskList: repeatTaskList,
+          onToggleCheck: (index) {
+            if (!_isSubmitted) {
+              toggleCheck(repeatTaskList, index);
+            }
+          },
+          onCollapse: () {
+            setState(() {
+              showFullRepeat = false;
+            });
+          },
+          onEditPoints: () => toggleEditingMode(repeatTaskList),
+          onEditPoint: (index, newPoint) =>
+              updatePoint(repeatTaskList, index, newPoint),
+          onStartEditing: (index) {
+            setState(() {
+              repeatTaskList[index] =
+                  repeatTaskList[index].copyWith(isEditing: true);
+            });
+          },
+        )
+            : showFullToday
+            ? TodayTaskFullScreen(
+          taskList: todayTaskList,
+          onToggleCheck: (index) {
+            if (!_isSubmitted) {
+              toggleCheck(todayTaskList, index);
+            }
+          },
+          onCollapse: () {
+            setState(() {
+              showFullToday = false;
+            });
+          },
+          onEditPoints: () => toggleEditingMode(todayTaskList),
+          onEditPoint: (index, newPoint) =>
+              updatePoint(todayTaskList, index, newPoint),
+          onStartEditing: (index) {
+            setState(() {
+              todayTaskList[index] =
+                  todayTaskList[index].copyWith(isEditing: true);
+            });
+          },
+        )
+            : LayoutBuilder(
+          builder: (context, constraints) {
+            // 🔎 세로 높이가 작은 기기(모바일/노트북)에서는 스크롤 구조로 전환
+            final isSmallHeight = constraints.maxHeight < 650;
+
+            if (isSmallHeight) {
+              // ✅ 작은 화면: 위/아래 박스를 자연스럽게 세로 스크롤
+              return SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: RepeatTaskBox(
+                        taskList: repeatTaskList,
+                        onToggleCheck: (index) {
+                          if (!_isSubmitted) {
+                            toggleCheck(repeatTaskList, index);
+                          }
+                        },
+                        onExpand: () {
+                          setState(() {
+                            showFullRepeat = true;
+                          });
+                        },
+                        onEditPoints: () =>
+                            toggleEditingMode(repeatTaskList),
+                        onEditPoint: (index, newPoint) =>
+                            updatePoint(
+                                repeatTaskList, index, newPoint),
+                        onStartEditing: (index) {
+                          setState(() {
+                            repeatTaskList[index] =
+                                repeatTaskList[index]
+                                    .copyWith(isEditing: true);
+                          });
+                        },
+                        sortingMethod: widget.sortingMethod,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TodayTaskBox(
+                        taskList: todayTaskList,
+                        onToggleCheck: (index) {
+                          if (!_isSubmitted) {
+                            toggleCheck(todayTaskList, index);
+                          }
+                        },
+                        onExpand: () {
+                          setState(() {
+                            showFullToday = true;
+                          });
+                        },
+                        onEditPoints: () =>
+                            toggleEditingMode(todayTaskList),
+                        onEditPoint: (index, newPoint) =>
+                            updatePoint(
+                                todayTaskList, index, newPoint),
+                        onStartEditing: (index) {
+                          setState(() {
+                            todayTaskList[index] =
+                                todayTaskList[index]
+                                    .copyWith(isEditing: true);
+                          });
+                        },
+                        sortingMethod: widget.sortingMethod,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // ✅ 충분히 큰 화면: 기존처럼 위/아래를 1:1로 분할
+            return Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: RepeatTaskBox(
+                    taskList: repeatTaskList,
+                    onToggleCheck: (index) {
+                      if (!_isSubmitted) {
+                        toggleCheck(repeatTaskList, index);
+                      }
+                    },
+                    onExpand: () {
+                      setState(() {
+                        showFullRepeat = true;
+                      });
+                    },
+                    onEditPoints: () =>
+                        toggleEditingMode(repeatTaskList),
+                    onEditPoint: (index, newPoint) =>
+                        updatePoint(repeatTaskList, index, newPoint),
+                    onStartEditing: (index) {
+                      setState(() {
+                        repeatTaskList[index] =
+                            repeatTaskList[index]
+                                .copyWith(isEditing: true);
+                      });
+                    },
+                    sortingMethod: widget.sortingMethod,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: TodayTaskBox(
+                    taskList: todayTaskList,
+                    onToggleCheck: (index) {
+                      if (!_isSubmitted) {
+                        toggleCheck(todayTaskList, index);
+                      }
+                    },
+                    onExpand: () {
+                      setState(() {
+                        showFullToday = true;
+                      });
+                    },
+                    onEditPoints: () =>
+                        toggleEditingMode(todayTaskList),
+                    onEditPoint: (index, newPoint) =>
+                        updatePoint(todayTaskList, index, newPoint),
+                    onStartEditing: (index) {
+                      setState(() {
+                        todayTaskList[index] =
+                            todayTaskList[index]
+                                .copyWith(isEditing: true);
+                      });
+                    },
+                    sortingMethod: widget.sortingMethod,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).cardColor,
