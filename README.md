@@ -1,47 +1,88 @@
-# taskmate
+# TaskMate
 
-A new Flutter project.
+Flutter 기반 플래너 + 가상 펫 육성 서비스
+(Android App & Web App 지원)
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 프로젝트 개요
 
-A few resources to get you started if this is your first Flutter project:
+TaskMate는 사용자의 작업 완료 여부에 따라 포인트를 지급하고,  
+해당 포인트로 가상 펫을 성장시키는 동기부여 애플리케이션입니다.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Frontend**: Flutter (Android, Web)
+- **Backend / DB**: Firebase  
+  - Firebase Authentication  
+  - Firestore  
+  - Firebase Cloud Functions  
+  - Firebase Hosting  
+  - Firebase Emulator Suite (테스트용)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
 
-## 📦 아이콘 출처 및 라이선스
+## 📂 프로젝트 구조
 
-이 프로젝트에서 사용된 아이콘은 다음과 같습니다:
+```
 
-- WebHostingHub Glyphs
-    ⤷ 라이선스: SIL Open Font License 1.1
-    ⤷ 출처: https://www.webhostinghub.com/glyphs
+project-root/
+├── lib/                 # Flutter 앱 소스 코드
+├── functions/           # Firebase Cloud Functions
+├── firestore.rules      # Firestore 보안 규칙
+├── firestore.indexes    # Firestore 인덱스 설정
+├── web/                 # Web 빌드 관련 파일
+├── android/             # Android 빌드 관련 파일
+├── assets/              # 이미지 / 아이콘 리소스
+└── README.md
 
-> 본 프로젝트에서는 해당 아이콘을 SIL Open Font License 1.1에 따라 사용하고 있으며, 아이콘의 저작권은 WebHostingHub에 있습니다.
+````
+
+---
 
 ## 🔐 Firestore Security Rules 테스트 방법
 
-이 프로젝트에서 사용된 보안 규칙 테스트 방법은 다음과 같습니다:
+이 프로젝트는 **Firestore Emulator**를 사용해 보안 규칙 테스트를 수행합니다.
 
-Firestore Emulator
-⤷ 용도: 로컬 환경에서 Firestore 보안 규칙을 시뮬레이션 및 검증
-⤷ 실행 명령어:
+### ▶ 테스트 실행
 
+```bash
 npm run test:rules
+````
+
+### ▶ 동작 방식
+
+* `rules.test.js` 또는 `firestore.test.json`에 정의된 테스트 케이스 실행
+* 규칙이 의도대로 허용/거부되는지 검증
+
+### ▶ 출력 해석
+
+* `✔` : 테스트 성공
+* `PERMISSION_DENIED` : 금지되어야 하는 요청이면 정상
+* 마지막 줄 `pass X / fail 0` → 모든 테스트가 정상적으로 통과된 것
+
+---
+
+## 📦 아이콘 라이선스
+
+이 프로젝트는 다음 아이콘을 사용합니다:
+
+* **Basic Straight Lineal**
+    * 라이선스: Freepik License (Attribution Required)
+    * 출처:  [https://www.freepik.com](https://www.freepik.com)
+> 본 프로젝트에서는 해당 아이콘을 Freepik License에 따라 사용하고 있으며, 아이콘의 저작권은 Freepik에 있습니다.
 
 
-⤷ 동작: rules.test.js 또는 firestore.test.json에 정의된 테스트 케이스를 실행하여 규칙이 의도대로 동작하는지 확인
+* **WebHostingHub Glyphs**
+    * 라이선스: SIL Open Font License 1.1
+    * 출처:  [https://www.webhostinghub.com/glyphs](https://www.webhostinghub.com/glyphs)
 
-📊 출력 해석
+> 본 프로젝트에서는 해당 아이콘을 SIL Open Font License 1.1에 따라 사용하고 있으며, 아이콘의 저작권은 WebHostingHub에 있습니다.
 
-✔ : 테스트가 성공했음을 의미합니다.
+---
 
-PERMISSION_DENIED 로그가 찍히더라도, 해당 요청이 규칙에 의해 거부되는 것을 기대한 경우라면 정상 동작입니다.
+## 📄 라이선스
 
-마지막에 pass X / fail 0 이면 모든 보안 규칙이 의도대로 작동한 것입니다.
+본 프로젝트의 코드는 팀의 학습 및 시연 목적을 위해 사용됩니다.
+
+```
+
+---
