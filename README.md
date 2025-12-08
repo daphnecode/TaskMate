@@ -227,6 +227,114 @@ npm run test:rules
 
 ---
 
+# 🚀 배포 가이드 (Web & Android)
+
+이 문서는 프로젝트를 Web(App)과 Android(App) 환경에 배포하는 과정을 정리한 가이드입니다.
+Flutter SDK 기반으로 작성되었으며, Firebase Hosting 및 Android 빌드에 필요한 명령어들을 포함합니다.
+
+---
+
+## 로컬 개발 환경 실행
+
+### 1. 패키지 설치
+
+```bash
+flutter pub get
+```
+
+### 2. 로컬 웹 실행
+
+```bash
+flutter run -d chrome
+```
+
+## ▶️ 3. 로컬 안드로이드 실행
+
+```bash
+flutter run -d android
+```
+
+---
+
+## 🌐 Web App 배포 (Firebase Hosting)
+
+### ✔️ 사전 준비
+
+#### 1. Firebase CLI 로그인
+
+```bash
+firebase login
+```
+
+#### 2. Firebase 프로젝트 선택
+
+```bash
+firebase use --add
+```
+
+#### 3. Web 빌드 생성
+
+```bash
+flutter build web --release
+```
+
+빌드 결과는 아래 위치에 생성됨:
+
+```
+build/web/
+```
+
+---
+
+## 🚀 Firebase Hosting에 배포
+
+### 1. Firebase Hosting 초기 설정 (최초 1회)
+
+```sh
+firebase init hosting
+```
+
+설정 예시:
+
+* **? What do you want to use as your public directory?**
+  → `build/web`
+* **? Configure as a single-page app? (rewrite all urls to /index.html)?**
+  → `Yes`
+* **Overwrite index.html?**
+  → `No`
+
+### 2. 배포 명령어
+
+```bash
+firebase deploy --only hosting
+```
+
+배포 완료 후 Firebase가 제공하는 URL 또는 커스텀 도메인에서 접속할 수 있습니다.
+
+---
+
+# 🤖 Android App 배포
+
+Android 앱은 APK 파일을 직접 전달하여 테스트할 수 있습니다.
+
+---
+
+## 📱 Android APK 빌드
+
+### ▶️ APK 빌드 (테스트 용도로 가장 많이 사용)
+
+```sh
+flutter build apk --release
+```
+
+생성 위치:
+
+```
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+---
+
 ## 📦 아이콘 라이선스
 
 이 프로젝트는 다음 아이콘을 사용합니다:
