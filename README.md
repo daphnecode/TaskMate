@@ -28,13 +28,180 @@ project-root/
 ├── lib/                 # Flutter 앱 소스 코드
 ├── functions/           # Firebase Cloud Functions
 ├── firestore.rules      # Firestore 보안 규칙
-├── firestore.indexes    # Firestore 인덱스 설정
+├── rules-test           # Firestore 보안 규칙 테스트
 ├── web/                 # Web 빌드 관련 파일
 ├── android/             # Android 빌드 관련 파일
 ├── assets/              # 이미지 / 아이콘 리소스
+├── pubspec.yaml
 └── README.md
 
-````
+```
+---
+
+## 📋 요구사항 (Requirements)
+
+이 프로젝트를 실행하기 위해 필요한 환경은 다음과 같습니다:
+
+- **Flutter SDK**: 3.32.4
+- **Dart SDK**: 3.8.1
+- **Node.js**: 22.16.0 이상 (Firebase CLI용)
+- **Firebase Tools**: 14.22.0 이상
+- **Android Studio**: version 2024.3 (Android 빌드용)
+- **Chrome 브라우저** (Web 빌드용)
+
+자세한 의존성 목록은 [`pubspec.yaml`](./pubspec.yaml)를 참고하세요.
+
+---
+
+## 🔧 Firebase 프로젝트 설정
+
+이 프로젝트는 **Firebase Auth, Cloud Firestore, Cloud Functions, Firebase Hosting**을 기반으로 동작합니다.  
+아래 절차는 새로운 Firebase 프로젝트를 생성하고, **Web App**과 **Android App**을 연결하는 방법을 설명합니다.
+
+---
+
+### 1. Firebase 프로젝트 생성
+
+1. https://console.firebase.google.com 에 접속
+2. **프로젝트 추가(Create Project)** 클릭
+3. 프로젝트 이름 입력 (예: `taskmate`)
+4. Google Analytics는 필요에 따라 활성화 또는 비활성화
+5. 프로젝트 생성 완료 후 콘솔로 이동
+
+### 2. Web App 등록 (Firebase Hosting + Flutter Web 빌드용)
+
+1. Firebase Console 좌측 메뉴 → **Project Overview**  
+2. **앱 추가 → Web(</>)** 선택
+3. 앱 이름 입력 (예: `taskmate-web`)
+4. Hosting 사용 여부 체크(선택)
+5. 생성 버튼 클릭 후 제공된 설정 값을 확인
+
+> Flutter에서는 Web 설정을 `firebase_options.dart`로 관리하므로 직접 JS 파일을 수정할 필요는 없음.
+
+### 3. Android App 등록
+
+1. Firebase Console → **Project Overview**
+2. **앱 추가 → Android** 선택
+3. 다음 정보를 입력:
+
+   | 항목 | 예시 |
+   |------|------|
+   | Android 패키지명 | `com.example.taskmate` |
+   | 앱 닉네임 | 선택 |
+   | SHA-1 | 필요 시 입력 (Google 로그인/푸시 알림 등에서 필요) |
+
+4. google-services.json 파일 다운로드
+5. Flutter 프로젝트의 경로에 추가:
+  android/app/google-services.json
+6. android/build.gradle에 플러그인 등록
+
+  plugins {
+      // Google services plugin (Firebase)
+      id("com.google.gms.google-services") version "4.4.3" apply false
+  }
+7. android/app/build.gradle에 플러그인 적용
+  plugins {
+      id("com.android.application")
+      id("kotlin-android")
+      id("com.google.gms.google-services") // Firebase 사용 시 필요
+  }
+
+### 4. lib/firebase_options.dart
+
+1. firebase_options.dart 파일 작성.
+
+```
+import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+import 'package:flutter/foundation.dart';
+
+class DefaultFirebaseOptions {
+  static FirebaseOptions get currentPlatform {
+    if (kIsWeb) {
+      return const FirebaseOptions(
+        apiKey: "YOUR_WEB_KEY",
+        appId: "YOUR_WEB_ID",
+        messagingSenderId: "YOUR_SENDER_ID",
+        projectId: "YOUR_PROJECT_ID",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+        measurementId: "YOUR_WEB_MEASUREMENT_ID",
+      );
+    }
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return const FirebaseOptions(
+          apiKey: "YOUR_ANDROID_API_KEY",
+          appId: "YOUR_ANDROID_APP_ID",
+          messagingSenderId: "YOUR_SENDER_ID",
+          projectId: "YOUR_PROJECT_ID",
+          storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+        );
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for iOS/macOS.',
+        );
+      case TargetPlatform.windows:
+      case TargetPlatform.linux:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for Windows/Linux.',
+        );
+      default:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions are not supported for this platform.',
+        );
+    }
+  }
+}
+```
+
+2. Firebase 초기화 코드
+
+main.dart에서 Firebase를 다음처럼 초기화합니다.
+
+await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
+
+---
+
+## ⚙️ Firebase Cloud Functions 초기 설정
+
+이 프로젝트는 서버 로직을 위해 Firebase Cloud Functions를 사용합니다.
+
+### 1. Functions 초기화
+
+프로젝트 루트에서 Firebase Functions 환경을 초기화합니다.
+
+```bash
+firebase init functions
+```
+
+설정 항목:
+- 언어: JavaScript 또는 TypeScript (본 프로젝트는 TypeScript 권장)
+- ESLint: 선택
+- Functions 디렉토리: 기본값(functions/)
+- 첫 배포: 이후 firebase deploy에서 수행
+
+### 2. Functions 배포
+
+```bash
+firebase deploy --only functions
+```
+
+---
+
+## 🗄️ Firestore 초기 설정
+
+서비스 데이터 저장을 위해 Cloud Firestore를 사용합니다.
+
+### Firestore 생성
+
+Firebase Console 
+→ Firestore Database
+→ Create Database
+→ 모드: Production Mode
+→ 로케이션 선택 후 생성
 
 ---
 
@@ -43,10 +210,9 @@ project-root/
 이 프로젝트는 **Firestore Emulator**를 사용해 보안 규칙 테스트를 수행합니다.
 
 ### ▶ 테스트 실행
-
 ```bash
 npm run test:rules
-````
+```
 
 ### ▶ 동작 방식
 
@@ -82,7 +248,5 @@ npm run test:rules
 ## 📄 라이선스
 
 본 프로젝트의 코드는 팀의 학습 및 시연 목적을 위해 사용됩니다.
-
-```
 
 ---
