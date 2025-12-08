@@ -58,8 +58,6 @@ project-root/
 이 프로젝트는 **Firebase Auth, Cloud Firestore, Cloud Functions, Firebase Hosting**을 기반으로 동작합니다.  
 아래 절차는 새로운 Firebase 프로젝트를 생성하고, **Web App**과 **Android App**을 연결하는 방법을 설명합니다.
 
----
-
 ### 1. Firebase 프로젝트 생성
 
 1. https://console.firebase.google.com 에 접속
@@ -232,8 +230,6 @@ npm run test:rules
 이 문서는 프로젝트를 Web(App)과 Android(App) 환경에 배포하는 과정을 정리한 가이드입니다.
 Flutter SDK 기반으로 작성되었으며, Firebase Hosting 및 Android 빌드에 필요한 명령어들을 포함합니다.
 
----
-
 ## 로컬 개발 환경 실행
 
 ### 1. 패키지 설치
@@ -284,8 +280,6 @@ flutter build web --release
 build/web/
 ```
 
----
-
 ## 🚀 Firebase Hosting에 배포
 
 ### 1. Firebase Hosting 초기 설정 (최초 1회)
@@ -317,8 +311,6 @@ firebase deploy --only hosting
 
 Android 앱은 APK 파일을 직접 전달하여 테스트할 수 있습니다.
 
----
-
 ## 📱 Android APK 빌드
 
 ### ▶️ APK 빌드 (테스트 용도로 가장 많이 사용)
@@ -332,6 +324,111 @@ flutter build apk --release
 ```
 build/app/outputs/flutter-apk/app-release.apk
 ```
+---
+
+# ⚡ Firebase Cloud Functions 배포 가이드
+
+## 📁 Cloud Functions 디렉토리 구조
+
+```
+functions/
+ ├─ __mocks__/                # 테스트용 mock
+ ├─ src/                      # API + API 테스트 코드
+ │   ├─ index.ts
+ │   └─ (기타 기능별 파일들)
+ ├─ test/                     # API 테스트 코드
+ ├─ .exlintrc.js
+ ├─ jestconfig.js
+ ├─ package.json
+ ├─ firebase.json
+ ├─ tsconfig.test.json
+ └─ tsconfig.json
+```
+
+## ⚡ Cloud Functions 배포 가이드
+
+Firebase Cloud Functions는 프로젝트의 서버 로직을 담당합니다.
+다음 절차를 통해 로컬 테스트 및 배포가 가능합니다.
+
+1. 배포 전 테스트
+
+Jest + Supertest 기반 자동 테스트
+
+### 📦 테스트 패키지 설치
+```bash
+cd functions
+npm install --save-dev jest supertest ts-jest @types/jest @types/supertest
+npx ts-jest config:init
+```
+
+### 📝 테스트 코드 예시
+```
+import express from 'express';
+import request from 'supertest';
+
+...
+
+describe('GET /daily/read/:userId/:dateKey', () => {
+  it('✅ 문서가 없으면 빈 목록 + submitted:false, lastSubmit:""', async () => {
+    authMocks.verifyIdToken.mockResolvedValue({ uid: 'u1' });
+
+    const res = await request(app)
+      .get('/daily/read/u1/2025-10-20')
+      .set('Authorization', 'Bearer token');
+
+    expect(authMocks.verifyIdToken).toHaveBeenCalled();
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      success: true,
+      message: 'daily read complete',
+      tasks: [],
+      submitted: false,
+      lastSubmit: '',
+    });
+  });
+});
+```
+ 
+
+### ▶ 테스트 실행
+```bash
+npm test
+```
+
+### ✔ 테스트 결과 예시
+```yaml
+ PASS  tests/<테스트파일>.test.t
+ √ ✅ 문서가 없으면 빈 목록 + submitted:false, lastSubmit:""
+
+Test Suites: 1 passed, 1 total
+Tests:       1 passed, 1 total
+```
+
+---
+
+2. 배포
+
+### 전체 배포:
+
+```bash
+firebase deploy --only functions
+```
+
+### 특정 함수만 배포:
+
+```sh
+firebase deploy --only functions:<함수이름>
+```
+
+---
+
+3. 🔍 배포 후 확인
+
+```sh
+firebase functions:log
+```
+
+또는 Firebase 콘솔 → Functions 메뉴에서 로그 및 상태 확인 가능.
 
 ---
 
